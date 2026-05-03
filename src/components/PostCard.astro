@@ -20,7 +20,7 @@ const metric = pseudoMetric(post.title);
 
 <article class="group h-full overflow-hidden rounded-[1.5rem] border border-slate-800 bg-slate-900/40 transition duration-300 ease-out hover:-translate-y-1 hover:border-cyan-500/50 hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)] backdrop-blur-md">
 	<a
-		href={post.link}
+		href={`/${post.slug}/`}
 		class="flex h-full flex-col focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-400"
 	>
 		{

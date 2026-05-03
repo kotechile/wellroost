@@ -18,7 +18,8 @@ interface WordPressPostResponse {
 	link?: string;
 	date?: string;
 	title?: WordPressRenderedField;
-	excerpt?: WordPressRenderedField;
+	content?: WordPressRenderedField;
+	slug?: string;
 	_embedded?: {
 		'wp:featuredmedia'?: WordPressMedia[];
 		'wp:term'?: WordPressTerm[][];
@@ -29,6 +30,8 @@ export interface WordPressPost {
 	id: number;
 	title: string;
 	excerpt: string;
+	content: string;
+	slug: string;
 	link: string;
 	date: string | null;
 	featuredImage: string | null;
@@ -87,6 +90,8 @@ function normalizePost(post: WordPressPostResponse): WordPressPost {
 		id: post.id,
 		title: stripHtml(post.title?.rendered) || 'Untitled post',
 		excerpt: stripHtml(post.excerpt?.rendered),
+		content: post.content?.rendered || '',
+		slug: post.slug || '',
 		link: post.link ?? '#',
 		date: post.date ?? null,
 		featuredImage,
@@ -157,6 +162,26 @@ export async function searchPosts(query: string, limit = 8) {
 	const posts = await fetchWordPress('posts', {
 		_embed: 1,
 		search: trimmedQuery,
+		per_page: limit
+	});
+	return posts.map(normalizePost);
+}
+export async function fetchPostBySlug(slug: string) {
+	const posts = await fetchWordPress('posts', {
+		_embed: 1,
+		slug: slug
+	});
+	
+	if (posts.length === 0) {
+		return null;
+	}
+	
+	return normalizePost(posts[0]);
+}
+
+export async function fetchAllPosts(limit = 100) {
+	const posts = await fetchWordPress('posts', {
+		_embed: 1,
 		per_page: limit
 	});
 	return posts.map(normalizePost);

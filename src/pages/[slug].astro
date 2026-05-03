@@ -1,0 +1,134 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { fetchAllPosts, fetchPostBySlug } from '../lib/wordpress';
+
+export async function getStaticPaths() {
+  const posts = await fetchAllPosts(100);
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { slug } = Astro.params;
+const { post } = Astro.props;
+
+if (!post) {
+  return Astro.redirect('/404');
+}
+
+const formattedDate = post.date ? new Date(post.date).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+}) : '';
+---
+
+<BaseLayout title={`${post.title} | Giniloh`}>
+  <div class="max-w-4xl mx-auto px-6 py-20">
+    <!-- Header / Intelligence Metadata -->
+    <div class="mb-12 space-y-4">
+      <div class="flex items-center gap-4 text-xs font-mono tracking-widest text-cyan-400 uppercase">
+        <span class="px-2 py-1 bg-cyan-500/10 border border-cyan-500/20 rounded">Brief_ID: {post.id}</span>
+        {post.categoryLabel && (
+          <span class="px-2 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded text-emerald-400">
+            Sector: {post.categoryLabel}
+          </span>
+        )}
+        <span class="ml-auto opacity-50">Released: {formattedDate}</span>
+      </div>
+      
+      <h1 class="text-4xl md:text-6xl font-bold tracking-tight text-white leading-tight">
+        {post.title}
+      </h1>
+      
+      <div class="flex items-center gap-6 pt-4 border-t border-slate-800/50">
+        <div class="text-slate-400 text-sm">
+          <span class="font-mono text-xs uppercase block text-slate-500">Subject</span>
+          Decision Frameworks
+        </div>
+        <div class="text-slate-400 text-sm">
+          <span class="font-mono text-xs uppercase block text-slate-500">Security</span>
+          Public Intelligence
+        </div>
+      </div>
+    </div>
+
+    <!-- Featured Image -->
+    {post.featuredImage && (
+      <div class="relative group mb-16">
+        <div class="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-emerald-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+        <div class="relative aspect-[21/9] rounded-2xl overflow-hidden border border-white/10">
+          <img 
+            src={post.featuredImage} 
+            alt={post.featuredImageAlt}
+            class="w-full h-full object-cover"
+          />
+        </div>
+      </div>
+    )}
+
+    <!-- Content Area -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+      <!-- Article Content -->
+      <article class="lg:col-span-8 prose prose-invert prose-slate max-w-none 
+        prose-headings:text-white prose-headings:font-bold prose-headings:tracking-tight
+        prose-a:text-cyan-400 prose-a:no-underline hover:prose-a:underline
+        prose-strong:text-white prose-code:text-emerald-400 prose-code:font-mono
+        prose-img:rounded-2xl prose-img:border prose-img:border-white/10">
+        
+        <div class="font-mono text-sm mb-8 p-6 rounded-xl bg-slate-900/40 border border-slate-800/50 backdrop-blur-sm text-slate-300 leading-relaxed italic">
+          <span class="text-cyan-400 font-bold block mb-2">Executive Summary:</span>
+          {post.excerpt}
+        </div>
+
+        <div set:html={post.content} />
+      </article>
+
+      <!-- Sidebar / Technical Metrics -->
+      <aside class="lg:col-span-4 space-y-8">
+        <div class="p-6 rounded-2xl bg-slate-900/40 border border-white/10 backdrop-blur-md sticky top-24">
+          <h3 class="font-mono text-xs uppercase tracking-widest text-slate-500 mb-6">Decision_Metrics</h3>
+          
+          <div class="space-y-6">
+            <div>
+              <div class="flex justify-between text-xs font-mono text-slate-400 mb-2">
+                <span>EST_ROI</span>
+                <span class="text-emerald-400">High</span>
+              </div>
+              <div class="h-1 bg-slate-800 rounded-full overflow-hidden">
+                <div class="h-full bg-emerald-500 w-[85%]"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs font-mono text-slate-400 mb-2">
+                <span>IMPLEMENTATION_EFFORT</span>
+                <span class="text-cyan-400">Medium</span>
+              </div>
+              <div class="h-1 bg-slate-800 rounded-full overflow-hidden">
+                <div class="h-full bg-cyan-500 w-[45%]"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs font-mono text-slate-400 mb-2">
+                <span>STRATEGIC_VALUE</span>
+                <span class="text-violet-400">Max</span>
+              </div>
+              <div class="h-1 bg-slate-800 rounded-full overflow-hidden">
+                <div class="h-full bg-violet-500 w-[95%]"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-8 pt-6 border-t border-slate-800/50">
+            <button class="w-full py-3 px-4 rounded-xl bg-white text-slate-950 font-bold text-sm hover:bg-cyan-400 transition-colors">
+              Deploy Framework
+            </button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</BaseLayout>
