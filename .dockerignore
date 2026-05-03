@@ -1,0 +1,12 @@
+node_modules
+dist
+.astro
+.env
+.env.local
+.DS_Store
+.git
+.gitignore
+npm-debug.log
+README.md
+Dockerfile
+.dockerignore
