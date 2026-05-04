@@ -26,6 +26,7 @@ const siblingCategories = category.children;
 	title={`${category.name} | Gini Loh`}
 	description={category.description || `Explore posts in ${category.name} on Gini Loh.`}
 >
+	<link slot="head" rel="canonical" href={new URL(`/categories/${category.slug}/`, Astro.site).toString()} />
 	<section class="pt-32">
 		<p class="section-eyebrow">Category Detail</p>
 		<h1 class="mt-4 max-w-4xl text-5xl font-bold tracking-tight text-white sm:text-6xl">

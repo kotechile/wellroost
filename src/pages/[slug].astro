@@ -28,7 +28,7 @@ const formattedDate = post.date ? new Date(post.date).toLocaleDateString('en-US'
   description={post.excerpt}
 >
   <!-- SEO & Social Meta Tags -->
-  <link slot="head" rel="canonical" href={`https://giniloh.com/${post.slug}/`} />
+  <link slot="head" rel="canonical" href={new URL(`/${post.slug}/`, Astro.site).toString()} />
   <meta slot="head" property="og:title" content={post.title} />
   <meta slot="head" property="og:description" content={post.excerpt} />
   {post.featuredImage && <meta slot="head" property="og:image" content={post.featuredImage} />}

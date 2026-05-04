@@ -9,6 +9,7 @@ const topCategories = await getTopLevelCategories();
 	title="Categories | Gini Loh"
 	description="Explore Gini Loh's category architecture, sourced directly from WordPress."
 >
+	<link slot="head" rel="canonical" href={new URL('/categories/', Astro.site).toString()} />
 	<section class="pt-32">
 		<p class="section-eyebrow">Category Index</p>
 		<h1 class="mt-4 max-w-4xl text-5xl font-bold tracking-tight text-white sm:text-6xl">
