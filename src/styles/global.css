@@ -409,6 +409,45 @@ a {
   margin-bottom: 0 !important;
 }
 
+/* WordPress injected takeaway summary block */
+.prose .geo-key-takeaways,
+.prose [data-geo-injected="key-takeaways"] {
+  background: #eff1f4 !important;
+  color: #202938 !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 16px !important;
+  padding: 20px 24px !important;
+  margin: 0 0 24px 0 !important;
+  box-shadow: none !important;
+}
+
+.prose .geo-key-takeaways h2,
+.prose [data-geo-injected="key-takeaways"] h2 {
+  margin: 0 0 12px 0 !important;
+  padding-left: 0 !important;
+  border-left: 0 !important;
+  color: #111827 !important;
+  font-size: 1.5rem !important;
+  line-height: 1.3 !important;
+  font-weight: 700 !important;
+  letter-spacing: normal !important;
+}
+
+.prose .geo-key-takeaways ul,
+.prose [data-geo-injected="key-takeaways"] ul {
+  margin: 0 !important;
+  padding-left: 1.5rem !important;
+  color: #1f2937 !important;
+}
+
+.prose .geo-key-takeaways li,
+.prose [data-geo-injected="key-takeaways"] li,
+.prose .geo-key-takeaways p,
+.prose [data-geo-injected="key-takeaways"] p {
+  color: #1f2937 !important;
+  line-height: 1.7 !important;
+}
+
 .prose img {
   margin-top: 4rem !important;
   margin-bottom: 4rem !important;
@@ -423,5 +462,4 @@ a {
   border-radius: 0 1rem 1rem 0 !important;
   color: #f1f5f9 !important;
 }
-
 
