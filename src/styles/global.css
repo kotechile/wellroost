@@ -275,6 +275,9 @@ a {
 /* We target blocks that have a white/light background from WordPress */
 .prose .wp-block-group,
 .prose .wp-block-columns,
+.prose .wp-block-group.has-background,
+.prose .wp-block-columns.has-background,
+.prose [class*="has-"][class*="-background-color"],
 .prose div[style*="background-color"] {
   height: auto !important;
   min-height: 0 !important;
@@ -286,17 +289,124 @@ a {
 /* Force high contrast for the light takeaway box */
 .prose div[style*="background-color: #ffffff"],
 .prose div[style*="background-color:#ffffff"],
-.prose .has-white-background-color {
-  background-color: #edf1f8 !important; /* Your requested light color */
-  color: #0f172a !important; /* Deep slate text for readability */
+.prose .has-white-background-color,
+.prose .has-light-gray-background-color,
+.prose .has-very-light-gray-background-color,
+.prose .wp-block-group.has-background,
+.prose .wp-block-columns.has-background {
+  background: #eff1f4 !important;
+  color: #202938 !important;
+  border: 1px solid rgba(17, 24, 39, 0.09) !important;
+  border-radius: 1.75rem !important;
+  box-shadow: none !important;
 }
 
+.prose .has-white-background-color h1,
+.prose .has-white-background-color h2,
+.prose .has-white-background-color h3,
+.prose .has-light-gray-background-color h1,
+.prose .has-light-gray-background-color h2,
+.prose .has-light-gray-background-color h3,
+.prose .has-very-light-gray-background-color h1,
+.prose .has-very-light-gray-background-color h2,
+.prose .has-very-light-gray-background-color h3,
 .prose div[style*="background-color"] h1,
 .prose div[style*="background-color"] h2,
 .prose div[style*="background-color"] h3,
 .prose div[style*="background-color"] p,
-.prose div[style*="background-color"] strong {
-  color: #0f172a !important; /* Ensure all text inside light boxes is dark */
+.prose div[style*="background-color"] strong,
+.prose .has-white-background-color li,
+.prose .has-white-background-color strong,
+.prose .has-white-background-color a,
+.prose .has-light-gray-background-color li,
+.prose .has-light-gray-background-color strong,
+.prose .has-light-gray-background-color a,
+.prose .has-very-light-gray-background-color li,
+.prose .has-very-light-gray-background-color strong,
+.prose .has-very-light-gray-background-color a,
+.prose .wp-block-group.has-background h1,
+.prose .wp-block-group.has-background h2,
+.prose .wp-block-group.has-background h3,
+.prose .wp-block-group.has-background p,
+.prose .wp-block-group.has-background li,
+.prose .wp-block-group.has-background strong,
+.prose .wp-block-columns.has-background h1,
+.prose .wp-block-columns.has-background h2,
+.prose .wp-block-columns.has-background h3,
+.prose .wp-block-columns.has-background p,
+.prose .wp-block-columns.has-background li,
+.prose .wp-block-columns.has-background strong {
+  color: #1f2937 !important;
+}
+
+.prose .has-white-background-color h2,
+.prose .has-light-gray-background-color h2,
+.prose .has-very-light-gray-background-color h2,
+.prose .wp-block-group.has-background h2,
+.prose .wp-block-columns.has-background h2,
+.prose div[style*="background-color"] h2 {
+  margin-top: 0 !important;
+  margin-bottom: 1.75rem !important;
+  padding-left: 0 !important;
+  border-left: 0 !important;
+  font-size: clamp(2rem, 3.5vw, 2.85rem) !important;
+  line-height: 1.08 !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.04em !important;
+  color: #101828 !important;
+}
+
+.prose .has-white-background-color ul,
+.prose .has-light-gray-background-color ul,
+.prose .has-very-light-gray-background-color ul,
+.prose .wp-block-group.has-background ul,
+.prose .wp-block-columns.has-background ul,
+.prose div[style*="background-color"] ul {
+  color: #202938 !important;
+  padding-left: 1.5rem !important;
+}
+
+.prose .has-white-background-color p,
+.prose .has-light-gray-background-color p,
+.prose .has-very-light-gray-background-color p,
+.prose .wp-block-group.has-background p,
+.prose .wp-block-columns.has-background p,
+.prose div[style*="background-color"] p,
+.prose .has-white-background-color li,
+.prose .has-light-gray-background-color li,
+.prose .has-very-light-gray-background-color li,
+.prose .wp-block-group.has-background li,
+.prose .wp-block-columns.has-background li,
+.prose div[style*="background-color"] li {
+  font-size: 1.05rem !important;
+  line-height: 1.8 !important;
+}
+
+.prose .has-white-background-color li + li,
+.prose .has-light-gray-background-color li + li,
+.prose .has-very-light-gray-background-color li + li,
+.prose .wp-block-group.has-background li + li,
+.prose .wp-block-columns.has-background li + li,
+.prose div[style*="background-color"] li + li {
+  margin-top: 1rem !important;
+}
+
+.prose .has-white-background-color > :first-child,
+.prose .has-light-gray-background-color > :first-child,
+.prose .has-very-light-gray-background-color > :first-child,
+.prose .wp-block-group.has-background > :first-child,
+.prose .wp-block-columns.has-background > :first-child,
+.prose div[style*="background-color"] > :first-child {
+  margin-top: 0 !important;
+}
+
+.prose .has-white-background-color > :last-child,
+.prose .has-light-gray-background-color > :last-child,
+.prose .has-very-light-gray-background-color > :last-child,
+.prose .wp-block-group.has-background > :last-child,
+.prose .wp-block-columns.has-background > :last-child,
+.prose div[style*="background-color"] > :last-child {
+  margin-bottom: 0 !important;
 }
 
 .prose img {
@@ -313,7 +423,5 @@ a {
   border-radius: 0 1rem 1rem 0 !important;
   color: #f1f5f9 !important;
 }
-
-
 
 
