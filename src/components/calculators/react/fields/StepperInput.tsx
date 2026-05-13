@@ -2,6 +2,7 @@ interface StepperInputProps {
 	id: string;
 	label: string;
 	value: number;
+	eyebrow?: string;
 	min?: number;
 	max?: number;
 	step?: number;
@@ -26,6 +27,7 @@ export function StepperInput({
 	id,
 	label,
 	value,
+	eyebrow,
 	min = 0,
 	max,
 	step = 1,
@@ -36,11 +38,21 @@ export function StepperInput({
 	const updateValue = (nextValue: number) => onChange(clampValue(nextValue, min, max));
 
 	return (
-		<label className="grid gap-3" htmlFor={id}>
+		<label
+			className="grid gap-3 rounded-[1.5rem] border border-slate-800/80 bg-slate-950/45 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] transition hover:border-slate-700/90"
+			htmlFor={id}
+		>
 			<div className="flex items-center justify-between gap-4">
-				<span className="text-sm font-semibold tracking-wide text-slate-100">{label}</span>
+				<div>
+					{eyebrow ? (
+						<p className="font-mono text-[0.64rem] uppercase tracking-[0.24em] text-slate-500">
+							{eyebrow}
+						</p>
+					) : null}
+					<span className="mt-1 block text-sm font-semibold tracking-wide text-slate-100">{label}</span>
+				</div>
 				{suffix ? (
-					<span className="font-mono text-xs uppercase tracking-[0.22em] text-cyan-300/70">
+					<span className="rounded-full border border-cyan-500/15 bg-cyan-500/10 px-3 py-1 font-mono text-[0.64rem] uppercase tracking-[0.22em] text-cyan-200/80">
 						{suffix}
 					</span>
 				) : null}

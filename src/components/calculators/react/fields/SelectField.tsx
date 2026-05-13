@@ -3,6 +3,7 @@ import type { LeasePenaltyMethod } from '../../../../lib/calculators/types';
 interface SelectFieldProps {
 	id: string;
 	label: string;
+	eyebrow?: string;
 	value: LeasePenaltyMethod;
 	helpText: string;
 	onChange: (value: LeasePenaltyMethod) => void;
@@ -14,12 +15,22 @@ const OPTIONS: Array<{ value: LeasePenaltyMethod; label: string }> = [
 	{ value: 'months', label: 'Months of rent' }
 ];
 
-export function SelectField({ id, label, value, helpText, onChange }: SelectFieldProps) {
+export function SelectField({ id, label, eyebrow, value, helpText, onChange }: SelectFieldProps) {
 	return (
-		<label className="grid gap-3" htmlFor={id}>
+		<label
+			className="grid gap-3 rounded-[1.5rem] border border-slate-800/80 bg-slate-950/45 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] transition hover:border-slate-700/90"
+			htmlFor={id}
+		>
 			<div className="flex items-center justify-between gap-4">
-				<span className="text-sm font-semibold tracking-wide text-slate-100">{label}</span>
-				<span className="font-mono text-xs uppercase tracking-[0.22em] text-cyan-300/70">
+				<div>
+					{eyebrow ? (
+						<p className="font-mono text-[0.64rem] uppercase tracking-[0.24em] text-slate-500">
+							{eyebrow}
+						</p>
+					) : null}
+					<span className="mt-1 block text-sm font-semibold tracking-wide text-slate-100">{label}</span>
+				</div>
+				<span className="rounded-full border border-cyan-500/15 bg-cyan-500/10 px-3 py-1 font-mono text-[0.64rem] uppercase tracking-[0.22em] text-cyan-200/80">
 					Contract type
 				</span>
 			</div>
