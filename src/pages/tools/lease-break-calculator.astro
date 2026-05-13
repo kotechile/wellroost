@@ -1,0 +1,81 @@
+---
+import CalculatorShell from '../../components/calculators/CalculatorShell.astro';
+import LeaseBreakCalculator from '../../components/calculators/react/LeaseBreakCalculator';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const faqItems = [
+	{
+		question: 'What does this estimate include?',
+		answer:
+			'The model compares fixed-fee, percentage, and months-of-rent penalty paths, takes the highest value, adds extra costs, and subtracts the security deposit offset.'
+	},
+	{
+		question: 'Why compare all three fee structures?',
+		answer:
+			'Some leases are written ambiguously or mix several penalty concepts. Comparing all three paths gives you a conservative estimate instead of assuming the lowest outcome.'
+	},
+	{
+		question: 'Does this replace legal advice?',
+		answer:
+			'No. This is a planning tool for rough financial exposure. Local laws, mitigation duties, and lease-specific clauses can still change the real amount owed.'
+	}
+];
+---
+
+<BaseLayout
+	title="Lease Break Calculator | Gini Loh"
+	description="Estimate the financial impact of breaking a lease early with a real-time calculator built for modern renters."
+>
+	<link
+		slot="head"
+		rel="canonical"
+		href={new URL('/tools/lease-break-calculator/', Astro.site).toString()}
+	/>
+
+	<CalculatorShell
+		eyebrow="Housing decisions"
+		title="Lease Break Calculator"
+		description="Estimate the cost of terminating a lease early using the three most common fee structures, then adjust for cleaning, repairs, and the security deposit offset."
+	>
+		<div slot="calculator">
+			<LeaseBreakCalculator client:load />
+		</div>
+
+		<div slot="aside" class="grid gap-6">
+			<article class="panel-soft rounded-[1.8rem] border border-slate-800/90 bg-slate-900/45 p-6 shadow-2xl backdrop-blur-md">
+				<p class="font-mono text-xs uppercase tracking-[0.28em] text-emerald-300/80">How it works</p>
+				<ol class="mt-5 grid gap-4 text-sm leading-7 text-slate-300">
+					<li>1. Enter your monthly rent and the number of months left on the lease.</li>
+					<li>2. Fill in the flat fee, percentage fee, and months-of-rent fields from your contract.</li>
+					<li>3. Add any repair or cleaning charges you expect, then subtract the security deposit amount.</li>
+					<li>4. Review the net estimate and compare the three penalty paths before you negotiate.</li>
+				</ol>
+			</article>
+
+			<article class="rounded-[1.8rem] border border-cyan-500/20 bg-[linear-gradient(180deg,rgba(8,47,73,0.9),rgba(2,6,23,0.96))] p-6 shadow-[0_0_40px_rgba(34,211,238,0.12)]">
+				<p class="font-mono text-xs uppercase tracking-[0.28em] text-cyan-200/80">Formula</p>
+				<div class="mt-4 rounded-[1.3rem] border border-slate-800/90 bg-slate-950/60 p-5 font-mono text-sm leading-7 text-slate-200">
+					<p>Net penalty = max(fixed fee, percentage path, months-rent path)</p>
+					<p class="mt-2">+ additional costs</p>
+					<p>− security deposit</p>
+				</div>
+				<p class="mt-4 text-sm leading-7 text-slate-300">
+					The tool intentionally uses the highest penalty path so the result is conservative rather
+					than overly optimistic.
+				</p>
+			</article>
+
+			<article class="panel-soft rounded-[1.8rem] border border-slate-800/90 bg-slate-900/45 p-6 shadow-2xl backdrop-blur-md">
+				<p class="font-mono text-xs uppercase tracking-[0.28em] text-cyan-300/70">FAQ</p>
+				<div class="mt-5 grid gap-4">
+					{faqItems.map((item) => (
+						<div class="rounded-[1.2rem] border border-slate-800/80 bg-slate-950/55 p-4">
+							<h2 class="text-base font-semibold text-white">{item.question}</h2>
+							<p class="mt-2 text-sm leading-7 text-slate-400">{item.answer}</p>
+						</div>
+					))}
+				</div>
+			</article>
+		</div>
+	</CalculatorShell>
+</BaseLayout>

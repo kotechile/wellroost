@@ -1,9 +1,9 @@
 ---
 const navLinks = [
-	{ href: '/categories', label: 'Frameworks' },
-	{ href: '#intelligence', label: 'Intelligence' },
-	{ href: '#tools', label: 'Tools' },
-	{ href: 'https://wellroost.com', label: 'WellRoost' }
+	{ href: '/', label: 'Home' },
+	{ href: '/categories', label: 'Categories' },
+	{ href: '/tools', label: 'Tools' },
+	{ href: '/about', label: 'About' }
 ];
 
 const pathname = Astro.url.pathname;
@@ -28,7 +28,10 @@ const pathname = Astro.url.pathname;
 			<nav class="hidden items-center gap-2 md:flex" aria-label="Primary navigation">
 				{
 					navLinks.map((link) => {
-						const isActive = pathname === link.href || (pathname.startsWith('/categories') && link.label === 'Frameworks');
+						const isActive =
+							pathname === link.href ||
+							(link.href !== '/' && pathname.startsWith(`${link.href}/`)) ||
+							(link.href === '/categories' && pathname.startsWith('/categories'));
 						return (
 							<a
 								href={link.href}
@@ -83,7 +86,10 @@ const pathname = Astro.url.pathname;
 						<nav class="grid gap-1" aria-label="Mobile navigation">
 							{
 								navLinks.map((link) => {
-									const isActive = pathname === link.href || (pathname.startsWith('/categories') && link.label === 'Frameworks');
+									const isActive =
+										pathname === link.href ||
+										(link.href !== '/' && pathname.startsWith(`${link.href}/`)) ||
+										(link.href === '/categories' && pathname.startsWith('/categories'));
 									return (
 										<a
 											href={link.href}
