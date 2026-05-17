@@ -35,7 +35,7 @@ const posts = category.wordpressCategoryId ? await fetchPostsByCategory(category
 			> {category.description || 'This category is ready to display live WordPress posts once the REST API returns content.'}
 		</p>
 		<div class="mt-8 flex flex-wrap gap-3">
-			<a href="/categories" class="btn-secondary">Back to categories</a>
+			<a href="/categories/" class="btn-secondary">Back to categories</a>
 			{
 				category.wordpressCategoryId ? (
 					<span class="rounded-full border border-slate-800 bg-slate-900/50 px-4 py-2 text-xs font-mono text-slate-500">

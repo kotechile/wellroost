@@ -35,16 +35,16 @@ const topCategories = await getTopLevelCategories();
 				<p class="font-mono text-xs uppercase tracking-widest text-slate-500">System Map</p>
 				<div class="mt-4 grid gap-3 text-sm font-mono text-slate-400">
 					<a href="/" class="transition hover:text-cyan-400">Home / Dashboard</a>
-					<a href="/categories" class="transition hover:text-cyan-400">Active Frameworks</a>
-					<a href="/tools" class="transition hover:text-cyan-400">Decision Tools</a>
-					<a href="/about" class="transition hover:text-cyan-400">System Thesis</a>
+					<a href="/categories/" class="transition hover:text-cyan-400">Active Frameworks</a>
+					<a href="/tools/" class="transition hover:text-cyan-400">Decision Tools</a>
+					<a href="/about/" class="transition hover:text-cyan-400">System Thesis</a>
 				</div>
 			</div>
 			<div>
 				<p class="font-mono text-xs uppercase tracking-widest text-slate-500">Active Modules</p>
 				<div class="mt-4 grid gap-3 text-sm font-mono text-slate-400">
-					{topCategories.slice(0, 3).map((category) => <a href={`/categories/${category.slug}`} class="transition hover:text-cyan-400">{category.name}</a>)}
-					<a href="/tools" class="transition hover:text-cyan-400">Tools Hub</a>
+					{topCategories.slice(0, 3).map((category) => <a href={`/categories/${category.slug}/`} class="transition hover:text-cyan-400">{category.name}</a>)}
+					<a href="/tools/" class="transition hover:text-cyan-400">Tools Hub</a>
 				</div>
 			</div>
 		</div>

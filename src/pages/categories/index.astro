@@ -28,7 +28,7 @@ const topCategories = await getTopLevelCategories();
 						<div class="max-w-3xl">
 							<p class="section-eyebrow text-cyan-400">Top-Level Pillar</p>
 							<h2 class="mt-3 text-3xl font-bold tracking-tight text-white">
-								<a href={`/categories/${category.slug}`} class="transition hover:text-cyan-400">
+								<a href={`/categories/${category.slug}/`} class="transition hover:text-cyan-400">
 									{category.name}
 								</a>
 							</h2>
@@ -36,7 +36,7 @@ const topCategories = await getTopLevelCategories();
 								{category.description || 'A core strategic area in the Gini Loh editorial system.'}
 							</p>
 						</div>
-						<a href={`/categories/${category.slug}`} class="btn-secondary whitespace-nowrap">
+						<a href={`/categories/${category.slug}/`} class="btn-secondary whitespace-nowrap">
 							View category
 						</a>
 					</div>

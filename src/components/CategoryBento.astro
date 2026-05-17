@@ -40,7 +40,7 @@ const featuredCategories = categories.slice(0, 3);
 				Three pillars plus the Tools Hub
 			</h2>
 		</div>
-		<a href="/categories" class="hidden text-sm font-mono text-cyan-400 transition hover:text-cyan-300 md:inline-flex">
+		<a href="/categories/" class="hidden text-sm font-mono text-cyan-400 transition hover:text-cyan-300 md:inline-flex">
 			[VIEW_PILLARS]
 		</a>
 	</div>
@@ -52,7 +52,7 @@ const featuredCategories = categories.slice(0, 3);
 				
 				return (
 					<a
-						href={`/categories/${category.slug}`}
+						href={`/categories/${category.slug}/`}
 						class="group relative flex min-h-48 flex-col justify-between overflow-hidden rounded-[1.5rem] border border-slate-800 bg-slate-900/40 p-6 transition duration-300 hover:-translate-y-1 hover:border-cyan-500/30 hover:shadow-2xl backdrop-blur-md"
 					>
 						<!-- Technical Background Pattern -->
@@ -85,7 +85,7 @@ const featuredCategories = categories.slice(0, 3);
 			})
 		}
 		<a
-			href="/tools"
+			href="/tools/"
 			class="group relative flex min-h-48 flex-col justify-between overflow-hidden rounded-[1.5rem] border border-cyan-500/20 bg-[linear-gradient(135deg,rgba(14,165,233,0.16),rgba(15,23,42,0.5)_55%,rgba(16,185,129,0.12))] p-6 transition duration-300 hover:-translate-y-1 hover:border-cyan-400/40 hover:shadow-[0_0_40px_rgba(56,189,248,0.18)] backdrop-blur-md"
 		>
 			<div class="absolute inset-0 opacity-[0.04] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PHBhdGggZD0iTTAgMjBoMjBNMjAgMHYyMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4=')]"></div>
