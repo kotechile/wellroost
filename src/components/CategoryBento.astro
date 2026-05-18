@@ -1,11 +1,13 @@
 ---
 import type { CategoryRecord } from '../lib/categories';
+import type { WordPressPost } from '../lib/wordpress';
 
 interface Props {
 	categories: CategoryRecord[];
+	postsByCategory?: Record<string, WordPressPost[]>;
 }
 
-const { categories } = Astro.props;
+const { categories, postsByCategory = {} } = Astro.props;
 const accentPresets = [
 	{
 		icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />',
@@ -30,6 +32,15 @@ const accentPresets = [
 ];
 
 const featuredCategories = categories.slice(0, 3);
+const activeCategory = featuredCategories[0] ?? null;
+
+function truncate(value: string, maxLength = 170) {
+	if (value.length <= maxLength) {
+		return value;
+	}
+
+	return `${value.slice(0, maxLength).trim()}...`;
+}
 ---
 
 <section id="pillars" class="mt-24 scroll-mt-32">
@@ -46,10 +57,18 @@ const featuredCategories = categories.slice(0, 3);
 		{
 			featuredCategories.map((category, index) => {
 				const preset = accentPresets[index % accentPresets.length];
+				const isActive = activeCategory?.slug === category.slug;
+				const postCount = postsByCategory[category.slug]?.length ?? category.postCount ?? 0;
 				
 				return (
-					<article
-						class="group relative flex min-h-48 flex-col justify-between overflow-hidden rounded-[1.5rem] border border-slate-800 bg-slate-900/40 p-6 transition duration-300 hover:-translate-y-1 hover:border-cyan-500/30 hover:shadow-2xl backdrop-blur-md"
+					<button
+						type="button"
+						id={`pillar-trigger-${category.slug}`}
+						aria-pressed={isActive ? 'true' : 'false'}
+						aria-controls={`pillar-posts-${category.slug}`}
+						data-pillar-trigger={category.slug}
+						data-active={isActive ? 'true' : 'false'}
+						class="group relative flex min-h-48 cursor-pointer flex-col justify-between overflow-hidden rounded-[1.5rem] border border-slate-800 bg-slate-900/40 p-6 text-left transition duration-300 hover:-translate-y-1 hover:border-cyan-500/30 hover:shadow-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-400 data-[active=true]:border-cyan-400/50 data-[active=true]:shadow-[0_0_42px_rgba(56,189,248,0.16)] backdrop-blur-md"
 					>
 						<!-- Technical Background Pattern -->
 						<div class="absolute inset-0 opacity-[0.03] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PHBhdGggZD0iTTAgMjBoMjBNMjAgMHYyMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4=')]"></div>
@@ -59,7 +78,7 @@ const featuredCategories = categories.slice(0, 3);
 								<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" set:html={preset.icon} />
 							</div>
 							<p class="font-mono text-[0.65rem] uppercase tracking-widest text-slate-500">
-								SYS.{category.children.length}
+								POSTS.{postCount}
 							</p>
 						</div>
 						
@@ -74,9 +93,9 @@ const featuredCategories = categories.slice(0, 3);
 						
 						<div class="relative z-10 mt-6 flex items-center gap-2 text-xs font-mono text-slate-500">
 							<span class="inline-flex h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
-							{category.postCount ?? 0} Linked Posts
+							{postCount} Linked Posts
 						</div>
-					</article>
+					</button>
 				);
 			})
 		}
@@ -110,4 +129,105 @@ const featuredCategories = categories.slice(0, 3);
 			</div>
 		</a>
 	</div>
+
+	<div id="pillar-results" class="mt-8 rounded-[1.7rem] border border-slate-800 bg-slate-900/45 p-5 shadow-2xl backdrop-blur-md sm:p-6">
+		{
+			featuredCategories.map((category) => {
+				const posts = postsByCategory[category.slug] ?? [];
+				const isActive = activeCategory?.slug === category.slug;
+
+				return (
+					<section
+						id={`pillar-posts-${category.slug}`}
+						aria-labelledby={`pillar-trigger-${category.slug}`}
+						data-pillar-panel={category.slug}
+						hidden={!isActive}
+					>
+						<div class="flex flex-col gap-3 border-b border-slate-800 pb-5 sm:flex-row sm:items-end sm:justify-between">
+							<div>
+								<p class="section-eyebrow text-cyan-400">Filtered Articles</p>
+								<h3 class="mt-2 text-2xl font-bold tracking-tight text-white">
+									{category.name}
+								</h3>
+							</div>
+							<p class="font-mono text-xs uppercase tracking-widest text-slate-500">
+								{posts.length} article{posts.length === 1 ? '' : 's'}
+							</p>
+						</div>
+
+						{posts.length ? (
+							<div class="mt-5 grid gap-4 lg:grid-cols-3">
+								{posts.map((post) => (
+									<a
+										href={`/${post.slug}/`}
+										class="group overflow-hidden rounded-[1.3rem] border border-slate-800 bg-slate-950/45 transition hover:-translate-y-1 hover:border-cyan-500/35 hover:shadow-[0_18px_40px_rgba(0,0,0,0.35)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-400"
+									>
+										{post.featuredImage ? (
+											<div class="aspect-video overflow-hidden border-b border-slate-800">
+												<img
+													src={post.featuredImage}
+													alt={post.featuredImageAlt || ''}
+													loading="lazy"
+													class="h-full w-full object-cover opacity-70 transition duration-500 group-hover:scale-105 group-hover:opacity-100"
+												/>
+											</div>
+										) : null}
+										<div class="p-5">
+											<div class="flex items-center justify-between gap-3 font-mono text-[0.65rem] uppercase tracking-widest text-slate-500">
+												<span class="text-cyan-400">{post.categoryLabel ?? category.name}</span>
+												<span>{post.date ? new Date(post.date).toLocaleDateString() : 'Live'}</span>
+											</div>
+											<h4 class="mt-3 text-lg font-bold leading-tight text-white transition group-hover:text-cyan-100">
+												{post.title}
+											</h4>
+											<p class="mt-3 text-sm leading-6 text-slate-400 font-mono">
+												&gt; {post.excerpt ? truncate(post.excerpt) : 'Open the article for the full decision brief.'}
+											</p>
+										</div>
+									</a>
+								))}
+							</div>
+						) : (
+							<p class="mt-5 rounded-[1.2rem] border border-slate-800 bg-slate-950/50 p-5 text-sm leading-7 text-slate-400 font-mono">
+								&gt; No articles are currently published in this pillar.
+							</p>
+						)}
+					</section>
+				);
+			})
+		}
+	</div>
 </section>
+
+<script>
+	const triggers = Array.from(document.querySelectorAll<HTMLElement>('[data-pillar-trigger]'));
+	const panels = Array.from(document.querySelectorAll<HTMLElement>('[data-pillar-panel]'));
+	const results = document.querySelector<HTMLElement>('#pillar-results');
+	const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+	function selectPillar(slug: string) {
+		for (const trigger of triggers) {
+			const isActive = trigger.dataset.pillarTrigger === slug;
+			trigger.dataset.active = isActive ? 'true' : 'false';
+			trigger.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+		}
+
+		for (const panel of panels) {
+			panel.hidden = panel.dataset.pillarPanel !== slug;
+		}
+
+		results?.scrollIntoView({
+			behavior: prefersReducedMotion ? 'auto' : 'smooth',
+			block: 'start'
+		});
+	}
+
+	for (const trigger of triggers) {
+		trigger.addEventListener('click', () => {
+			const slug = trigger.dataset.pillarTrigger;
+			if (slug) {
+				selectPillar(slug);
+			}
+		});
+	}
+</script>
