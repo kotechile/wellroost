@@ -3,26 +3,25 @@ import CalculatorShell from '../../components/calculators/CalculatorShell.astro'
 import RemodelyticsPlatform from '../../components/calculators/react/RemodelyticsPlatform';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
+const acronym = (term: string, description: string) =>
+	`<abbr title="${description}" class="cursor-help underline decoration-dotted underline-offset-4">${term}</abbr>`;
+
 const engineNotes = [
 	{
 		title: 'Localized cost scaling',
-		body:
-			'Applies city cost index and material-tier multipliers before any ROI, ARV, or leverage math runs.'
+		body: `Applies city cost index and material-tier multipliers before any ${acronym('ROI', 'Return on Investment: gain or loss relative to the amount spent.')}, ${acronym('ARV', 'After-Repair Value: the estimated home value after the renovation is completed.')}, or leverage math runs.`
 	},
 	{
 		title: 'Investor and lender lens',
-		body:
-			'Calculates comp ARV, 70% rule ARV, MAO, purchase LTV, refinance LTV, and CLTV from the same scenario.'
+		body: `Calculates comp ${acronym('ARV', 'After-Repair Value: the estimated home value after the renovation is completed.')}, 70% rule ${acronym('ARV', 'After-Repair Value: the estimated home value after the renovation is completed.')}, ${acronym('MAO', 'Maximum Allowable Offer: the highest price an investor should pay before repairs.')}, purchase ${acronym('LTV', 'Loan-to-Value ratio: the loan amount divided by the home value.')}, refinance ${acronym('LTV', 'Loan-to-Value ratio: the loan amount divided by the home value.')}, and ${acronym('CLTV', 'Combined Loan-to-Value: total debt secured by the home divided by the home value.')} from the same scenario.`
 	},
 	{
 		title: 'Energy policy logic',
-		body:
-			'Models HEAR, HOMES, and Section 25C incentive paths using household income, AMI, savings, and caps.'
+		body: `Models ${acronym('HEAR', 'High-Efficiency Electric Home Rebate program under the Inflation Reduction Act.')}, ${acronym('HOMES', 'Home Owner Managing Energy Savings rebate program under the Inflation Reduction Act.')}, and Section 25C incentive paths using household income, ${acronym('AMI', 'Area Median Income: the local midpoint household income used for program eligibility.')}, savings, and caps.`
 	},
 	{
 		title: 'Over-improvement guardrails',
-		body:
-			'Flags NKBA-style spend ratios, DIY concentration, DTI stress, and high combined leverage before a remodel looks artificially attractive.'
+		body: `Flags ${acronym('NKBA', 'National Kitchen and Bath Association: used here as a remodeling budget guardrail reference.')}-style spend ratios, DIY concentration, ${acronym('DTI', 'Debt-to-Income ratio: monthly debt payments divided by monthly income.')} stress, and high combined leverage before a remodel looks artificially attractive.`
 	}
 ];
 ---
@@ -50,7 +49,7 @@ const engineNotes = [
 				</h2>
 				<p class="mt-4 text-sm leading-7 text-slate-300">
 					This release keeps the calculations local and transparent while shaping the interface around
-					the future data broker: RSMeans or XactRemodel costs, AVM feeds, HUD AMI, EIA utility rates,
+					the future data broker: RSMeans or XactRemodel costs, <Fragment set:html={acronym('AVM', 'Automated Valuation Model: a computer-generated property value estimate.')} /> feeds, HUD <Fragment set:html={acronym('AMI', 'Area Median Income: the local midpoint household income used for program eligibility.')} />, EIA utility rates,
 					and DSIRE or state rebate programs.
 				</p>
 				<div class="mt-6 rounded-[1.3rem] border border-white/10 bg-white/5 p-4">
@@ -70,7 +69,7 @@ const engineNotes = [
 					{engineNotes.map((item) => (
 						<div class="rounded-[1.2rem] border border-slate-800/80 bg-slate-950/55 p-4">
 							<h2 class="text-base font-semibold text-white">{item.title}</h2>
-							<p class="mt-2 text-sm leading-7 text-slate-400">{item.body}</p>
+							<p class="mt-2 text-sm leading-7 text-slate-400" set:html={item.body}></p>
 						</div>
 					))}
 				</div>
@@ -79,10 +78,10 @@ const engineNotes = [
 			<article class="panel-soft rounded-[1.8rem] border border-slate-800/90 bg-slate-900/45 p-6 shadow-2xl backdrop-blur-md">
 				<p class="font-mono text-xs uppercase tracking-[0.28em] text-cyan-300/70">Formula stack</p>
 				<div class="mt-4 rounded-[1.3rem] border border-slate-800/90 bg-slate-950/60 p-5 font-mono text-sm leading-7 text-slate-200">
-					<p>Local cost = baseline × local CCI / baseline CCI</p>
-					<p class="mt-2">MAO = ARV × 70% − repair cost</p>
-					<p class="mt-2">CLTV = (mortgage balance + HELOC) / ARV</p>
-					<p class="mt-2">Energy NPV = discounted savings − net project cost</p>
+					<p>Local cost = baseline × local <Fragment set:html={acronym('CCI', 'City Cost Index: a multiplier used to localize national construction costs.')} /> / baseline <Fragment set:html={acronym('CCI', 'City Cost Index: a multiplier used to localize national construction costs.')} /></p>
+					<p class="mt-2"><Fragment set:html={acronym('MAO', 'Maximum Allowable Offer: the highest price an investor should pay before repairs.')} /> = <Fragment set:html={acronym('ARV', 'After-Repair Value: the estimated home value after the renovation is completed.')} /> × 70% − repair cost</p>
+					<p class="mt-2"><Fragment set:html={acronym('CLTV', 'Combined Loan-to-Value: total debt secured by the home divided by the home value.')} /> = (mortgage balance + <Fragment set:html={acronym('HELOC', 'Home Equity Line of Credit: a revolving loan secured by home equity.')} />) / <Fragment set:html={acronym('ARV', 'After-Repair Value: the estimated home value after the renovation is completed.')} /></p>
+					<p class="mt-2">Energy <Fragment set:html={acronym('NPV', 'Net Present Value: the value today of future savings after discounting.')} /> = discounted savings − net project cost</p>
 				</div>
 			</article>
 

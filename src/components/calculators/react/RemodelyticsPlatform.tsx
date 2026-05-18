@@ -1,13 +1,18 @@
-import { useId, useMemo, useState } from 'react';
+import { useId, useMemo, useState, type ReactNode } from 'react';
 
 import { calculateRemodelytics } from '../../../lib/calculators/remodelytics';
 import { formatCurrency } from '../../../lib/calculators/format';
+import { fetchPropertyContext } from '../../../lib/remodelytics/adapters/property';
+import { fetchValuationContext } from '../../../lib/remodelytics/adapters/valuation';
+import { mergeRemodelyticsInputs } from '../../../lib/remodelytics/merge';
+import type { RemodelyticsFetchedContext, RemodelyticsOverrides } from '../../../lib/remodelytics/types';
 import type {
 	RemodelyticsEngine,
 	RemodelyticsInputs,
 	RemodelyticsMaterialTier,
 	RemodelyticsProjectType
 } from '../../../lib/calculators/types';
+import AddressLookupPanel from './AddressLookupPanel';
 
 const INITIAL_INPUTS: RemodelyticsInputs = {
 	engine: 'resale',
@@ -68,6 +73,43 @@ const MATERIAL_OPTIONS: Array<{ value: RemodelyticsMaterialTier; label: string }
 	{ value: 'intricate', label: 'Intricate' }
 ];
 
+const INITIAL_ADDRESS = '1234 palm ave, miami beach, fl 33139';
+
+const ACRONYM_HELP = {
+	AMI: 'Area Median Income: the local midpoint household income used for program eligibility.',
+	ARV: 'After-Repair Value: the estimated home value after the renovation is completed.',
+	AVM: 'Automated Valuation Model: a computer-generated property value estimate.',
+	CCI: 'City Cost Index: a multiplier used to localize national construction costs.',
+	CLTV: 'Combined Loan-to-Value: total debt secured by the home divided by the home value.',
+	DTI: 'Debt-to-Income ratio: monthly debt payments divided by monthly income.',
+	FHA: 'Federal Housing Administration: a government-backed mortgage program.',
+	HEAR: 'High-Efficiency Electric Home Rebate program under the Inflation Reduction Act.',
+	HELOC: 'Home Equity Line of Credit: a revolving loan secured by home equity.',
+	HOMES: 'Home Owner Managing Energy Savings rebate program under the Inflation Reduction Act.',
+	LTV: 'Loan-to-Value ratio: the loan amount divided by the home value.',
+	MAO: 'Maximum Allowable Offer: the highest price an investor should pay before repairs.',
+	NKBA: 'National Kitchen and Bath Association: used here as a remodeling budget guardrail reference.',
+	NPV: 'Net Present Value: the value today of future savings after discounting.',
+	ROI: 'Return on Investment: gain or loss relative to the amount spent.'
+} as const;
+
+interface AcronymProps {
+	term: keyof typeof ACRONYM_HELP;
+	children?: ReactNode;
+}
+
+function Acronym({ term, children }: AcronymProps) {
+	return (
+		<abbr
+			title={ACRONYM_HELP[term]}
+			className="cursor-help decoration-dotted underline-offset-4"
+			style={{ textDecorationLine: 'underline', textDecorationStyle: 'dotted' }}
+		>
+			{children ?? term}
+		</abbr>
+	);
+}
+
 function formatNumber(value: number, suffix = '') {
 	return `${new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 }).format(
 		Number.isFinite(value) ? value : 0
@@ -88,12 +130,12 @@ function getRiskTone(risk: 'Low' | 'Moderate' | 'High') {
 
 interface NumberFieldProps {
 	id: string;
-	label: string;
+	label: ReactNode;
 	value: number;
 	prefix?: string;
 	suffix?: string;
 	step?: number;
-	helpText: string;
+	helpText: ReactNode;
 	onChange: (value: number) => void;
 }
 
@@ -144,9 +186,9 @@ function NumberField({
 }
 
 interface MetricCardProps {
-	label: string;
+	label: ReactNode;
 	value: string;
-	detail: string;
+	detail: ReactNode;
 	tone?: 'cyan' | 'emerald' | 'amber' | 'rose';
 }
 
@@ -170,19 +212,68 @@ function MetricCard({ label, value, detail, tone = 'cyan' }: MetricCardProps) {
 }
 
 export default function RemodelyticsPlatform() {
-	const [inputs, setInputs] = useState(INITIAL_INPUTS);
+	const [address, setAddress] = useState(INITIAL_ADDRESS);
+	const [fetchedContext, setFetchedContext] = useState<RemodelyticsFetchedContext | null>(null);
+	const [overrides, setOverrides] = useState<RemodelyticsOverrides>({});
+	const [lookupStatus, setLookupStatus] = useState<'idle' | 'loading' | 'loaded' | 'error'>('idle');
+	const [lookupMessage, setLookupMessage] = useState<string | null>(null);
 	const [copied, setCopied] = useState(false);
 	const fieldId = useId();
+	const inputs = useMemo(
+		() => mergeRemodelyticsInputs(INITIAL_INPUTS, fetchedContext, overrides),
+		[fetchedContext, overrides]
+	);
 	const breakdown = useMemo(() => calculateRemodelytics(inputs), [inputs]);
 
+	const runPropertyLookup = async (nextAddress = address, nextProjectType = inputs.projectType) => {
+		const normalizedAddress = nextAddress.trim();
+
+		if (!normalizedAddress) {
+			setLookupStatus('error');
+			setLookupMessage('Enter an address before loading property context.');
+			return;
+		}
+
+		setLookupStatus('loading');
+		setLookupMessage('Looking up property facts and valuation context...');
+
+		try {
+			const propertyResult = await fetchPropertyContext({ address: normalizedAddress });
+			const valuationResult = await fetchValuationContext({
+				address: normalizedAddress,
+				projectType: nextProjectType,
+				currentValue: propertyResult.property.currentValue?.value
+			});
+
+			setFetchedContext({
+				property: propertyResult.property,
+				valuation: valuationResult.valuation
+			});
+			setLookupStatus('loaded');
+			setLookupMessage('Property context loaded. You can now review and override the fetched values.');
+		} catch (error) {
+			setLookupStatus('error');
+			setLookupMessage(
+				error instanceof Error
+					? error.message
+					: 'Property lookup failed. You can continue with manual assumptions.'
+			);
+		}
+	};
+
 	const updateInput = <K extends keyof RemodelyticsInputs>(key: K, value: RemodelyticsInputs[K]) => {
-		setInputs((current) => ({ ...current, [key]: value }));
+		setOverrides((current) => ({ ...current, [key]: value }));
+
+		if (key === 'projectType' && fetchedContext?.property?.address?.value) {
+			void runPropertyLookup(fetchedContext.property.address.value, value as RemodelyticsProjectType);
+		}
 	};
 
 	const exportPacket = async () => {
 		const packet = {
 			tool: 'Remodelytics underwriting packet',
 			property: {
+				address: fetchedContext?.property?.address?.value ?? address,
 				zipCode: inputs.zipCode,
 				homeValue: inputs.homeValue,
 				homeSize: inputs.homeSize,
@@ -206,6 +297,15 @@ export default function RemodelyticsPlatform() {
 
 	return (
 		<div className="grid gap-6">
+			<AddressLookupPanel
+				address={address}
+				status={lookupStatus}
+				message={lookupMessage}
+				context={fetchedContext}
+				onAddressChange={setAddress}
+				onLookup={() => void runPropertyLookup()}
+			/>
+
 			<div className="overflow-hidden rounded-[1.8rem] border border-cyan-500/20 bg-[linear-gradient(135deg,rgba(0,11,80,0.76),rgba(2,6,23,0.96)_58%,rgba(29,106,229,0.2))]">
 				<div className="grid gap-6 px-6 py-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)] xl:px-7">
 					<div>
@@ -216,7 +316,7 @@ export default function RemodelyticsPlatform() {
 							Model the remodel like an underwriter, investor, and homeowner at once
 						</h2>
 						<p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300">
-							Segment a renovation across resale lift, energy NPV, income potential, over-improvement
+							Segment a renovation across resale lift, energy <Acronym term="NPV" />, income potential, over-improvement
 							guardrails, and loan leverage. Values are live-calculated from your assumptions and ready
 							for pressure testing.
 						</p>
@@ -262,16 +362,16 @@ export default function RemodelyticsPlatform() {
 							<MetricCard
 								label="Local cost"
 								value={formatCurrency(breakdown.localProjectCost)}
-								detail="CCI-adjusted scope"
+								detail={<><Acronym term="CCI" />-adjusted scope</>}
 							/>
 							<MetricCard
-								label="ARV"
+								label={<Acronym term="ARV" />}
 								value={formatCurrency(Math.max(breakdown.arvProfessional, breakdown.arvSeventyRule))}
 								detail="Comp / 70% blend"
 								tone="emerald"
 							/>
 							<MetricCard
-								label="MAO"
+								label={<Acronym term="MAO" />}
 								value={formatCurrency(breakdown.mao)}
 								detail="Investor ceiling"
 								tone="amber"
@@ -327,7 +427,9 @@ export default function RemodelyticsPlatform() {
 						onChange={(event) => updateInput('zipCode', event.target.value)}
 						className="min-w-0 rounded-[1rem] border border-slate-700/80 bg-slate-950/80 px-4 py-3 text-sm font-semibold text-white outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 sm:text-base"
 					/>
-					<span className="text-xs leading-5 text-slate-500">Placeholder for RSMeans, AVM, AMI, and DSIRE lookups.</span>
+					<span className="text-xs leading-5 text-slate-500">
+						Placeholder for RSMeans, <Acronym term="AVM" />, <Acronym term="AMI" />, and DSIRE lookups.
+					</span>
 				</label>
 				<NumberField
 					id={`${fieldId}-home-value`}
@@ -352,7 +454,7 @@ export default function RemodelyticsPlatform() {
 				/>
 				<NumberField
 					id={`${fieldId}-cci-local`}
-					label="Local CCI"
+					label={<>Local <Acronym term="CCI" /></>}
 					value={inputs.cityCostIndex}
 					step={1}
 					onChange={(value) => updateInput('cityCostIndex', value)}
@@ -360,7 +462,7 @@ export default function RemodelyticsPlatform() {
 				/>
 				<NumberField
 					id={`${fieldId}-comp-average`}
-					label="Comp average ARV"
+					label={<>Comp average <Acronym term="ARV" /></>}
 					prefix="$"
 					step={5000}
 					value={inputs.compAverageValue}
@@ -410,10 +512,10 @@ export default function RemodelyticsPlatform() {
 					<MetricCard
 						label="Resale lift"
 						value={formatCurrency(breakdown.immediateAppreciation)}
-						detail={`${formatNumber(breakdown.pointInTimeRoi, '%')} point-in-time ROI`}
+						detail={<>{formatNumber(breakdown.pointInTimeRoi, '%')} point-in-time <Acronym term="ROI" /></>}
 					/>
 					<MetricCard
-						label="Energy NPV"
+						label={<>Energy <Acronym term="NPV" /></>}
 						value={formatCurrency(breakdown.energyNpv)}
 						detail={`${formatCurrency(breakdown.monthlyUtilitySavingsYearOne)} estimated monthly savings`}
 						tone={breakdown.energyNpv >= 0 ? 'emerald' : 'rose'}
@@ -427,7 +529,7 @@ export default function RemodelyticsPlatform() {
 					<MetricCard
 						label="Leverage"
 						value={`${formatNumber(breakdown.purchaseLtv, '%')} LTV`}
-						detail={`${formatNumber(breakdown.cltv, '%')} CLTV after proposed HELOC`}
+						detail={<><Acronym term="CLTV" /> {formatNumber(breakdown.cltv, '%')} after proposed <Acronym term="HELOC" /></>}
 						tone={breakdown.purchaseLtv > 97 || breakdown.cltv > 90 ? 'rose' : 'emerald'}
 					/>
 				</div>
@@ -464,7 +566,7 @@ export default function RemodelyticsPlatform() {
 						<div className="mt-4 grid gap-3">
 							<div className="rounded-[1.1rem] border border-slate-800 bg-slate-950/70 p-4">
 								<div className="flex items-center justify-between gap-4">
-									<p className="text-sm font-semibold text-white">NKBA budget warning meter</p>
+									<p className="text-sm font-semibold text-white"><Acronym term="NKBA" /> budget warning meter</p>
 									<span className={`rounded-full border px-3 py-1 text-xs ${getRiskTone(breakdown.overImprovementRisk)}`}>
 										{formatNumber(breakdown.nkbaSpendRatio, '%')}
 									</span>
@@ -503,16 +605,16 @@ export default function RemodelyticsPlatform() {
 					step={1000}
 					value={inputs.householdIncome}
 					onChange={(value) => updateInput('householdIncome', value)}
-					helpText="Used for HEAR/HOMES AMI bands."
+					helpText={<>Used for <Acronym term="HEAR" />/<Acronym term="HOMES" /> <Acronym term="AMI" /> bands.</>}
 				/>
 				<NumberField
 					id={`${fieldId}-ami`}
-					label="Local AMI"
+					label={<>Local <Acronym term="AMI" /></>}
 					prefix="$"
 					step={1000}
 					value={inputs.localAmi}
 					onChange={(value) => updateInput('localAmi', value)}
-					helpText="HUD AMI placeholder until API integration."
+					helpText={<>HUD <Acronym term="AMI" /> placeholder until API integration.</>}
 				/>
 				<NumberField
 					id={`${fieldId}-reduction`}
@@ -525,12 +627,12 @@ export default function RemodelyticsPlatform() {
 				/>
 				<NumberField
 					id={`${fieldId}-dti`}
-					label="Debt-to-income"
+					label={<>Debt-to-income (<Acronym term="DTI" />)</>}
 					suffix="%"
 					step={1}
 					value={inputs.dtiPercent}
 					onChange={(value) => updateInput('dtiPercent', value)}
-					helpText="Underwriting stress check."
+					helpText={<>Underwriting stress check using <Acronym term="DTI" />.</>}
 				/>
 			</div>
 
@@ -543,7 +645,7 @@ export default function RemodelyticsPlatform() {
 						<h3 className="mt-2 text-xl font-semibold text-white">As-completed valuation and leverage</h3>
 					</div>
 					<span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 font-mono text-[0.64rem] uppercase tracking-[0.22em] text-slate-400">
-						FHA / HomeStyle / HELOC stress
+						<Acronym term="FHA" /> / HomeStyle / <Acronym term="HELOC" /> stress
 					</span>
 				</div>
 				<div className="grid grid-cols-[repeat(auto-fit,minmax(14rem,1fr))] gap-5">
@@ -554,7 +656,7 @@ export default function RemodelyticsPlatform() {
 						step={5000}
 						value={inputs.currentValue}
 						onChange={(value) => updateInput('currentValue', value)}
-						helpText="Current AVM or appraisal baseline."
+						helpText={<>Current <Acronym term="AVM" /> or appraisal baseline.</>}
 					/>
 					<NumberField
 						id={`${fieldId}-purchase-price`}
@@ -563,7 +665,7 @@ export default function RemodelyticsPlatform() {
 						step={5000}
 						value={inputs.purchasePrice}
 						onChange={(value) => updateInput('purchasePrice', value)}
-						helpText="Purchase basis for lesser-of LTV."
+						helpText={<>Purchase basis for lesser-of <Acronym term="LTV" />.</>}
 					/>
 					<NumberField
 						id={`${fieldId}-loan`}
@@ -572,16 +674,16 @@ export default function RemodelyticsPlatform() {
 						step={5000}
 						value={inputs.mortgageLoanAmount}
 						onChange={(value) => updateInput('mortgageLoanAmount', value)}
-						helpText="Proposed loan amount for LTV tests."
+						helpText={<>Proposed loan amount for <Acronym term="LTV" /> tests.</>}
 					/>
 					<NumberField
 						id={`${fieldId}-heloc`}
-						label="Proposed HELOC"
+						label={<>Proposed <Acronym term="HELOC" /></>}
 						prefix="$"
 						step={1000}
 						value={inputs.proposedHelocAmount}
 						onChange={(value) => updateInput('proposedHelocAmount', value)}
-						helpText="Additional lien amount for CLTV."
+						helpText={<>Additional lien amount for <Acronym term="CLTV" />.</>}
 					/>
 					<NumberField
 						id={`${fieldId}-mortgage-balance`}
@@ -590,7 +692,7 @@ export default function RemodelyticsPlatform() {
 						step={5000}
 						value={inputs.mortgageBalance}
 						onChange={(value) => updateInput('mortgageBalance', value)}
-						helpText="Existing mortgage balance for CLTV."
+						helpText={<>Existing mortgage balance for <Acronym term="CLTV" />.</>}
 					/>
 				</div>
 			</div>
@@ -671,7 +773,7 @@ export default function RemodelyticsPlatform() {
 					/>
 					<NumberField
 						id={`${fieldId}-diy`}
-						label="DIY share of ARV"
+						label={<>DIY share of <Acronym term="ARV" /></>}
 						suffix="%"
 						step={1}
 						value={inputs.diyPercentOfArv}
@@ -685,7 +787,7 @@ export default function RemodelyticsPlatform() {
 						step={0.25}
 						value={inputs.utilityInflationRate}
 						onChange={(value) => updateInput('utilityInflationRate', value)}
-						helpText="Annual escalation used in savings NPV."
+						helpText={<>Annual escalation used in savings <Acronym term="NPV" />.</>}
 					/>
 					<NumberField
 						id={`${fieldId}-discount-rate`}
