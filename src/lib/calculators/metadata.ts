@@ -1,17 +1,5 @@
 export const calculatorTools = [
 	{
-		title: 'Lease Break Calculator',
-		slug: 'lease-break',
-		href: '/calculators/lease-break/',
-		status: 'Live',
-		accent: 'emerald',
-		description:
-			'Estimate the real cost of breaking a lease early, including penalties, extra charges, and security deposit offsets.',
-		utility: 'Calculate renter exit costs',
-		category: 'FinanceApplication',
-		keywords: ['lease break calculator', 'early lease termination', 'rent calculator']
-	},
-	{
 		title: 'Remodeling ROI Calculator',
 		slug: 'remodeling-roi',
 		href: '/calculators/remodeling-roi/',
@@ -60,7 +48,7 @@ export function getCalculatorSchema(tool: CalculatorTool, site: URL) {
 		},
 		publisher: {
 			'@type': 'Organization',
-			name: 'Gini Loh',
+			name: 'WellRoost',
 			url: new URL('/', site).toString()
 		}
 	};
