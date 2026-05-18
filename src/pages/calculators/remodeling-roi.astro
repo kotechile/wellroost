@@ -1,0 +1,84 @@
+---
+import CalculatorShell from '../../components/calculators/CalculatorShell.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import BasicRemodelingCalculator from '../../components/calculators/react/BasicRemodelingCalculator';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCalculatorBySlug, getCalculatorSchema } from '../../lib/calculators/metadata';
+
+const calculator = getCalculatorBySlug('remodeling-roi');
+const schema = calculator && Astro.site ? getCalculatorSchema(calculator, Astro.site) : null;
+
+const quickNotes = [
+	{
+		title: 'How to read the result',
+		body:
+			'Use Worth it when the project looks sensible across value, timeline, and quality of life. Use Maybe when the answer depends heavily on your assumptions. Use Skip when the cost is doing too much work for the likely payoff.'
+	},
+	{
+		title: 'What Basic leaves out',
+		body:
+			'This version does not use live comps, local contractor pricing, incentive databases, or loan rules. It is a fast first filter, not a professional underwriting model.'
+	}
+];
+---
+
+<BaseLayout
+	title="Remodeling ROI Calculator | Gini Loh"
+	description="Get a fast Worth it / Maybe / Skip recommendation for a home upgrade using simple cost, resale, timeline, and savings inputs."
+>
+	<link slot="head" rel="canonical" href={new URL('/calculators/remodeling-roi/', Astro.site).toString()} />
+	{schema ? <JsonLd slot="head" data={schema} /> : null}
+
+	<CalculatorShell
+		eyebrow="Remodeling calculator"
+		title="Remodeling ROI Calculator"
+		description="A fast homeowner-first calculator that gives you a practical remodel recommendation using six simple inputs: cost, resale lift, timeline, enjoyment, and savings."
+	>
+		<div slot="calculator">
+			<BasicRemodelingCalculator client:load />
+		</div>
+
+		<div slot="aside" class="grid gap-6">
+			<article class="overflow-hidden rounded-[1.8rem] border border-cyan-500/20 bg-[linear-gradient(135deg,rgba(8,47,73,0.92),rgba(2,6,23,0.98)_70%,rgba(16,185,129,0.12))] p-6 shadow-[0_0_40px_rgba(34,211,238,0.08)]">
+				<p class="font-mono text-xs uppercase tracking-[0.28em] text-cyan-200/80">Basic tier</p>
+				<h2 class="mt-3 text-2xl font-semibold tracking-tight text-white">
+					The quick answer before the big research project
+				</h2>
+				<p class="mt-4 text-sm leading-7 text-slate-300">
+					This tool is designed for homeowners who want a fast directional answer. It keeps the math
+					honest, but it does not ask you for property-data details most people do not have handy.
+				</p>
+				<div class="mt-6 rounded-[1.3rem] border border-white/10 bg-white/5 p-4">
+					<p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-slate-500">
+						Best use case
+					</p>
+					<p class="mt-2 text-sm leading-7 text-slate-200">
+						Run this first when you are comparing whether a project feels sensible at all. Move to
+						Remodelytics when you want valuation context, local cost logic, or underwriting detail.
+					</p>
+				</div>
+			</article>
+
+			<article class="panel-soft rounded-[1.8rem] border border-slate-800/90 bg-slate-900/45 p-6 shadow-2xl backdrop-blur-md">
+				<p class="font-mono text-xs uppercase tracking-[0.28em] text-emerald-300/80">Plain-English guide</p>
+				<div class="mt-5 grid gap-4">
+					{quickNotes.map((item) => (
+						<div class="rounded-[1.2rem] border border-slate-800/80 bg-slate-950/55 p-4">
+							<h2 class="text-base font-semibold text-white">{item.title}</h2>
+							<p class="mt-2 text-sm leading-7 text-slate-400">{item.body}</p>
+						</div>
+					))}
+				</div>
+			</article>
+
+			<article class="panel-soft rounded-[1.8rem] border border-slate-800/90 bg-slate-900/45 p-6 shadow-2xl backdrop-blur-md">
+				<p class="font-mono text-xs uppercase tracking-[0.28em] text-cyan-300/70">Behind the answer</p>
+				<div class="mt-4 rounded-[1.3rem] border border-slate-800/90 bg-slate-950/60 p-5 font-mono text-sm leading-7 text-slate-200">
+					<p>value during stay = resale lift + savings + enjoyment credit</p>
+					<p class="mt-2">recommendation blends recovery, timeline, savings, and personal fit</p>
+					<p class="mt-2">answer = Worth it / Maybe / Skip</p>
+				</div>
+			</article>
+		</div>
+	</CalculatorShell>
+</BaseLayout>
