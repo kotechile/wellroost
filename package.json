@@ -1,5 +1,5 @@
 {
-  "name": "giniloh-front-end",
+  "name": "wellroost-front-end",
   "type": "module",
   "version": "0.0.1",
   "engines": {
@@ -14,8 +14,8 @@
   },
   "dependencies": {
     "@astrojs/react": "^4.4.1",
-    "@fontsource/inter": "^5.2.8",
-    "@fontsource/jetbrains-mono": "^5.2.8",
+    "@fontsource/geist-mono": "^5.1.0",
+    "@fontsource/geist-sans": "^5.1.0",
     "@tailwindcss/vite": "^4.2.4",
     "astro": "^6.2.1",
     "react": "^19.2.0",

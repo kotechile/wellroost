@@ -43,12 +43,12 @@ function truncate(value: string, maxLength = 170) {
 }
 ---
 
-<section id="pillars" class="mt-24 scroll-mt-32">
+<section id="guides" class="mt-24 scroll-mt-32">
 	<div class="flex items-end justify-between gap-6">
 		<div>
-			<p class="section-eyebrow">Active Frameworks</p>
+			<p class="section-eyebrow">More help</p>
 			<h2 class="mt-3 text-3xl font-semibold tracking-tight text-slate-100 sm:text-4xl">
-				Three pillars plus the Tools Hub
+				Read the guides behind the calculators
 			</h2>
 		</div>
 	</div>
@@ -87,13 +87,13 @@ function truncate(value: string, maxLength = 170) {
 								{category.name}
 							</h3>
 							<p class="mt-2 text-sm text-slate-400 font-mono">
-								> {category.description || 'Live framework module sourced from the WordPress taxonomy.'}
+								> {category.description || 'Articles and examples from the live WordPress category.'}
 							</p>
 						</div>
 						
 						<div class="relative z-10 mt-6 flex items-center gap-2 text-xs font-mono text-slate-500">
 							<span class="inline-flex h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
-							{postCount} Linked Posts
+							{postCount} Related Posts
 						</div>
 					</button>
 				);
@@ -111,7 +111,7 @@ function truncate(value: string, maxLength = 170) {
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7h16M7 4v6m10-6v6M6 14h4v4H6v-4Zm8 0h4v4h-4v-4Z" />
 					</svg>
 				</div>
-				<p class="font-mono text-[0.65rem] uppercase tracking-widest text-cyan-300/70">TOOLS</p>
+				<p class="font-mono text-[0.65rem] uppercase tracking-widest text-cyan-300/70">CALCULATORS</p>
 			</div>
 
 			<div class="relative z-10 mt-8">
@@ -181,7 +181,7 @@ function truncate(value: string, maxLength = 170) {
 												{post.title}
 											</h4>
 											<p class="mt-3 text-sm leading-6 text-slate-400 font-mono">
-												&gt; {post.excerpt ? truncate(post.excerpt) : 'Open the article for the full decision brief.'}
+												&gt; {post.excerpt ? truncate(post.excerpt) : 'Open the article for the full guide.'}
 											</p>
 										</div>
 									</a>

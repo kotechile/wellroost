@@ -2,30 +2,29 @@
 const navLinks = [
 	{ href: '/', label: 'Home' },
 	{ href: '/calculators/', label: 'Calculators' },
-	{ href: '/categories/', label: 'Categories' },
+	{ href: '/insights/', label: 'Insights' },
 	{ href: '/about/', label: 'About' }
 ];
 
 const pathname = Astro.url.pathname;
 ---
 
-<header class="fixed inset-x-0 top-4 z-50 flex justify-center px-4">
-	<div class="w-full max-w-6xl rounded-full border border-slate-700/50 bg-slate-900/80 px-3 py-3 shadow-[0_22px_45px_rgba(0,0,0,0.5)] backdrop-blur-md">
-		<div class="flex items-center justify-between gap-4">
+<header class="fixed inset-x-0 top-0 z-50 flex justify-center bg-white/80 backdrop-blur-md border-b border-gray-200">
+	<div class="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+		<div class="flex h-16 items-center justify-between">
+			<!-- Logo -->
 			<a
 				href="/"
-				class="inline-flex items-center gap-3 rounded-full px-3 py-2 text-sm font-semibold tracking-[0.18em] text-slate-100 transition hover:bg-slate-800/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400"
+				class="inline-flex items-center gap-2 font-semibold tracking-tight text-gray-1000 transition hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
 			>
-				<span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-800 border border-slate-700 text-base text-cyan-400 font-mono shadow-[0_0_15px_rgba(34,211,238,0.2)]">
-					GL
+				<span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-black text-white text-sm font-bold">
+					W
 				</span>
-				<span class="hidden text-left sm:block">
-					<span class="block text-[0.68rem] uppercase text-cyan-400/80 font-mono">Gini Loh</span>
-					<span class="block text-[0.82rem] tracking-[0.2em] text-slate-300">Decision Engine</span>
-				</span>
+				<span class="text-lg">WellRoost</span>
 			</a>
 
-			<nav class="hidden items-center gap-2 md:flex" aria-label="Primary navigation">
+			<!-- Desktop Nav -->
+			<nav class="hidden items-center gap-6 md:flex" aria-label="Primary navigation">
 				{
 					navLinks.map((link) => {
 						const isActive =
@@ -35,10 +34,10 @@ const pathname = Astro.url.pathname;
 							<a
 								href={link.href}
 								class:list={[
-									'rounded-full px-4 py-2 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400 font-mono uppercase tracking-widest text-[0.7rem]',
+									'text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
 									isActive
-										? 'bg-slate-800 text-cyan-400 shadow-[inset_0_0_0_1px_rgba(34,211,238,0.2)]'
-										: 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'
+										? 'text-black'
+										: 'text-gray-500 hover:text-black'
 								]}
 								aria-current={isActive ? 'page' : undefined}
 							>
@@ -49,12 +48,13 @@ const pathname = Astro.url.pathname;
 				}
 			</nav>
 
-			<div class="flex items-center gap-2">
+			<!-- Mobile Actions / Search -->
+			<div class="flex items-center gap-2 md:gap-4">
 				<button
 					type="button"
 					data-search-open
 					aria-label="Open site search"
-					class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-700/50 bg-slate-800/50 text-slate-300 transition hover:scale-105 hover:bg-slate-700 hover:text-cyan-400 hover:shadow-[0_0_15px_rgba(34,211,238,0.2)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400 motion-reduce:hover:scale-100"
+					class="inline-flex h-9 w-9 items-center justify-center rounded-md text-gray-500 transition hover:bg-gray-100 hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
 				>
 					<svg viewBox="0 0 24 24" fill="none" class="h-5 w-5" aria-hidden="true">
 						<path
@@ -69,7 +69,7 @@ const pathname = Astro.url.pathname;
 
 				<details class="group relative md:hidden">
 					<summary
-						class="inline-flex h-11 w-11 cursor-pointer list-none items-center justify-center rounded-full border border-slate-700/50 bg-slate-800/50 text-slate-300 transition hover:bg-slate-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400"
+						class="inline-flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-md text-gray-500 transition hover:bg-gray-100 hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
 						aria-label="Open navigation menu"
 					>
 						<svg viewBox="0 0 24 24" fill="none" class="h-5 w-5" aria-hidden="true">
@@ -81,7 +81,7 @@ const pathname = Astro.url.pathname;
 							/>
 						</svg>
 					</summary>
-					<div class="absolute right-0 top-[calc(100%+0.8rem)] w-64 rounded-[1.5rem] border border-slate-700/80 bg-slate-900/95 p-3 shadow-[0_18px_55px_rgba(0,0,0,0.6)] backdrop-blur-xl">
+					<div class="absolute right-0 top-[calc(100%+0.5rem)] w-56 rounded-md border border-gray-200 bg-white p-2 shadow-lg">
 						<nav class="grid gap-1" aria-label="Mobile navigation">
 							{
 								navLinks.map((link) => {
@@ -92,8 +92,8 @@ const pathname = Astro.url.pathname;
 										<a
 											href={link.href}
 											class:list={[
-												'rounded-2xl px-4 py-3 text-sm transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400 font-mono uppercase tracking-widest text-[0.75rem]',
-												isActive ? 'bg-slate-800 text-cyan-400' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'
+												'rounded-md px-3 py-2 text-sm transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+												isActive ? 'bg-gray-100 text-black font-medium' : 'text-gray-600 hover:bg-gray-50 hover:text-black'
 											]}
 											aria-current={isActive ? 'page' : undefined}
 										>

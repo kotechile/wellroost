@@ -9,7 +9,7 @@ interface Props {
 	description?: string;
 }
 
-const { title, description = 'Headless editorial front end for Gini Loh powered by Astro and WordPress.' } = Astro.props;
+const { title, description = 'WellRoost—The Decision Engine for Your Home. Built around a core ecosystem of interactive calculators and data-driven insights.' } = Astro.props;
 ---
 
 <!doctype html>
@@ -27,12 +27,8 @@ const { title, description = 'Headless editorial front end for Gini Loh powered 
 		<title>{title}</title>
 		<slot name="head" />
 	</head>
-	<body class="min-h-screen bg-site text-slate-200 antialiased">
-		<div class="site-background">
-			<div class="orb orb-one"></div>
-			<div class="orb orb-two"></div>
-			<div class="orb orb-three"></div>
-		</div>
+	<body class="min-h-screen text-gray-900 antialiased selection:bg-black selection:text-white">
+		<div class="site-background"></div>
 		<SiteNav />
 		<SearchOverlay />
 		<main class="relative z-10">

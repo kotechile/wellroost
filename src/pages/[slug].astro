@@ -82,13 +82,13 @@ const formattedDate = post.date ? new Date(post.date).toLocaleDateString('en-US'
             </div>
 
             <!-- Main Content -->
-            <div class="article-body space-y-8 max-w-3xl mx-auto" set:html={post.content} />
+            <div class="article-body space-y-8 max-w-4xl mx-auto" set:html={post.content} />
           </div>
         </div>
       </main>
 
       <!-- Sidebar Column -->
-      <aside class="w-full lg:w-80 xl:w-96 shrink-0">
+      <aside class="w-full lg:w-70 xl:w-75 shrink-0">
         <div class="sticky top-24 space-y-8">
           <!-- Decision Metrics Card -->
           <div class="p-8 rounded-3xl bg-slate-900/40 border border-white/10 backdrop-blur-md shadow-2xl">
