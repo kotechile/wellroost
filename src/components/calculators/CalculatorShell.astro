@@ -3,20 +3,23 @@ interface Props {
 	eyebrow: string;
 	title: string;
 	description: string;
+	variant?: 'light' | 'dark';
 }
 
-const { eyebrow, title, description } = Astro.props;
+const { eyebrow, title, description, variant = 'light' } = Astro.props;
+
+const isDark = variant === 'dark';
 ---
 
 <section class="pt-24 sm:pt-32">
 	<div class="max-w-3xl">
-		<p class="text-sm font-semibold tracking-wide uppercase text-gray-500">{eyebrow}</p>
-		<h1 class="mt-4 text-5xl font-bold tracking-tight text-gray-1000 sm:text-6xl">{title}</h1>
-		<p class="mt-6 text-lg leading-8 text-gray-600">{description}</p>
+		<p class:list={["text-sm font-semibold tracking-wide uppercase", isDark ? "text-emerald-400/80" : "text-gray-500"]}>{eyebrow}</p>
+		<h1 class:list={["mt-4 text-5xl font-bold tracking-tight sm:text-6xl", isDark ? "text-white" : "text-gray-1000"]}>{title}</h1>
+		<p class:list={["mt-6 text-lg leading-8", isDark ? "text-slate-300" : "text-gray-600"]}>{description}</p>
 	</div>
 
 	<div class="mt-16 grid gap-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(24rem,1fr)]">
-		<div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
+		<div class:list={["rounded-2xl p-6 sm:p-8", isDark ? "bg-transparent" : "border border-gray-200 bg-white shadow-sm"]}>
 			<slot name="calculator" />
 		</div>
 		<div class="grid gap-6">

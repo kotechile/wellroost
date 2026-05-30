@@ -23,16 +23,17 @@ const quickNotes = [
 ---
 
 <BaseLayout
-	title="Move or Improve CapEx Calculator | WellRoost"
-	description="Compare the five-year net equity projection of renovating your current home versus selling and relocating side-by-side."
+	title="Should You Renovate or Move? | Move or Improve Calculator | WellRoost"
+	description="Find out whether renovating your home or selling and buying a new one builds more equity over 5 years. Professional-grade side-by-side net equity projection."
 >
 	<link slot="head" rel="canonical" href={new URL('/calculators/move-or-improve/', Astro.site).toString()} />
 	{schema ? <JsonLd slot="head" data={schema} /> : null}
 
 	<CalculatorShell
 		eyebrow="Relocation vs Renovation"
-		title="Move or Improve CapEx Calculator"
-		description="Objective, professional-grade financial engine that generates a mathematically sound, side-by-side five-year net equity ledger projection to help you decide whether to stay and remodel or sell and move."
+		title="Move or Improve Calculator"
+		description="Should you renovate your home or sell and buy a new one? This calculator projects your net equity over the next 5 years for both options — side by side — so you can make an informed decision."
+		variant="dark"
 	>
 		<div slot="calculator">
 			<MoveOrImproveCalculator client:load />
@@ -40,16 +41,16 @@ const quickNotes = [
 
 		<div slot="aside" class="grid gap-6">
 			<article class="overflow-hidden rounded-[1.8rem] border border-emerald-500/20 bg-[linear-gradient(135deg,rgba(2,44,23,0.92),rgba(2,6,23,0.98)_70%,rgba(16,185,129,0.12))] p-6 shadow-[0_0_40px_rgba(16,185,129,0.08)]">
-				<p class="font-mono text-xs uppercase tracking-[0.28em] text-emerald-200 font-semibold">Underwriting Tier</p>
+				<p class="font-mono text-xs uppercase tracking-[0.28em] text-emerald-200 font-semibold">How It Works</p>
 				<h2 class="mt-3 text-2xl font-semibold tracking-tight text-white">
-					5-Year Net Equity Ledgers
+					5-Year Side-by-Side Comparison
 				</h2>
 				<p class="mt-4 text-sm leading-7 text-slate-200">
-					Unlike simple calculators that use generic national averages, this tool models amortizations, interest loss, transaction friction, and home appreciation side-by-side.
+					Unlike simple calculators that use generic national averages, this tool models your actual mortgage amortization, renovation ROI, transaction costs, and home appreciation — all side by side.
 				</p>
 				<div class="mt-6 rounded-[1.3rem] border border-white/10 bg-white/5 p-4">
 					<p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-slate-300 font-semibold">
-						Appreciation Dynamics
+						Why Appreciation Matters
 					</p>
 					<p class="mt-2 text-sm leading-7 text-white font-medium">
 						High appreciation rates typically favor moving because appreciation applies to a larger base price (e.g. $700k new property vs $500k current property), whereas low growth environments favor staying put due to heavy transaction friction.
@@ -58,24 +59,24 @@ const quickNotes = [
 			</article>
 
 			<article class="panel-soft rounded-[1.8rem] border border-slate-800/90 bg-slate-900/45 p-6 shadow-2xl backdrop-blur-md">
-				<p class="font-mono text-xs uppercase tracking-[0.28em] text-emerald-300 font-semibold">Decision Guide</p>
+				<p class="font-mono text-xs uppercase tracking-[0.28em] text-emerald-400 font-semibold">Decision Guide</p>
 				<div class="mt-5 grid gap-4">
 					{quickNotes.map((item) => (
 						<div class="rounded-[1.2rem] border border-slate-800/80 bg-slate-950/55 p-4">
 							<h2 class="text-base font-semibold text-white">{item.title}</h2>
-							<p class="mt-2 text-sm leading-7 text-slate-200">{item.body}</p>
+							<p class="mt-2 text-sm leading-7 text-slate-300">{item.body}</p>
 						</div>
 					))}
 				</div>
 			</article>
 
 			<article class="panel-soft rounded-[1.8rem] border border-slate-800/90 bg-slate-900/45 p-6 shadow-2xl backdrop-blur-md">
-				<p class="font-mono text-xs uppercase tracking-[0.28em] text-emerald-300/80 font-semibold">Formula Ledger</p>
+				<p class="font-mono text-xs uppercase tracking-[0.28em] text-emerald-400/80 font-semibold">Formula Reference</p>
 				<div class="mt-4 rounded-[1.3rem] border border-slate-800/90 bg-slate-950/60 p-5 font-mono text-xs leading-7 text-slate-100">
-					<p>V_improve(y) = (V_0 + C_quote * ROI) * (1 + alpha)^y</p>
-					<p class="mt-2">V_move(y) = P_new * (1 + alpha)^y</p>
-					<p class="mt-2">Equity_A = V_improve(5) - LegacyMortgage(60) - HELOC(60)</p>
-					<p class="mt-2">Equity_B = V_move(5) - NewMortgage(60)</p>
+					<p>V_improve(y) = (V_0 + C_quote × ROI) × (1 + α)^y</p>
+					<p class="mt-2">V_move(y) = P_new × (1 + α)^y</p>
+					<p class="mt-2">Equity_A = V_improve(5) − LegacyMortgage(60) − HELOC(60)</p>
+					<p class="mt-2">Equity_B = V_move(5) − NewMortgage(60)</p>
 				</div>
 			</article>
 		</div>
