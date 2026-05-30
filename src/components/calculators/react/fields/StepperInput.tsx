@@ -45,7 +45,7 @@ export function StepperInput({
 			<div className="flex items-center justify-between gap-4">
 				<div>
 					{eyebrow ? (
-						<p className="font-mono text-[0.64rem] uppercase tracking-[0.24em] text-slate-500">
+						<p className="font-mono text-[0.64rem] uppercase tracking-[0.24em] text-slate-400">
 							{eyebrow}
 						</p>
 					) : null}
@@ -86,7 +86,7 @@ export function StepperInput({
 					+
 				</button>
 			</div>
-			<p className="text-sm leading-6 text-slate-400">{helpText}</p>
+			<p className="text-sm leading-6 text-slate-300">{helpText}</p>
 		</label>
 	);
 }
