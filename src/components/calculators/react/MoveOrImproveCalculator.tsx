@@ -560,9 +560,9 @@ export default function MoveOrImproveCalculator() {
         {/* Custom Appreciation Slider */}
         <div className="mt-6 grid gap-4 md:grid-cols-2 items-center">
           <label className="grid gap-2">
-            <div className="flex justify-between text-xs font-mono text-slate-300">
-              <span>Annual home price growth:</span>
-              <span className="text-white font-semibold">{formatPercent(Number((inputs.annualAppreciation * 100).toFixed(2)))}</span>
+            <div className="flex justify-between text-xs font-mono text-slate-200">
+              <span className="font-semibold text-slate-200">Annual home price growth:</span>
+              <span className="text-emerald-400 font-bold">{formatPercent(Number((inputs.annualAppreciation * 100).toFixed(2)))}</span>
             </div>
             <input
               type="range"
@@ -623,8 +623,8 @@ export default function MoveOrImproveCalculator() {
             </thead>
             <tbody className="font-medium text-white">
               {/* ——— Home Value Group ——— */}
-              <tr className="border-t-2 border-slate-700/50">
-                <td colSpan={5} className="py-2 px-3 text-[0.65rem] font-mono uppercase tracking-widest text-slate-500">Home Value</td>
+              <tr className="border-t-2 border-slate-700/50 bg-slate-950/65">
+                <td colSpan={5} className="py-2 px-3 text-[0.7rem] font-mono uppercase tracking-widest text-slate-200 font-extrabold">Home Value</td>
               </tr>
               <tr className="bg-slate-950/40 hover:bg-slate-950/60 border-b border-slate-800/40">
                 <td className="py-3.5 px-3 font-semibold"><span className="text-emerald-400 font-bold mr-1.5">Renovate:</span>Home Value</td>
@@ -642,8 +642,8 @@ export default function MoveOrImproveCalculator() {
               </tr>
 
               {/* ——— Debt Group ——— */}
-              <tr className="border-t-2 border-slate-700/50">
-                <td colSpan={5} className="py-2 px-3 text-[0.65rem] font-mono uppercase tracking-widest text-slate-500">What You Owe</td>
+              <tr className="border-t-2 border-slate-700/50 bg-slate-950/65">
+                <td colSpan={5} className="py-2 px-3 text-[0.7rem] font-mono uppercase tracking-widest text-slate-200 font-extrabold">What You Owe</td>
               </tr>
               <tr className="bg-slate-950/40 hover:bg-slate-950/60 border-b border-slate-800/40">
                 <td className="py-3.5 px-3 font-semibold"><span className="text-emerald-400 font-bold mr-1.5">Renovate:</span>Debt</td>
@@ -661,8 +661,8 @@ export default function MoveOrImproveCalculator() {
               </tr>
 
               {/* ——— Net Equity Group (hero rows) ——— */}
-              <tr className="border-t-2 border-slate-700/50">
-                <td colSpan={5} className="py-2 px-3 text-[0.65rem] font-mono uppercase tracking-widest text-slate-500">Net Equity (Value − Debt)</td>
+              <tr className="border-t-2 border-slate-700/50 bg-slate-950/65">
+                <td colSpan={5} className="py-2 px-3 text-[0.7rem] font-mono uppercase tracking-widest text-slate-200 font-extrabold">Net Equity (Value − Debt)</td>
               </tr>
               <tr className="bg-emerald-950 border-y border-emerald-800/80">
                 <td className="py-3.5 px-3 font-bold"><span className="text-emerald-300 font-bold mr-1.5">Renovate:</span>Net Equity</td>
@@ -680,8 +680,8 @@ export default function MoveOrImproveCalculator() {
               </tr>
 
               {/* ——— Total Paid Out Group ——— */}
-              <tr className="border-t-2 border-slate-700/50">
-                <td colSpan={5} className="py-2 px-3 text-[0.65rem] font-mono uppercase tracking-widest text-slate-500">Total Paid Out</td>
+              <tr className="border-t-2 border-slate-700/50 bg-slate-950/65">
+                <td colSpan={5} className="py-2 px-3 text-[0.7rem] font-mono uppercase tracking-widest text-slate-200 font-extrabold">Total Paid Out</td>
               </tr>
               <tr className="bg-slate-950/40 hover:bg-slate-950/60 border-b border-slate-800/40">
                 <td className="py-3.5 px-3 font-semibold"><span className="text-emerald-400 font-bold mr-1.5">Renovate:</span>Total Paid</td>
