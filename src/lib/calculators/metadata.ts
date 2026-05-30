@@ -1,5 +1,17 @@
 export const calculatorTools = [
 	{
+		title: 'Move or Improve Calculator',
+		slug: 'move-or-improve',
+		href: '/calculators/move-or-improve/',
+		status: 'Live',
+		accent: 'emerald',
+		description:
+			'Compare the 5-year financial projection of renovating your current home versus selling and relocating.',
+		utility: 'Choose between home renovation and relocation',
+		category: 'FinanceApplication',
+		keywords: ['move or improve calculator', 'renovate vs relocate', 'remodel vs sell calculator']
+	},
+	{
 		title: 'Remodeling ROI Calculator',
 		slug: 'remodeling-roi',
 		href: '/calculators/remodeling-roi/',
