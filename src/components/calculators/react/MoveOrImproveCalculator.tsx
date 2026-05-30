@@ -43,6 +43,7 @@ export default function MoveOrImproveCalculator() {
   const [inputs, setInputs] = useState<MoveOrImproveInputs>(INITIAL_INPUTS);
   const [activeTab, setActiveTab] = useState<'current' | 'improve' | 'move'>('current');
   const [sensitivityPreset, setSensitivityPreset] = useState<'low' | 'base' | 'high' | 'custom'>('base');
+  const [showLogic, setShowLogic] = useState(false);
   const fieldId = useId();
 
   // Run calculation engine
@@ -407,7 +408,7 @@ export default function MoveOrImproveCalculator() {
                   placeholder="20814"
                   className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white focus:border-cyan-500 outline-none"
                 />
-                <span className="text-[10px] text-slate-300">Sets transfer & recordation tax matrices.</span>
+                <span className="text-[10px] text-slate-350">Seeded with Montgomery County, MD progressive tax brackets (default 208xx/209xx).</span>
               </label>
 
               <label className="grid gap-3 rounded-[1.5rem] border border-slate-800/80 bg-slate-950/45 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] hover:border-slate-700/90">
@@ -651,6 +652,41 @@ export default function MoveOrImproveCalculator() {
               {result.taxDetails.statutoryExemptionApplied ? 'Montgomery County Exemption Applied' : 'No Local Exemptions'}
             </span>
           </div>
+        </div>
+
+        {/* Collapsible Accordion for Calculation Logic */}
+        <div className="mt-6 border-t border-slate-800/60 pt-5">
+          <button
+            onClick={() => setShowLogic(!showLogic)}
+            className="flex items-center justify-between w-full py-2 text-xs font-mono uppercase tracking-wider text-slate-300 hover:text-white transition focus:outline-none cursor-pointer"
+          >
+            <span>[ {showLogic ? 'Hide' : 'View'} Calculation Logic ]</span>
+            <span className="text-slate-400 font-bold">{showLogic ? '▲' : '▼'}</span>
+          </button>
+          
+          {showLogic && (
+            <div className="mt-4 p-5 rounded-2xl border border-slate-800/80 bg-slate-950/60 font-sans text-xs leading-6 text-slate-200 space-y-4">
+              <div>
+                <h4 className="font-bold text-white text-sm mb-2">1. The Improvement Pathway (Renovate)</h4>
+                <p>Models your home's future value based on your renovation injection (C_quote) and its expected Return on Investment (ROI), compounded over time.</p>
+                <div className="mt-2 font-mono text-[11px] bg-slate-900/80 p-3 rounded-lg border border-slate-850 text-emerald-400">
+                  Gross Value(y) = (V0 + C_quote * ROI) * (1 + alpha)^y<br />
+                  Net Equity(5) = Gross Value(5) - Legacy Mortgage(60) - HELOC(60)
+                </div>
+              </div>
+              <div>
+                <h4 className="font-bold text-white text-sm mb-2">2. The Relocation Pathway (Move)</h4>
+                <p>Models selling your current property, absorbing localized transaction taxes, and purchasing a new asset (P_new) with a new market-rate loan.</p>
+                <div className="mt-2 font-mono text-[11px] bg-slate-900/80 p-3 rounded-lg border border-slate-850 text-cyan-400">
+                  Gross Value(y) = P_new * (1 + alpha)^y<br />
+                  Net Equity(5) = Gross Value(5) - New Mortgage(60)
+                </div>
+              </div>
+              <div className="text-slate-350 text-[10px] border-t border-slate-800/80 pt-3">
+                * Note: Under the hood, the engine calculates complete amortization arrays for the legacy mortgage, HELOC, and new relocation loan over a 60-month holding period (m=60) using standard fixed-rate debt paydown matrices.
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
