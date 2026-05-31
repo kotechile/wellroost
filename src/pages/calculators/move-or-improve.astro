@@ -33,7 +33,6 @@ const quickNotes = [
 		eyebrow="Relocation vs Renovation"
 		title="Move or Improve Calculator"
 		description="Should you renovate your home or sell and buy a new one? This calculator projects your net equity over the next 5 years for both options — side by side — so you can make an informed decision."
-		variant="dark"
 	>
 		<div slot="calculator">
 			<MoveOrImproveCalculator client:load />
@@ -83,15 +82,4 @@ const quickNotes = [
 	</CalculatorShell>
 </BaseLayout>
 
-<style is:global>
-	body {
-		background-color: #0b0f19 !important; /* Rich deep dark slate */
-		color: #f8fafc !important; /* Crisp slate-50 */
-	}
-	/* Make site background grid mesh match dark mode */
-	.site-background {
-		background-image: 
-			linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-			linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px) !important;
-	}
-</style>
+
