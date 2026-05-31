@@ -36,6 +36,7 @@ export interface LedgerYearRow {
   outstandingDebt: number;
   netEquity: number;
   cumulativePayments: number;
+  yearlySpent: number;
 }
 
 export interface MoveOrImproveBreakdown {
@@ -49,6 +50,8 @@ export interface MoveOrImproveBreakdown {
   variance: {
     year5EquityVariance: number; // improve - move
     year5PaymentVariance: number;
+    fiveYearTotalImprove: number;
+    fiveYearTotalMove: number;
   };
   taxDetails: {
     transferTax: number;

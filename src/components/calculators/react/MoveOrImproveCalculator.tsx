@@ -618,84 +618,93 @@ export default function MoveOrImproveCalculator() {
                 <th className="py-3 px-3">Year 0</th>
                 <th className="py-3 px-3">Year 1</th>
                 <th className="py-3 px-3">Year 3</th>
-                <th className="py-3 px-3 text-right">Year 5</th>
+                <th className="py-3 px-3">Year 5</th>
+                <th className="py-3 px-3 text-right">5-Year Total Sum</th>
               </tr>
             </thead>
             <tbody className="font-medium text-white">
               {/* ——— Home Value Group ——— */}
               <tr className="border-t-2 border-slate-700/50 bg-slate-950/65">
-                <td colSpan={5} className="py-2 px-3 text-[0.7rem] font-mono uppercase tracking-widest text-slate-200 font-extrabold">Home Value</td>
+                <td colSpan={6} className="py-2 px-3 text-[0.7rem] font-mono uppercase tracking-widest text-slate-200 font-extrabold">Home Value</td>
               </tr>
               <tr className="bg-slate-950/40 hover:bg-slate-950/60 border-b border-slate-800/40">
                 <td className="py-3.5 px-3 font-semibold"><span className="text-emerald-400 font-bold mr-1.5">Renovate:</span>Home Value</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.improvePathway[0].grossValue)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.improvePathway[1].grossValue)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.improvePathway[3].grossValue)}</td>
-                <td className="py-3.5 px-3 tabular-nums text-right font-semibold text-emerald-400">{formatCurrency(result.improvePathway[5].grossValue)}</td>
+                <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.improvePathway[5].grossValue)}</td>
+                <td className="py-3.5 px-3 tabular-nums text-right text-slate-400">—</td>
               </tr>
               <tr className="bg-slate-900/30 hover:bg-slate-900/50 border-b border-slate-800/40">
                 <td className="py-3.5 px-3 font-semibold"><span className="text-cyan-400 font-bold mr-1.5">Move:</span>Home Value</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[0].grossValue)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[1].grossValue)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[3].grossValue)}</td>
-                <td className="py-3.5 px-3 tabular-nums text-right font-semibold text-cyan-400">{formatCurrency(result.movePathway[5].grossValue)}</td>
+                <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[5].grossValue)}</td>
+                <td className="py-3.5 px-3 tabular-nums text-right text-slate-400">—</td>
               </tr>
 
               {/* ——— Debt Group ——— */}
               <tr className="border-t-2 border-slate-700/50 bg-slate-950/65">
-                <td colSpan={5} className="py-2 px-3 text-[0.7rem] font-mono uppercase tracking-widest text-slate-200 font-extrabold">What You Owe</td>
+                <td colSpan={6} className="py-2 px-3 text-[0.7rem] font-mono uppercase tracking-widest text-slate-200 font-extrabold">What You Owe</td>
               </tr>
               <tr className="bg-slate-950/40 hover:bg-slate-950/60 border-b border-slate-800/40">
                 <td className="py-3.5 px-3 font-semibold"><span className="text-emerald-400 font-bold mr-1.5">Renovate:</span>Debt</td>
                 <td className="py-3.5 px-3 tabular-nums text-rose-400">{formatCurrency(result.improvePathway[0].outstandingDebt)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.improvePathway[1].outstandingDebt)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.improvePathway[3].outstandingDebt)}</td>
-                <td className="py-3.5 px-3 tabular-nums text-right font-semibold">{formatCurrency(result.improvePathway[5].outstandingDebt)}</td>
+                <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.improvePathway[5].outstandingDebt)}</td>
+                <td className="py-3.5 px-3 tabular-nums text-right text-slate-400">—</td>
               </tr>
               <tr className="bg-slate-900/30 hover:bg-slate-900/50 border-b border-slate-800/40">
                 <td className="py-3.5 px-3 font-semibold"><span className="text-cyan-400 font-bold mr-1.5">Move:</span>Debt</td>
                 <td className="py-3.5 px-3 tabular-nums text-rose-400">{formatCurrency(result.movePathway[0].outstandingDebt)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[1].outstandingDebt)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[3].outstandingDebt)}</td>
-                <td className="py-3.5 px-3 tabular-nums text-right font-semibold">{formatCurrency(result.movePathway[5].outstandingDebt)}</td>
+                <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[5].outstandingDebt)}</td>
+                <td className="py-3.5 px-3 tabular-nums text-right text-slate-400">—</td>
               </tr>
 
               {/* ——— Net Equity Group (hero rows) ——— */}
               <tr className="border-t-2 border-slate-700/50 bg-slate-950/65">
-                <td colSpan={5} className="py-2 px-3 text-[0.7rem] font-mono uppercase tracking-widest text-slate-200 font-extrabold">Net Equity (Value − Debt)</td>
+                <td colSpan={6} className="py-2 px-3 text-[0.7rem] font-mono uppercase tracking-widest text-slate-200 font-extrabold">Net Equity (Value − Debt)</td>
               </tr>
               <tr className="bg-emerald-950 border-y border-emerald-800/80">
                 <td className="py-3.5 px-3 font-bold"><span className="text-emerald-300 font-bold mr-1.5">Renovate:</span>Net Equity</td>
                 <td className="py-3.5 px-3 tabular-nums font-semibold text-emerald-100">{formatCurrency(result.improvePathway[0].netEquity)}</td>
                 <td className="py-3.5 px-3 tabular-nums font-semibold text-emerald-100">{formatCurrency(result.improvePathway[1].netEquity)}</td>
                 <td className="py-3.5 px-3 tabular-nums font-semibold text-emerald-100">{formatCurrency(result.improvePathway[3].netEquity)}</td>
-                <td className="py-3.5 px-3 tabular-nums text-right font-extrabold text-sm text-emerald-300 bg-emerald-900 border border-emerald-700/80 rounded px-2.5 py-1.5 shadow-[inset_0_0_12px_rgba(16,185,129,0.3)]">{formatCurrency(result.improvePathway[5].netEquity)}</td>
+                <td className="py-3.5 px-3 tabular-nums text-emerald-300 font-bold">{formatCurrency(result.improvePathway[5].netEquity)}</td>
+                <td className="py-3.5 px-3 tabular-nums text-right text-slate-400">—</td>
               </tr>
               <tr className="bg-cyan-950 border-y border-cyan-800/80">
                 <td className="py-3.5 px-3 font-bold"><span className="text-cyan-300 font-bold mr-1.5">Move:</span>Net Equity</td>
                 <td className="py-3.5 px-3 tabular-nums font-semibold text-cyan-100">{formatCurrency(result.movePathway[0].netEquity)}</td>
                 <td className="py-3.5 px-3 tabular-nums font-semibold text-cyan-100">{formatCurrency(result.movePathway[1].netEquity)}</td>
                 <td className="py-3.5 px-3 tabular-nums font-semibold text-cyan-100">{formatCurrency(result.movePathway[3].netEquity)}</td>
-                <td className="py-3.5 px-3 tabular-nums text-right font-extrabold text-sm text-cyan-300 bg-cyan-900 border border-cyan-700/80 rounded px-2.5 py-1.5 shadow-[inset_0_0_12px_rgba(34,211,238,0.3)]">{formatCurrency(result.movePathway[5].netEquity)}</td>
+                <td className="py-3.5 px-3 tabular-nums text-cyan-300 font-bold">{formatCurrency(result.movePathway[5].netEquity)}</td>
+                <td className="py-3.5 px-3 tabular-nums text-right text-slate-400">—</td>
               </tr>
 
-              {/* ——— Total Paid Out Group ——— */}
+              {/* ——— Out-of-Pocket Cash Spent Group ——— */}
               <tr className="border-t-2 border-slate-700/50 bg-slate-950/65">
-                <td colSpan={5} className="py-2 px-3 text-[0.7rem] font-mono uppercase tracking-widest text-slate-200 font-extrabold">Total Paid Out</td>
+                <td colSpan={6} className="py-2 px-3 text-[0.7rem] font-mono uppercase tracking-widest text-slate-200 font-extrabold">OUT-OF-POCKET CASH SPENT (PER YEAR)</td>
               </tr>
               <tr className="bg-slate-950/40 hover:bg-slate-950/60 border-b border-slate-800/40">
-                <td className="py-3.5 px-3 font-semibold"><span className="text-emerald-400 font-bold mr-1.5">Renovate:</span>Total Paid</td>
-                <td className="py-3.5 px-3 tabular-nums">$0</td>
-                <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.improvePathway[1].cumulativePayments)}</td>
-                <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.improvePathway[3].cumulativePayments)}</td>
-                <td className="py-3.5 px-3 tabular-nums text-right font-semibold">{formatCurrency(result.improvePathway[5].cumulativePayments)}</td>
+                <td className="py-3.5 px-3 font-semibold"><span className="text-emerald-400 font-bold mr-1.5">Renovate:</span>Out-of-pocket</td>
+                <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.improvePathway[0].yearlySpent)}</td>
+                <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.improvePathway[1].yearlySpent)}</td>
+                <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.improvePathway[3].yearlySpent)}</td>
+                <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.improvePathway[5].yearlySpent)}</td>
+                <td className="py-3.5 px-3 tabular-nums text-right font-extrabold text-sm text-emerald-300 bg-emerald-900 border border-emerald-700/80 rounded px-2.5 py-1.5 shadow-[inset_0_0_12px_rgba(16,185,129,0.3)]">{formatCurrency(result.variance.fiveYearTotalImprove)}</td>
               </tr>
               <tr className="bg-slate-900/30 hover:bg-slate-900/50">
-                <td className="py-3.5 px-3 font-semibold"><span className="text-cyan-400 font-bold mr-1.5">Move:</span>Total Paid</td>
-                <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[0].cumulativePayments)}</td>
-                <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[1].cumulativePayments)}</td>
-                <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[3].cumulativePayments)}</td>
-                <td className="py-3.5 px-3 tabular-nums text-right font-semibold">{formatCurrency(result.movePathway[5].cumulativePayments)}</td>
+                <td className="py-3.5 px-3 font-semibold"><span className="text-cyan-400 font-bold mr-1.5">Move:</span>Out-of-pocket</td>
+                <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[0].yearlySpent)}</td>
+                <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[1].yearlySpent)}</td>
+                <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[3].yearlySpent)}</td>
+                <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[5].yearlySpent)}</td>
+                <td className="py-3.5 px-3 tabular-nums text-right font-extrabold text-sm text-cyan-300 bg-cyan-900 border border-cyan-700/80 rounded px-2.5 py-1.5 shadow-[inset_0_0_12px_rgba(34,211,238,0.3)]">{formatCurrency(result.variance.fiveYearTotalMove)}</td>
               </tr>
             </tbody>
           </table>
@@ -715,7 +724,7 @@ export default function MoveOrImproveCalculator() {
                   <strong className="text-emerald-300">Bottom line: Staying and renovating</strong> is projected to leave you with{' '}
                   <strong className="text-white">{formatCurrency(improveEquityYear5)}</strong> in equity after 5 years — that's{' '}
                   <strong className="text-emerald-400">{formatCurrency(variance)} more</strong> than if you sold and bought a new home.
-                  You'd pay <strong className="text-white">{formatCurrency(result.improvePathway[5].cumulativePayments)}</strong> total over 60 months in mortgage and HELOC payments, but your home's value grows to{' '}
+                  You'd pay <strong className="text-white">{formatCurrency(result.variance.fiveYearTotalImprove)}</strong> total over 60 months in mortgage and HELOC payments, but your home's value grows to{' '}
                   <strong className="text-white">{formatCurrency(result.improvePathway[5].grossValue)}</strong>.
                 </>
               ) : (

@@ -111,26 +111,30 @@ export function runCapExMatrixCalculator(inputs: MoveOrImproveInputs): MoveOrImp
   const improvePathway: LedgerYearRow[] = [];
   const movePathway: LedgerYearRow[] = [];
   
+  const HYSA_YIELD_RATE = 0.04; // Money Market / HYSA yield
+  
   // Year 0
   improvePathway.push({
     grossValue: currentValue,
     outstandingDebt: legacyDebt.principalBalance + initialRenovationCashOutlay,
     netEquity: currentValue - (legacyDebt.principalBalance + initialRenovationCashOutlay),
-    cumulativePayments: 0
+    cumulativePayments: 0,
+    yearlySpent: 0
   });
   
+  const upfrontMoveFees = sellFriction + countyTaxDetails.recordationTax;
   movePathway.push({
     grossValue: newPropertyPrice,
     outstandingDebt: newLoanAmount,
     netEquity: (newPropertyPrice + leftoverCash) - newLoanAmount,
-    cumulativePayments: sellFriction + countyTaxDetails.recordationTax
+    cumulativePayments: upfrontMoveFees,
+    yearlySpent: upfrontMoveFees
   });
 
   for (let year = 1; year <= 5; year++) {
     const m = year * 12;
     
     // Improvement Pathway Calculations
-    // Renovated asset value appreciation: V_improve = (V_0 + C_quote * ROI) * (1 + alpha)^y
     const vRenovatedCompletion = currentValue + (totalQuoteCost * activeRoi);
     const vImprove = vRenovatedCompletion * Math.pow(1 + annualAppreciation, year);
     
@@ -144,36 +148,41 @@ export function runCapExMatrixCalculator(inputs: MoveOrImproveInputs): MoveOrImp
     const outstandingDebtImprove = legacyBal + helocBal;
     
     // Add temporary rental housing costs for second-story additions (e.g. 6 months at $2500/month = $15,000 in first year)
-    let extraCosts = 0;
-    if (renovation.isSecondStory && year === 1) {
-      extraCosts = 6 * 2500;
-    }
-    
-    const cumPaymentsImprove = ((legacyMonthlyPayment + helocPayment) * m) + extraCosts;
+    const annualExtraCosts = (renovation.isSecondStory && year === 1) ? (6 * 2500) : 0;
+    const yearlySpentImprove = ((legacyMonthlyPayment + helocPayment) * 12) + annualExtraCosts;
+    const cumPaymentsImprove = ((legacyMonthlyPayment + helocPayment) * m) + (renovation.isSecondStory && year >= 1 ? (6 * 2500) : 0);
     
     improvePathway.push({
       grossValue: vImprove,
       outstandingDebt: outstandingDebtImprove,
       netEquity: vImprove - outstandingDebtImprove,
-      cumulativePayments: cumPaymentsImprove
+      cumulativePayments: cumPaymentsImprove,
+      yearlySpent: yearlySpentImprove
     });
     
     // Moving Pathway Calculations
     const vMove = newPropertyPrice * Math.pow(1 + annualAppreciation, year);
     const mortgageBalNew = calculateProspectiveBalance(newLoanAmount, newMortgageRate, newMortgageTermMonths, m);
     
-    const cumPaymentsMove = (newMonthlyPayment * m) + sellFriction + countyTaxDetails.recordationTax;
+    const compoundedCash = leftoverCash * Math.pow(1 + HYSA_YIELD_RATE, year);
+    const yearlySpentMove = newMonthlyPayment * 12;
+    const cumPaymentsMove = (newMonthlyPayment * m) + upfrontMoveFees;
     
     movePathway.push({
       grossValue: vMove,
       outstandingDebt: mortgageBalNew,
-      netEquity: (vMove + leftoverCash) - mortgageBalNew,
-      cumulativePayments: cumPaymentsMove
+      netEquity: (vMove + compoundedCash) - mortgageBalNew,
+      cumulativePayments: cumPaymentsMove,
+      yearlySpent: yearlySpentMove
     });
   }
   
+  const fiveYearExtraCosts = renovation.isSecondStory ? (6 * 2500) : 0;
+  const fiveYearTotalImprove = ((legacyMonthlyPayment + helocPayment) * 60) + fiveYearExtraCosts;
+  const fiveYearTotalMove = (newMonthlyPayment * 60) + upfrontMoveFees;
+  
   const year5EquityVariance = improvePathway[5].netEquity - movePathway[5].netEquity;
-  const year5PaymentVariance = improvePathway[5].cumulativePayments - movePathway[5].cumulativePayments;
+  const year5PaymentVariance = fiveYearTotalImprove - fiveYearTotalMove;
   
   return {
     initialBaseline: {
@@ -185,7 +194,9 @@ export function runCapExMatrixCalculator(inputs: MoveOrImproveInputs): MoveOrImp
     movePathway,
     variance: {
       year5EquityVariance,
-      year5PaymentVariance
+      year5PaymentVariance,
+      fiveYearTotalImprove,
+      fiveYearTotalMove
     },
     taxDetails: {
       transferTax: countyTaxDetails.transferTax,
