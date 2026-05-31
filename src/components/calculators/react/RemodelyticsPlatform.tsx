@@ -157,7 +157,7 @@ function NumberField({
 			<span className="text-sm font-semibold tracking-wide text-slate-100">{label}</span>
 			<div className="relative min-w-0">
 				{prefix ? (
-					<span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-mono text-sm text-slate-500">
+					<span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-mono text-sm text-slate-400">
 						{prefix}
 					</span>
 				) : null}
@@ -175,12 +175,12 @@ function NumberField({
 					].join(' ')}
 				/>
 				{suffix ? (
-					<span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 font-mono text-xs text-slate-500">
+					<span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 font-mono text-xs text-slate-400">
 						{suffix}
 					</span>
 				) : null}
 			</div>
-			<span className="text-xs leading-5 text-slate-500">{helpText}</span>
+			<span className="text-xs leading-5 text-slate-400">{helpText}</span>
 		</label>
 	);
 }
@@ -202,11 +202,11 @@ function MetricCard({ label, value, detail, tone = 'cyan' }: MetricCardProps) {
 
 	return (
 		<div className={`min-w-0 overflow-hidden rounded-[1.35rem] border bg-slate-950/55 p-4 ${toneClass}`}>
-			<p className="font-mono text-[0.66rem] uppercase tracking-[0.22em] text-slate-500">{label}</p>
+			<p className="font-mono text-[0.66rem] uppercase tracking-[0.22em] text-slate-400">{label}</p>
 			<p className="mt-3 text-[clamp(1.7rem,2.4vw,2.35rem)] leading-none font-semibold tracking-tight tabular-nums">
 				{value}
 			</p>
-			<p className="mt-2 text-sm leading-6 text-slate-400">{detail}</p>
+			<p className="mt-2 text-sm leading-6 text-slate-300">{detail}</p>
 		</div>
 	);
 }
@@ -306,16 +306,16 @@ export default function RemodelyticsPlatform() {
 				onLookup={() => void runPropertyLookup()}
 			/>
 
-			<div className="overflow-hidden rounded-[1.8rem] border border-cyan-500/20 bg-[linear-gradient(135deg,rgba(0,11,80,0.76),rgba(2,6,23,0.96)_58%,rgba(29,106,229,0.2))]">
+			<div className="overflow-hidden rounded-[1.8rem] border border-cyan-500/20 bg-[linear-gradient(135deg,rgba(0,11,80,0.96),rgba(2,6,23,0.98)_58%,rgba(10,37,100,0.95))]">
 				<div className="grid gap-6 px-6 py-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)] xl:px-7">
 					<div>
-						<p className="font-mono text-xs uppercase tracking-[0.3em] text-cyan-200/80">
+						<p className="font-mono text-xs uppercase tracking-[0.3em] text-cyan-200">
 							Multi-engine platform
 						</p>
 						<h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
 							Model the remodel like an underwriter, investor, and homeowner at once
 						</h2>
-						<p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300">
+						<p className="mt-4 max-w-2xl text-sm leading-7 text-slate-200">
 							Segment a renovation across resale lift, energy <Acronym term="NPV" />, income potential, over-improvement
 							guardrails, and loan leverage. Values are live-calculated from your assumptions and ready
 							for pressure testing.
@@ -331,8 +331,8 @@ export default function RemodelyticsPlatform() {
 									className={[
 										'rounded-full border px-4 py-2 font-mono text-[0.68rem] uppercase tracking-[0.22em] transition focus:outline-none focus:ring-2 focus:ring-cyan-400/30',
 										inputs.engine === engine
-											? 'border-cyan-300/40 bg-cyan-300/15 text-cyan-100'
-											: 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'
+											? 'border-cyan-300/40 bg-cyan-300/20 text-cyan-50'
+											: 'border-white/20 bg-white/5 text-slate-200 hover:bg-white/10'
 									].join(' ')}
 								>
 									{ENGINE_LABELS[engine]}
@@ -343,7 +343,7 @@ export default function RemodelyticsPlatform() {
 					<div className="grid content-between gap-4 rounded-[1.6rem] border border-white/10 bg-slate-950/45 p-4">
 						<div className="flex items-start justify-between gap-4">
 							<div>
-								<p className="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-slate-500">
+								<p className="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-slate-400">
 									Selected project
 								</p>
 								<p className="mt-2 text-2xl font-semibold text-white">
@@ -397,7 +397,7 @@ export default function RemodelyticsPlatform() {
 							</option>
 						))}
 					</select>
-					<span className="text-xs leading-5 text-slate-500">Routes the remodel into the best-fit engine.</span>
+					<span className="text-xs leading-5 text-slate-400">Routes the remodel into the best-fit engine.</span>
 				</label>
 				<label className="grid min-w-0 gap-3 rounded-[1.35rem] border border-slate-800/80 bg-slate-950/45 p-4">
 					<span className="text-sm font-semibold tracking-wide text-slate-100">Material tier</span>
@@ -414,7 +414,7 @@ export default function RemodelyticsPlatform() {
 							</option>
 						))}
 					</select>
-					<span className="text-xs leading-5 text-slate-500">Applies a proxy finish-grade multiplier.</span>
+					<span className="text-xs leading-5 text-slate-400">Applies a proxy finish-grade multiplier.</span>
 				</label>
 				<label
 					htmlFor={`${fieldId}-zip`}
@@ -427,7 +427,7 @@ export default function RemodelyticsPlatform() {
 						onChange={(event) => updateInput('zipCode', event.target.value)}
 						className="min-w-0 rounded-[1rem] border border-slate-700/80 bg-slate-950/80 px-4 py-3 text-sm font-semibold text-white outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 sm:text-base"
 					/>
-					<span className="text-xs leading-5 text-slate-500">
+					<span className="text-xs leading-5 text-slate-400">
 						Placeholder for RSMeans, <Acronym term="AVM" />, <Acronym term="AMI" />, and DSIRE lookups.
 					</span>
 				</label>
@@ -480,10 +480,10 @@ export default function RemodelyticsPlatform() {
 				/>
 			</div>
 
-			<div className="grid gap-4 rounded-[1.8rem] border border-cyan-500/20 bg-[linear-gradient(180deg,rgba(14,165,233,0.11),rgba(2,6,23,0.86))] p-6">
+			<div className="grid gap-4 rounded-[1.8rem] border border-cyan-500/20 bg-[linear-gradient(180deg,rgba(8,47,73,0.97),rgba(2,6,23,0.98))] p-6">
 				<div className="flex flex-wrap items-end justify-between gap-4">
 					<div>
-						<p className="font-mono text-xs uppercase tracking-[0.28em] text-cyan-200/80">
+						<p className="font-mono text-xs uppercase tracking-[0.28em] text-cyan-200">
 							Engine output
 						</p>
 						<h3 className="mt-3 text-3xl font-semibold tracking-tight text-white">
@@ -494,14 +494,14 @@ export default function RemodelyticsPlatform() {
 						<button
 							type="button"
 							onClick={exportPacket}
-							className="rounded-full border border-cyan-400/25 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-400/15 focus:outline-none focus:ring-2 focus:ring-cyan-400/30"
+							className="rounded-full border border-cyan-400/35 bg-cyan-400/20 px-4 py-2 text-sm font-semibold text-cyan-50 transition hover:bg-cyan-400/25 focus:outline-none focus:ring-2 focus:ring-cyan-400/30"
 						>
 							{copied ? 'Packet copied' : 'Copy underwriting packet'}
 						</button>
 						<button
 							type="button"
 							onClick={() => window.print()}
-							className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-400/30"
+							className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-cyan-400/30"
 						>
 							Print / save PDF
 						</button>
@@ -535,8 +535,8 @@ export default function RemodelyticsPlatform() {
 				</div>
 
 				<div className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
-					<div className="rounded-[1.5rem] border border-slate-800/90 bg-slate-950/50 p-5">
-						<p className="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-slate-500">
+					<div className="rounded-[1.5rem] border border-slate-800/90 bg-slate-950/75 p-5">
+						<p className="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-slate-400">
 							Engine confidence map
 						</p>
 						<div className="mt-5 grid gap-4">
@@ -559,8 +559,8 @@ export default function RemodelyticsPlatform() {
 						</div>
 					</div>
 
-					<div className="rounded-[1.5rem] border border-slate-800/90 bg-slate-950/50 p-5">
-						<p className="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-slate-500">
+					<div className="rounded-[1.5rem] border border-slate-800/90 bg-slate-950/75 p-5">
+						<p className="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-slate-400">
 							Safeguards and underwriting flags
 						</p>
 						<div className="mt-4 grid gap-3">
