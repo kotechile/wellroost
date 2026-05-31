@@ -743,7 +743,20 @@ export default function MoveOrImproveCalculator() {
                 <td colSpan={6} className="py-2 px-3 text-[0.7rem] font-mono uppercase tracking-widest text-slate-200 font-extrabold">OUT-OF-POCKET CASH SPENT (PER YEAR)</td>
               </tr>
               <tr className="bg-slate-950/40 hover:bg-slate-950/60 border-b border-slate-800/40">
-                <td className="py-3.5 px-3 font-semibold"><span className="text-emerald-400 font-bold mr-1.5">Renovate:</span>Out-of-pocket</td>
+                <td className="py-3.5 px-3 font-semibold">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-emerald-400 font-bold">Renovate:</span>
+                    <span>Out-of-pocket</span>
+                    <span 
+                      className="inline-flex cursor-help text-slate-400 hover:text-white transition"
+                      title="Year 0: $0 (HELOC funding covers quote + permits). Years 1–5: 12 months of your current mortgage payment + the new renovation HELOC payment (+ temporary rental costs, if applicable)."
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5">
+                        <path fillRule="evenodd" d="M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0ZM9 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM6.75 7.25a.75.75 0 0 0 0 1.5h.75v3a.75.75 0 0 0 1.5 0v-3.75a.75.75 0 0 0-.75-.75h-1.5Z" clipRule="evenodd" />
+                      </svg>
+                    </span>
+                  </div>
+                </td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.improvePathway[0].yearlySpent)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.improvePathway[1].yearlySpent)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.improvePathway[3].yearlySpent)}</td>
@@ -751,7 +764,20 @@ export default function MoveOrImproveCalculator() {
                 <td className="py-3.5 px-3 tabular-nums text-right font-extrabold text-sm text-emerald-300 bg-emerald-900 border border-emerald-700/80 rounded px-2.5 py-1.5 shadow-[inset_0_0_12px_rgba(16,185,129,0.3)]">{formatCurrency(result.variance.fiveYearTotalImprove)}</td>
               </tr>
               <tr className="bg-slate-900/30 hover:bg-slate-900/50">
-                <td className="py-3.5 px-3 font-semibold"><span className="text-cyan-400 font-bold mr-1.5">Move:</span>Out-of-pocket</td>
+                <td className="py-3.5 px-3 font-semibold">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-cyan-400 font-bold">Move:</span>
+                    <span>Out-of-pocket</span>
+                    <span 
+                      className="inline-flex cursor-help text-slate-400 hover:text-white transition"
+                      title="Year 0: Upfront selling friction (broker commission, transfer taxes, moving expenses) + recordation fees on the new loan. Years 1–5: 12 months of new mortgage payments."
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5">
+                        <path fillRule="evenodd" d="M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0ZM9 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM6.75 7.25a.75.75 0 0 0 0 1.5h.75v3a.75.75 0 0 0 1.5 0v-3.75a.75.75 0 0 0-.75-.75h-1.5Z" clipRule="evenodd" />
+                      </svg>
+                    </span>
+                  </div>
+                </td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[0].yearlySpent)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[1].yearlySpent)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[3].yearlySpent)}</td>
