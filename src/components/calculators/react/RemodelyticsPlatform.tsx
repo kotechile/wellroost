@@ -381,7 +381,7 @@ export default function RemodelyticsPlatform() {
 				</div>
 			</div>
 
-			<div className="grid grid-cols-[repeat(auto-fit,minmax(14rem,1fr))] gap-5 rounded-[1.8rem] border border-slate-800/90 bg-slate-950/40 p-5">
+			<div className="grid grid-cols-[repeat(auto-fit,minmax(14rem,1fr))] gap-5 rounded-[1.8rem] border border-slate-800/90 bg-slate-950/55 p-5">
 				<label className="grid min-w-0 gap-3 rounded-[1.35rem] border border-slate-800/80 bg-slate-950/45 p-4">
 					<span className="text-sm font-semibold tracking-wide text-slate-100">Project type</span>
 					<select
@@ -636,15 +636,15 @@ export default function RemodelyticsPlatform() {
 				/>
 			</div>
 
-			<div className="grid gap-5 rounded-[1.8rem] border border-slate-800/90 bg-slate-950/40 p-5">
+			<div className="grid gap-5 rounded-[1.8rem] border border-slate-800/90 bg-slate-950/55 p-5">
 				<div className="flex flex-wrap items-end justify-between gap-4">
 					<div>
-						<p className="font-mono text-xs uppercase tracking-[0.28em] text-cyan-300/70">
+						<p className="font-mono text-xs uppercase tracking-[0.28em] text-cyan-200">
 							Underwriting assumptions
 						</p>
 						<h3 className="mt-2 text-xl font-semibold text-white">As-completed valuation and leverage</h3>
 					</div>
-					<span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 font-mono text-[0.64rem] uppercase tracking-[0.22em] text-slate-400">
+					<span className="rounded-full border border-white/20 bg-white/8 px-3 py-1 font-mono text-[0.64rem] uppercase tracking-[0.22em] text-slate-300">
 						<Acronym term="FHA" /> / HomeStyle / <Acronym term="HELOC" /> stress
 					</span>
 				</div>
@@ -697,15 +697,15 @@ export default function RemodelyticsPlatform() {
 				</div>
 			</div>
 
-			<div className="grid gap-5 rounded-[1.8rem] border border-slate-800/90 bg-slate-950/40 p-5">
+			<div className="grid gap-5 rounded-[1.8rem] border border-slate-800/90 bg-slate-950/55 p-5">
 				<div className="flex flex-wrap items-end justify-between gap-4">
 					<div>
-						<p className="font-mono text-xs uppercase tracking-[0.28em] text-emerald-300/70">
+						<p className="font-mono text-xs uppercase tracking-[0.28em] text-emerald-300">
 							Income and energy assumptions
 						</p>
 						<h3 className="mt-2 text-xl font-semibold text-white">ADU cash flow and green appraisal inputs</h3>
 					</div>
-					<span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 font-mono text-[0.64rem] uppercase tracking-[0.22em] text-slate-400">
+					<span className="rounded-full border border-white/20 bg-white/8 px-3 py-1 font-mono text-[0.64rem] uppercase tracking-[0.22em] text-slate-300">
 						30-year lifecycle
 					</span>
 				</div>

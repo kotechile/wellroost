@@ -41,31 +41,29 @@ export default function AddressLookupPanel({
 						workflow before adding a live data provider.
 					</p>
 				</div>
-				<span className="rounded-full border border-white/25 bg-white/10 px-3 py-1 font-mono text-[0.64rem] uppercase tracking-[0.22em] text-slate-200">
+				<span className="rounded-full border border-white/20 bg-white/8 px-3 py-1 font-mono text-[0.64rem] uppercase tracking-[0.22em] text-slate-300">
 					{status === 'loaded' ? 'context loaded' : status === 'loading' ? 'looking up' : 'manual fallback'}
 				</span>
 			</div>
 
-			<div className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,1.15fr)_minmax(17rem,0.85fr)]">
+			<div className="mt-5 grid gap-4">
 				<div className="rounded-[1.35rem] border border-slate-800/80 bg-slate-950/55 p-4">
 					<label className="grid gap-3">
 						<span className="text-sm font-semibold tracking-wide text-slate-100">Property address</span>
-						<div className="flex flex-col gap-3 sm:flex-row">
-							<input
-								value={address}
-								onChange={(event) => onAddressChange(event.target.value)}
-								placeholder="123 Example St, Miami Beach, FL 33139"
-								className="min-w-0 flex-1 rounded-[1rem] border border-slate-700/80 bg-slate-950/80 px-4 py-3 text-sm font-semibold text-white outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 sm:text-base"
-							/>
-							<button
-								type="button"
-								onClick={onLookup}
-								disabled={status === 'loading'}
-								className="shrink-0 whitespace-nowrap rounded-[1rem] border border-cyan-400/40 bg-cyan-400/20 px-4 py-3 text-sm font-semibold text-cyan-50 transition hover:bg-cyan-400/25 disabled:cursor-wait disabled:opacity-70"
-							>
-								{status === 'loading' ? 'Loading context...' : 'Load property context'}
-							</button>
-						</div>
+						<input
+							value={address}
+							onChange={(event) => onAddressChange(event.target.value)}
+							placeholder="123 Example St, Miami Beach, FL 33139"
+							className="w-full rounded-[1rem] border border-slate-700/80 bg-slate-950/80 px-4 py-3 text-sm font-semibold text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 sm:text-base"
+						/>
+						<button
+							type="button"
+							onClick={onLookup}
+							disabled={status === 'loading'}
+							className="w-full rounded-[1rem] border border-cyan-400/40 bg-cyan-400/15 px-5 py-3 text-sm font-semibold text-cyan-50 transition hover:bg-cyan-400/25 focus:outline-none focus:ring-2 focus:ring-cyan-400/30 disabled:cursor-wait disabled:opacity-70 sm:w-auto"
+						>
+							{status === 'loading' ? 'Loading context...' : 'Load property context'}
+						</button>
 					</label>
 
 					{message ? (
@@ -82,7 +80,7 @@ export default function AddressLookupPanel({
 					) : null}
 				</div>
 
-				<div className="grid grid-cols-[repeat(auto-fit,minmax(11rem,1fr))] gap-3">
+				<div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
 					<div className="rounded-[1.15rem] border border-slate-800 bg-slate-950/55 p-4">
 						<p className="font-mono text-[0.66rem] uppercase tracking-[0.22em] text-slate-400">ZIP</p>
 						<p className="mt-3 text-xl font-semibold tabular-nums text-white">
