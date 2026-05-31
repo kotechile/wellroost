@@ -18,6 +18,9 @@ export interface RenovationInputs {
   overrunRate: number; // e.g. 0.10 for 10%
   addBedBath: boolean;
   isSecondStory: boolean;
+  isAddition: boolean;
+  currentSqft: number;
+  addedSqft: number;
 }
 
 export interface MoveOrImproveInputs {

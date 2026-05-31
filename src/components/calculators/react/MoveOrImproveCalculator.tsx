@@ -28,7 +28,10 @@ const INITIAL_INPUTS: MoveOrImproveInputs = {
     quoteAmount: 85000,
     overrunRate: 0.10,
     addBedBath: false,
-    isSecondStory: false
+    isSecondStory: false,
+    isAddition: false,
+    currentSqft: 2000,
+    addedSqft: 0
   }
 };
 
@@ -371,6 +374,15 @@ export default function MoveOrImproveCalculator() {
                     />
                     <span className="text-xs text-slate-200">Second-story addition (+50% cost, 6 months temp rent)</span>
                   </label>
+                  <label className="flex items-center space-x-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={inputs.renovation.isAddition}
+                      onChange={(e) => updateRenovation('isAddition', e.target.checked)}
+                      className="rounded border-slate-800 bg-slate-950 text-emerald-500 focus:ring-emerald-500/20"
+                    />
+                    <span className="text-xs text-slate-200">This includes a physical addition (adding square footage)</span>
+                  </label>
                 </div>
               </div>
 
@@ -395,6 +407,46 @@ export default function MoveOrImproveCalculator() {
                 </div>
               </div>
             </div>
+
+            {inputs.renovation.isAddition && (
+              <div className="rounded-[1.5rem] border border-emerald-500/20 bg-emerald-950/15 p-5 grid gap-4 md:grid-cols-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+                <div>
+                  <h4 className="text-sm font-semibold text-slate-100">Addition Footprint Details</h4>
+                  <p className="mt-1 text-xs text-slate-400">Values are scaled using local comps per square foot.</p>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className="grid gap-1.5">
+                    <span className="text-xs text-slate-300">Current Home Size (sqft)</span>
+                    <input
+                      type="number"
+                      min="500"
+                      max="15000"
+                      step="100"
+                      value={inputs.renovation.currentSqft}
+                      onChange={(e) => updateRenovation('currentSqft', parseInt(e.target.value) || 0)}
+                      className="rounded-xl border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-white focus:border-emerald-500 outline-none"
+                    />
+                  </label>
+                  <label className="grid gap-1.5">
+                    <span className="text-xs text-slate-300">Addition Size (sqft)</span>
+                    <input
+                      type="number"
+                      min="0"
+                      max="5000"
+                      step="50"
+                      value={inputs.renovation.addedSqft}
+                      onChange={(e) => updateRenovation('addedSqft', parseInt(e.target.value) || 0)}
+                      className="rounded-xl border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-white focus:border-emerald-500 outline-none"
+                    />
+                  </label>
+                </div>
+                {inputs.renovation.currentSqft > 0 && inputs.renovation.addedSqft > 0 && (
+                  <div className="md:col-span-2 text-xs text-emerald-400 font-semibold bg-emerald-950/40 p-2.5 rounded-xl border border-emerald-800/40">
+                    (+{((inputs.renovation.addedSqft / inputs.renovation.currentSqft) * 100).toFixed(0)}% space added to your home footprint)
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 

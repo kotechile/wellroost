@@ -107,6 +107,16 @@ export function runCapExMatrixCalculator(inputs: MoveOrImproveInputs): MoveOrImp
   
   const newMonthlyPayment = calculateMonthlyPayment(newLoanAmount, newMortgageRate, newMortgageTermMonths);
   
+  // Calculate value boost from physical square footage addition vs standard ROI fallback
+  let vRenovatedCompletion = currentValue;
+  if (renovation.isAddition && renovation.currentSqft > 0 && renovation.addedSqft > 0) {
+    const localPricePerSqft = currentValue / renovation.currentSqft;
+    const realEstateEquityBoost = renovation.addedSqft * localPricePerSqft * 0.85; // 0.85 Integration Factor
+    vRenovatedCompletion = currentValue + realEstateEquityBoost;
+  } else {
+    vRenovatedCompletion = currentValue + (totalQuoteCost * activeRoi);
+  }
+  
   // Year-by-year calculations (m = 12 * y)
   const improvePathway: LedgerYearRow[] = [];
   const movePathway: LedgerYearRow[] = [];
@@ -135,7 +145,6 @@ export function runCapExMatrixCalculator(inputs: MoveOrImproveInputs): MoveOrImp
     const m = year * 12;
     
     // Improvement Pathway Calculations
-    const vRenovatedCompletion = currentValue + (totalQuoteCost * activeRoi);
     const vImprove = vRenovatedCompletion * Math.pow(1 + annualAppreciation, year);
     
     const legacyBal = calculateProspectiveBalance(
