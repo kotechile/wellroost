@@ -2,17 +2,18 @@ import { useId, useMemo, useState, type ReactNode } from 'react';
 
 import { calculateRemodelytics } from '../../../lib/calculators/remodelytics';
 import { formatCurrency } from '../../../lib/calculators/format';
-import { fetchPropertyContext } from '../../../lib/remodelytics/adapters/property';
-import { fetchValuationContext } from '../../../lib/remodelytics/adapters/valuation';
+// Temporarily hidden: Property lookup adapter and panel imports
+// import { fetchPropertyContext } from '../../../lib/remodelytics/adapters/property';
+// import { fetchValuationContext } from '../../../lib/remodelytics/adapters/valuation';
 import { mergeRemodelyticsInputs } from '../../../lib/remodelytics/merge';
-import type { RemodelyticsFetchedContext, RemodelyticsOverrides } from '../../../lib/remodelytics/types';
+import type { RemodelyticsOverrides } from '../../../lib/remodelytics/types';
 import type {
 	RemodelyticsEngine,
 	RemodelyticsInputs,
 	RemodelyticsMaterialTier,
 	RemodelyticsProjectType
 } from '../../../lib/calculators/types';
-import AddressLookupPanel from './AddressLookupPanel';
+// import AddressLookupPanel from './AddressLookupPanel';
 
 const INITIAL_INPUTS: RemodelyticsInputs = {
 	engine: 'resale',
@@ -212,19 +213,21 @@ function MetricCard({ label, value, detail, tone = 'cyan' }: MetricCardProps) {
 }
 
 export default function RemodelyticsPlatform() {
-	const [address, setAddress] = useState(INITIAL_ADDRESS);
-	const [fetchedContext, setFetchedContext] = useState<RemodelyticsFetchedContext | null>(null);
+	// Temporary hidden: Property lookup states (can be restored when connecting live data provider)
+	// const [address, setAddress] = useState(INITIAL_ADDRESS);
+	// const [fetchedContext, setFetchedContext] = useState<any>(null);
+	// const [lookupStatus, setLookupStatus] = useState<'idle' | 'loading' | 'loaded' | 'error'>('idle');
+	// const [lookupMessage, setLookupMessage] = useState<string | null>(null);
 	const [overrides, setOverrides] = useState<RemodelyticsOverrides>({});
-	const [lookupStatus, setLookupStatus] = useState<'idle' | 'loading' | 'loaded' | 'error'>('idle');
-	const [lookupMessage, setLookupMessage] = useState<string | null>(null);
 	const [copied, setCopied] = useState(false);
 	const fieldId = useId();
 	const inputs = useMemo(
-		() => mergeRemodelyticsInputs(INITIAL_INPUTS, fetchedContext, overrides),
-		[fetchedContext, overrides]
+		() => mergeRemodelyticsInputs(INITIAL_INPUTS, null, overrides),
+		[overrides]
 	);
 	const breakdown = useMemo(() => calculateRemodelytics(inputs), [inputs]);
 
+	/*
 	const runPropertyLookup = async (nextAddress = address, nextProjectType = inputs.projectType) => {
 		const normalizedAddress = nextAddress.trim();
 
@@ -260,20 +263,23 @@ export default function RemodelyticsPlatform() {
 			);
 		}
 	};
+	*/
 
 	const updateInput = <K extends keyof RemodelyticsInputs>(key: K, value: RemodelyticsInputs[K]) => {
 		setOverrides((current) => ({ ...current, [key]: value }));
 
+		/*
 		if (key === 'projectType' && fetchedContext?.property?.address?.value) {
 			void runPropertyLookup(fetchedContext.property.address.value, value as RemodelyticsProjectType);
 		}
+		*/
 	};
 
 	const exportPacket = async () => {
 		const packet = {
 			tool: 'Remodelytics underwriting packet',
 			property: {
-				address: fetchedContext?.property?.address?.value ?? address,
+				address: INITIAL_ADDRESS,
 				zipCode: inputs.zipCode,
 				homeValue: inputs.homeValue,
 				homeSize: inputs.homeSize,
@@ -297,6 +303,7 @@ export default function RemodelyticsPlatform() {
 
 	return (
 		<div className="grid gap-6">
+			{/* Temporary hidden: Property lookup panel
 			<AddressLookupPanel
 				address={address}
 				status={lookupStatus}
@@ -305,6 +312,7 @@ export default function RemodelyticsPlatform() {
 				onAddressChange={setAddress}
 				onLookup={() => void runPropertyLookup()}
 			/>
+			*/}
 
 			<div className="overflow-hidden rounded-[1.8rem] border border-cyan-500/20 bg-[linear-gradient(135deg,rgba(0,11,80,0.96),rgba(2,6,23,0.98)_58%,rgba(10,37,100,0.95))]">
 				<div className="grid gap-6 px-6 py-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)] xl:px-7">
