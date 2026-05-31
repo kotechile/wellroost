@@ -96,9 +96,14 @@ export function runCapExMatrixCalculator(inputs: MoveOrImproveInputs): MoveOrImp
   const sellFriction = sellCommission + countyTaxDetails.transferTax + friction.movingExpenses;
   const netHomeSaleProceeds = currentValue - legacyDebt.principalBalance - sellFriction;
   
-  // Buying new home details: downpayment is rolled from net proceeds, capped at purchase price
-  const downPayment = Math.min(newPropertyPrice, Math.max(0, netHomeSaleProceeds));
-  const newLoanAmount = Math.max(0, newPropertyPrice - downPayment);
+  // Calculate remaining cash "delta" after buying the new home
+  const deltaCashReceived = netHomeSaleProceeds - newPropertyPrice;
+  
+  // If delta is negative, a new mortgage is needed. Otherwise, new loan is 0.
+  const newLoanAmount = deltaCashReceived < 0 ? Math.abs(deltaCashReceived) : 0;
+  
+  // If delta is positive, we downsized and keep the leftover cash in hand.
+  const leftoverCash = deltaCashReceived > 0 ? deltaCashReceived : 0;
   
   const newMonthlyPayment = calculateMonthlyPayment(newLoanAmount, newMortgageRate, newMortgageTermMonths);
   
@@ -117,7 +122,7 @@ export function runCapExMatrixCalculator(inputs: MoveOrImproveInputs): MoveOrImp
   movePathway.push({
     grossValue: newPropertyPrice,
     outstandingDebt: newLoanAmount,
-    netEquity: newPropertyPrice - newLoanAmount,
+    netEquity: (newPropertyPrice + leftoverCash) - newLoanAmount,
     cumulativePayments: sellFriction + countyTaxDetails.recordationTax
   });
 
@@ -162,7 +167,7 @@ export function runCapExMatrixCalculator(inputs: MoveOrImproveInputs): MoveOrImp
     movePathway.push({
       grossValue: vMove,
       outstandingDebt: mortgageBalNew,
-      netEquity: vMove - mortgageBalNew,
+      netEquity: (vMove + leftoverCash) - mortgageBalNew,
       cumulativePayments: cumPaymentsMove
     });
   }
