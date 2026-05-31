@@ -788,6 +788,34 @@ export default function MoveOrImproveCalculator() {
           </table>
         </div>
 
+        {/* ——— OUT-OF-POCKET EXPLANATION GUIDE ——— */}
+        <div className="mt-5 p-5 rounded-2xl border border-slate-800/80 bg-slate-950/45 grid gap-5 md:grid-cols-2 text-xs leading-6 text-slate-300">
+          <div>
+            <span className="font-semibold text-emerald-400 flex items-center gap-1.5 mb-2 font-mono uppercase tracking-wider text-[0.7rem]">
+              <span className="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
+              Renovate Out-of-Pocket Breakdown
+            </span>
+            <p>
+              <strong>Year 0 ($0):</strong> Upfront construction and permit fees are fully covered by the HELOC loan, requiring $0 initial out-of-pocket cash.
+            </p>
+            <p className="mt-2">
+              <strong>Years 1–5 (Ongoing):</strong> Consists of 12 months of your primary legacy mortgage payments plus the new HELOC loan payments (plus temporary rent in Year 1 if a second-story addition is selected).
+            </p>
+          </div>
+          <div className="border-t border-slate-800/60 pt-4 md:border-t-0 md:pt-0 md:border-l md:border-slate-800/60 md:pl-5">
+            <span className="font-semibold text-cyan-400 flex items-center gap-1.5 mb-2 font-mono uppercase tracking-wider text-[0.7rem]">
+              <span className="inline-block w-2 h-2 rounded-full bg-cyan-500"></span>
+              Move Out-of-Pocket Breakdown
+            </span>
+            <p>
+              <strong>Year 0 (Upfront fees):</strong> Selling friction transaction fees (broker commissions, transfer taxes, physical moving expenses) plus recordation taxes for the new property mortgage.
+            </p>
+            <p className="mt-2">
+              <strong>Years 1–5 (Ongoing):</strong> Consists of 12 months of mortgage payments on your new loan (based on the new purchase rate and loan balance).
+            </p>
+          </div>
+        </div>
+
         {/* ——— BOTTOM-LINE SUMMARY ——— */}
         <div className={`mt-6 rounded-[1.3rem] p-5 border ${
           improveIsBetter
