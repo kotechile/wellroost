@@ -10,22 +10,27 @@ const { post } = Astro.props;
 // Helper to generate a simulated decision metric based on title hash or length for visual consistency
 const pseudoMetric = (title: string) => {
 	const val = title.length % 3;
-	if (val === 0) return { roi: '14.2%', effort: 'Low' };
-	if (val === 1) return { roi: '8.5%', effort: 'Med' };
-	return { roi: '21.0%', effort: 'High' };
+	if (val === 0) return { roi: 'High ROI', effort: 'Low Effort' };
+	if (val === 1) return { roi: 'Moderate ROI', effort: 'Medium Effort' };
+	return { roi: 'Max ROI', effort: 'Strategic Lift' };
 };
 
 const metric = pseudoMetric(post.title);
+const formattedDate = post.date ? new Date(post.date).toLocaleDateString('en-US', {
+	year: 'numeric',
+	month: 'short',
+	day: 'numeric'
+}) : 'Latest';
 ---
 
-<article class="group h-full overflow-hidden rounded-xl border border-gray-200 bg-white transition duration-200 ease-out hover:-translate-y-1 hover:border-gray-300 hover:shadow-md">
+<article class="group h-full overflow-hidden rounded-2xl border border-gray-200 bg-white transition duration-200 ease-out hover:-translate-y-1 hover:border-gray-300 hover:shadow-md">
 	<a
 		href={`/${post.slug}/`}
 		class="flex h-full flex-col focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
 	>
 		{
-			post.featuredImage && (
-				<div class="h-48 overflow-hidden border-b border-gray-100 bg-gray-50">
+			post.featuredImage ? (
+				<div class="h-48 w-full overflow-hidden border-b border-gray-100 bg-gray-50">
 					<img
 						src={post.featuredImage}
 						alt={post.featuredImageAlt || ''}
@@ -33,13 +38,19 @@ const metric = pseudoMetric(post.title);
 						class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
 					/>
 				</div>
+			) : (
+				<div class="h-48 w-full bg-gray-50 border-b border-gray-100 flex items-center justify-center text-gray-400">
+					<svg class="h-10 w-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 4a2 2 0 00-2-2m-2-3V3m8 8h-6M21 12H9m0 0v-4" />
+					</svg>
+				</div>
 			)
 		}
 		
 		<div class="flex flex-1 flex-col p-6">
-			<div class="flex items-center justify-between gap-4 text-xs font-medium uppercase tracking-wider text-gray-500 mb-4 border-b border-gray-100 pb-3">
-				<span class="text-primary">{post.categoryLabel ?? 'Brief'}</span>
-				<span>{post.date ? new Date(post.date).toLocaleDateString() : 'REAL-TIME'}</span>
+			<div class="flex items-center justify-between gap-4 text-xs font-medium uppercase tracking-wider text-gray-500 mb-3 border-b border-gray-100 pb-3">
+				<span class="text-primary font-semibold">{post.categoryLabel ?? 'Guide'}</span>
+				<span class="font-mono text-[11px] text-gray-400">{formattedDate}</span>
 			</div>
 			
 			<h3 class="text-xl font-bold tracking-tight text-gray-1000 transition-colors leading-tight group-hover:text-primary">
@@ -47,18 +58,18 @@ const metric = pseudoMetric(post.title);
 			</h3>
 			
 			<p class="mt-3 flex-1 text-sm leading-6 text-gray-600 line-clamp-3">
-				{post.excerpt || 'Data points detected. Full analysis available in the WellRoost portal.'}
+				{post.excerpt || 'Read the full guide and analytical breakdown on WellRoost.'}
 			</p>
 			
-			<div class="mt-6 flex items-center justify-between rounded-lg bg-gray-50 border border-gray-100 p-3 text-xs font-medium">
+			<div class="mt-6 flex items-center justify-between rounded-xl bg-gray-50 border border-gray-100 p-3 text-xs font-medium">
 				<div>
-					<span class="text-gray-500 uppercase tracking-wide">Exp. ROI:</span> 
-					<span class="text-gray-1000 ml-1">{metric.roi}</span>
+					<span class="text-gray-400 uppercase tracking-wide text-[10px]">Impact:</span> 
+					<span class="text-gray-900 font-semibold ml-1">{metric.roi}</span>
 				</div>
 				<div class="h-4 w-px bg-gray-200"></div>
 				<div>
-					<span class="text-gray-500 uppercase tracking-wide">Effort:</span> 
-					<span class="text-gray-1000 ml-1">{metric.effort}</span>
+					<span class="text-gray-400 uppercase tracking-wide text-[10px]">Scope:</span> 
+					<span class="text-gray-900 font-semibold ml-1">{metric.effort}</span>
 				</div>
 			</div>
 		</div>

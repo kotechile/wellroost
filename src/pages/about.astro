@@ -1,53 +1,61 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getOverviewContent } from '../lib/overview';
-
-const overview = await getOverviewContent();
 ---
 
 <BaseLayout
-	title="About | Gini Loh"
-	description="Learn the mission, audience, and integrated strategy thesis behind Gini Loh."
+	title="About | WellRoost"
+	description="Learn the mission, data frameworks, and decision thesis behind WellRoost."
 >
 	<link slot="head" rel="canonical" href={new URL('/about/', Astro.site).toString()} />
-	<section class="pt-32">
-		<p class="section-eyebrow">About Gini Loh</p>
-		<h1 class="mt-4 max-w-4xl text-5xl font-bold tracking-tight text-white sm:text-6xl">
-			One integrated resource for earning more, keeping more, and growing more
+
+	<section class="pt-20 sm:pt-28">
+		<p class="section-eyebrow">About WellRoost</p>
+		<h1 class="mt-3 max-w-4xl text-4xl sm:text-5xl font-bold tracking-tight text-gray-1000">
+			The Decision Engine for Your Home
 		</h1>
-		<p class="mt-6 max-w-3xl text-lg leading-8 text-slate-400 font-mono">
-			> {overview.mission}
+		<p class="mt-6 max-w-3xl text-lg leading-relaxed text-gray-600">
+			WellRoost was built on a simple premise: homeownership decisions shouldn't rely on guesswork or contractor sales pitches. We provide the analytical frameworks, calculators, and objective models to help you make high-ROI choices for your property.
 		</p>
 	</section>
 
-	<section class="mt-12 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-		<div class="panel-soft rounded-[2.2rem] border border-slate-800 bg-slate-900/40 p-8 shadow-2xl backdrop-blur-md">
-			<p class="section-eyebrow text-cyan-400">Origin Story</p>
-			<p class="mt-4 text-lg leading-8 text-slate-400 font-mono">> {overview.originStory}</p>
+	<section class="mt-12 grid gap-6 md:grid-cols-2">
+		<div class="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
+			<p class="text-xs font-semibold uppercase tracking-wider text-primary">Our Philosophy</p>
+			<h2 class="mt-2 text-2xl font-bold text-gray-1000">Numbers Before Hammers</h2>
+			<p class="mt-4 text-sm sm:text-base leading-relaxed text-gray-600">
+				Whether you are evaluating a $60,000 kitchen remodel, considering a heat pump conversion, or deciding whether to move or improve, our calculators quantify the actual payback, resale lift, and total cost of ownership.
+			</p>
 		</div>
-		<div class="rounded-[2.2rem] border border-slate-800 bg-slate-950 p-8 relative overflow-hidden">
-			<div class="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PGRlZnM+PHBhdHRlcm4gaWQ9ImciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTTAgNDBoNDBNNDAgMHY0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEiIG9wYWNpdHk9IjAuMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNnKSIvPjwvc3ZnPg==')]"></div>
-			<p class="section-eyebrow text-emerald-400 relative z-10">Brand Thesis</p>
-			<div class="mt-4 grid gap-4 relative z-10">
-				{overview.aboutSections.map((section) => (
-					<div class="rounded-[1.6rem] border border-slate-800 bg-slate-900/50 p-5">
-						<h2 class="text-2xl font-bold tracking-tight text-white">{section.title}</h2>
-						<p class="mt-3 text-base leading-7 text-slate-400">{section.body}</p>
-					</div>
-				))}
-			</div>
+		<div class="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
+			<p class="text-xs font-semibold uppercase tracking-wider text-emerald-600">Integrated Strategy</p>
+			<h2 class="mt-2 text-2xl font-bold text-gray-1000">Tools + Editorial Insights</h2>
+			<p class="mt-4 text-sm sm:text-base leading-relaxed text-gray-600">
+				We connect dynamic calculators with live intelligence articles synced from our central knowledge base, giving you both the high-level strategy and the granular math.
+			</p>
 		</div>
 	</section>
 
 	<section class="mt-12">
-		<p class="section-eyebrow text-cyan-400">Audience</p>
-		<div class="mt-4 grid gap-5 md:grid-cols-3">
-			{overview.audience.map((segment) => (
-				<article class="panel-soft rounded-[1.9rem] border border-slate-800 bg-slate-900/40 p-6 shadow-2xl backdrop-blur-md">
-					<h2 class="text-2xl font-bold tracking-tight text-white">{segment.title}</h2>
-					<p class="mt-3 text-base leading-7 text-slate-400 font-mono">> {segment.description}</p>
-				</article>
-			))}
+		<p class="section-eyebrow">Who We Serve</p>
+		<div class="mt-4 grid gap-6 md:grid-cols-3">
+			<article class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+				<h3 class="text-lg font-bold text-gray-1000">Homeowners</h3>
+				<p class="mt-2 text-sm leading-relaxed text-gray-600">
+					Planning high-stakes renovations and looking to maximize equity growth while avoiding costly contractor pitfalls.
+				</p>
+			</article>
+			<article class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+				<h3 class="text-lg font-bold text-gray-1000">Move vs. Improve Evaluators</h3>
+				<p class="mt-2 text-sm leading-relaxed text-gray-600">
+					Weighing the 5-year financial impact of selling and buying versus expanding their current footprint.
+				</p>
+			</article>
+			<article class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+				<h3 class="text-lg font-bold text-gray-1000">System Builders</h3>
+				<p class="mt-2 text-sm leading-relaxed text-gray-600">
+					Optimizing residential energy, smart home ecosystems, preventive maintenance, and utility efficiency.
+				</p>
+			</article>
 		</div>
 	</section>
 </BaseLayout>

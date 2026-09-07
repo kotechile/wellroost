@@ -18,32 +18,32 @@ export interface OverviewContent {
 }
 
 const FALLBACK_OVERVIEW: OverviewContent = {
-	eyebrow: 'Integrated career and wealth systems',
-	headline: 'Master your money. Accelerate your career.',
+	eyebrow: 'The Decision Engine for Your Home',
+	headline: 'Stop guessing. Start calculating.',
 	subheadline:
-		'Gini Loh connects compensation strategy, automation, and investing so ambitious professionals can earn more, keep more, and build a life with less friction.',
+		'WellRoost connects home renovation ROI, energy optimization, and financial analytics so homeowners make objective, high-ROI property choices.',
 	mission:
-		'Create one practical roadmap for professionals who want bigger paychecks, smarter portfolios, and a more intentional life.',
+		'Create practical data tools and insights for homeowners and buyers making expensive property, remodeling, and lifestyle choices.',
 	originStory:
-		'The front end is ready for a richer brand narrative once giniloh_overview.md is available. For now, this copy keeps the positioning aligned with the project mission from AGENTS.md.',
+		'WellRoost was created to eliminate guesswork from homeownership. Instead of relying on contractor sales pitches or unverified opinions, we provide transparent financial models and decision engines.',
 	audience: [
 		{
-			title: 'Ambitious professionals',
-			description: 'Readers growing their income and looking for a better capital allocation strategy.'
+			title: 'Homeowners',
+			description: 'Planning renovations and looking to maximize equity growth and comfort.'
 		},
 		{
-			title: 'System builders',
-			description: 'People who want to use automation, AI, and process design to buy back time.'
+			title: 'Move vs. Improve Evaluators',
+			description: 'Comparing the 5-year financial impact of renovating versus selling and relocating.'
 		},
 		{
-			title: 'Strategic decision-makers',
-			description: 'Readers evaluating trade-offs across work, money, property, and long-term optionality.'
+			title: 'System Builders',
+			description: 'Optimizing residential energy, smart home systems, and preventive maintenance.'
 		}
 	],
 	aboutSections: [
 		{
-			title: 'What Gini Loh Covers',
-			body: 'Career growth, investing, operating systems, and decision-making frameworks built for modern professionals.'
+			title: 'What WellRoost Covers',
+			body: 'Remodeling ROI, energy optimization, move vs. improve tradeoffs, and residential property finances.'
 		}
 	]
 };
@@ -60,57 +60,17 @@ async function loadOverview() {
 		return FALLBACK_OVERVIEW;
 	}
 
-	const rawContent = await readFile(overviewPath, 'utf8');
-	const cleanedContent = rawContent.replace(/\r/g, '');
+	try {
+		const rawContent = await readFile(overviewPath, 'utf8');
+		const cleanedContent = rawContent.replace(/\r/g, '');
 
-	const headlineMatch = cleanedContent.match(/Master Your Money\.\s*Accelerate Your Career/i);
-	const originMatch = cleanedContent.match(
-		/The path to financial freedom[\s\S]*?We built Gini Loh to be the resource we wished we had\.[\s\S]*?fulfilling life\./i
-	);
-	const missionMatch = cleanedContent.match(
-		/Our mission is to give high-potential professionals[\s\S]*?24\/7 networking robot\./i
-	);
-
-	const audience: AudienceSegment[] = [
-		{
-			title: 'The go-getter',
-			description: 'Ready to negotiate the next offer for maximum compensation and long-term leverage.'
-		},
-		{
-			title: 'System builder',
-			description: 'Looking to automate saving, investing, retirement contributions, and day-to-day execution.'
-		},
-		{
-			title: 'Aspiring leader',
-			description: 'Building a career through intentional skill-stacking, promotion strategy, and better decisions.'
-		}
-	];
-
-	return {
-		eyebrow: 'Data-driven decisions for ambitious professionals',
-		headline: headlineMatch?.[0] ?? FALLBACK_OVERVIEW.headline,
-		subheadline:
-			'Integrated career strategy and financial operating systems for people who want more income, smarter portfolios, and a life with less chaos.',
-		mission: cleanTextBlock(missionMatch?.[0] ?? FALLBACK_OVERVIEW.mission),
-		originStory: cleanTextBlock(originMatch?.[0] ?? FALLBACK_OVERVIEW.originStory),
-		audience,
-		aboutSections: [
-			{
-				title: 'Why the Site Exists',
-				body: cleanTextBlock(
-					originMatch?.[0] ??
-						'Gini Loh closes the gap between career advice and financial strategy so readers can connect higher income with better capital deployment.'
-				)
-			},
-			{
-				title: 'The Working Thesis',
-				body: cleanTextBlock(
-					missionMatch?.[0] ??
-						'The site is built to help readers earn more, keep more, and grow more by using integrated systems instead of disconnected advice.'
-				)
-			}
-		]
-	} satisfies OverviewContent;
+		return {
+			...FALLBACK_OVERVIEW,
+			originStory: cleanTextBlock(cleanedContent)
+		};
+	} catch {
+		return FALLBACK_OVERVIEW;
+	}
 }
 
 export async function getOverviewContent() {

@@ -15,60 +15,100 @@ export interface CategoryRecord {
 
 const FALLBACK_CATEGORIES: CategoryRecord[] = [
 	{
-		id: 'wordpress-categories-unavailable',
-		name: 'WordPress Categories Unavailable',
-		slug: 'wordpress-categories-unavailable',
-		description:
-			'TODO: configure PUBLIC_WORDPRESS_API_BASE and ensure the WordPress REST API is reachable so the category menu and pages can load live taxonomy data.',
+		id: 'home-finances',
+		name: 'Home Finances',
+		slug: 'home-finances',
+		description: 'Frameworks for maintenance budgeting, smart upgrades, insurance, and hidden property expenses.',
 		level: 1,
 		parentCategoryId: null,
 		wordpressCategoryId: null,
-		wordpressSiteDomain: null,
-		postCount: null,
+		wordpressSiteDomain: 'wellroost.com',
+		postCount: 0,
+		children: []
+	},
+	{
+		id: 'renovations-roi',
+		name: 'Renovations & ROI',
+		slug: 'renovations-roi',
+		description: 'Calculations for value-add remodeling, move vs improve tradeoffs, and equity-building renovations.',
+		level: 1,
+		parentCategoryId: null,
+		wordpressCategoryId: null,
+		wordpressSiteDomain: 'wellroost.com',
+		postCount: 0,
+		children: []
+	},
+	{
+		id: 'energy-systems',
+		name: 'Energy & Systems',
+		slug: 'energy-systems',
+		description: 'Objective math behind utility savings, heat pumps, solar transition, and preventive system maintenance.',
+		level: 1,
+		parentCategoryId: null,
+		wordpressCategoryId: null,
+		wordpressSiteDomain: 'wellroost.com',
+		postCount: 0,
+		children: []
+	},
+	{
+		id: 'gear-ecosystems',
+		name: 'Gear Ecosystems',
+		slug: 'gear-ecosystems',
+		description: 'Rigorous evaluations to ensure you invest in the right property tools and battery platforms.',
+		level: 1,
+		parentCategoryId: null,
+		wordpressCategoryId: null,
+		wordpressSiteDomain: 'wellroost.com',
+		postCount: 0,
 		children: []
 	}
 ];
 
 let categoryCache: Promise<CategoryRecord[]> | undefined;
 
-async function loadCategories() {
-	const liveCategories = await fetchAllCategories(100);
-	if (!liveCategories.length) {
-		return FALLBACK_CATEGORIES;
+async function loadCategories(): Promise<CategoryRecord[]> {
+	try {
+		const liveCategories = await fetchAllCategories(100);
+		if (liveCategories.length > 0) {
+			const filtered = liveCategories
+				.filter((category) => !category.parent && category.slug !== 'uncategorized')
+				.map((category) => ({
+					id: String(category.id),
+					name: category.name,
+					slug: category.slug,
+					description: category.description,
+					level: 1,
+					parentCategoryId: null,
+					wordpressCategoryId: category.id,
+					wordpressSiteDomain: 'wellroost.com',
+					postCount: category.count,
+					children: []
+				}));
+			
+			if (filtered.length > 0) {
+				return filtered;
+			}
+		}
+	} catch (error) {
+		console.error('Failed to fetch live categories from WordPress:', error);
 	}
 
-	const records: CategoryRecord[] = liveCategories
-		.filter((category) => !category.parent)
-		.map((category) => ({
-			id: String(category.id),
-			name: category.name,
-			slug: category.slug,
-			description: category.description,
-			level: 1,
-			parentCategoryId: null,
-			wordpressCategoryId: category.id,
-			wordpressSiteDomain: null,
-			postCount: category.count,
-			children: []
-		}))
-		.filter((category) => category.name && category.slug && category.slug !== 'uncategorized');
-
-	return records;
+	return FALLBACK_CATEGORIES;
 }
 
-export async function getAllCategories() {
+export async function getAllCategories(): Promise<CategoryRecord[]> {
 	categoryCache ??= loadCategories();
 	return categoryCache;
 }
 
-export async function getTopLevelCategories() {
+export async function getTopLevelCategories(): Promise<CategoryRecord[]> {
 	const categories = await getAllCategories();
 	return categories
 		.filter((category) => !category.parentCategoryId)
 		.sort((left, right) => left.name.localeCompare(right.name));
 }
 
-export async function getCategoryBySlug(slug: string) {
+export async function getCategoryBySlug(slug: string): Promise<CategoryRecord | null> {
 	const categories = await getAllCategories();
 	return categories.find((category) => category.slug === slug) ?? null;
 }

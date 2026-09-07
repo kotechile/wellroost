@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import JsonLd from '../components/JsonLd.astro';
 import { fetchAllPosts } from '../lib/wordpress';
 
 export async function getStaticPaths() {
@@ -21,47 +22,149 @@ const formattedDate = post.date ? new Date(post.date).toLocaleDateString('en-US'
   month: 'long',
   day: 'numeric'
 }) : '';
+
+// Determine metrics based on category slug or fallback
+const categorySlug = post.categorySlug || '';
+let estRoi = 'High';
+let estRoiWidth = '80%';
+let implementationEffort = 'Medium';
+let implementationWidth = '50%';
+let strategicValue = 'High';
+let strategicWidth = '85%';
+
+if (categorySlug.includes('renov') || categorySlug.includes('remodel')) {
+  estRoi = 'High';
+  estRoiWidth = '85%';
+  implementationEffort = 'High';
+  implementationWidth = '75%';
+  strategicValue = 'Max';
+  strategicWidth = '90%';
+} else if (categorySlug.includes('energy') || categorySlug.includes('system')) {
+  estRoi = 'High';
+  estRoiWidth = '80%';
+  implementationEffort = 'Medium';
+  implementationWidth = '50%';
+  strategicValue = 'High';
+  strategicWidth = '85%';
+} else if (categorySlug.includes('finance') || categorySlug.includes('budget')) {
+  estRoi = 'Max';
+  estRoiWidth = '95%';
+  implementationEffort = 'Low';
+  implementationWidth = '30%';
+  strategicValue = 'Max';
+  strategicWidth = '95%';
+}
+
+const siteUrl = Astro.site?.toString() || 'https://wellroost.com/';
+const postUrl = new URL(`/${post.slug}/`, siteUrl).toString();
+const categoryUrl = post.categorySlug ? new URL(`/categories/${post.categorySlug}/`, siteUrl).toString() : null;
+
+const articleSchema = {
+	"@context": "https://schema.org",
+	"@type": "Article",
+	"headline": post.title,
+	"description": post.excerpt,
+	"image": post.featuredImage || new URL('/favicon.svg', siteUrl).toString(),
+	"datePublished": post.date,
+	"dateModified": post.modified || post.date,
+	"author": {
+		"@type": "Organization",
+		"name": "WellRoost Editorial Team",
+		"url": siteUrl
+	},
+	"publisher": {
+		"@type": "Organization",
+		"name": "WellRoost",
+		"logo": {
+			"@type": "ImageObject",
+			"url": new URL('/favicon.svg', siteUrl).toString()
+		}
+	},
+	"mainEntityOfPage": {
+		"@type": "WebPage",
+		"@id": postUrl
+	}
+};
+
+const breadcrumbElements = [
+	{
+		"@type": "ListItem",
+		"position": 1,
+		"name": "Home",
+		"item": siteUrl
+	}
+];
+
+if (post.categoryLabel && post.categorySlug && categoryUrl) {
+	breadcrumbElements.push({
+		"@type": "ListItem",
+		"position": 2,
+		"name": post.categoryLabel,
+		"item": categoryUrl
+	});
+}
+
+breadcrumbElements.push({
+	"@type": "ListItem",
+	"position": breadcrumbElements.length + 1,
+	"name": post.title,
+	"item": postUrl
+});
+
+const breadcrumbSchema = {
+	"@context": "https://schema.org",
+	"@type": "BreadcrumbList",
+	"itemListElement": breadcrumbElements
+};
 ---
 
 <BaseLayout 
-  title={`${post.title} | Giniloh`}
+  title={`${post.title} | WellRoost`}
   description={post.excerpt}
 >
   <!-- SEO & Social Meta Tags -->
-  <link slot="head" rel="canonical" href={new URL(`/${post.slug}/`, Astro.site).toString()} />
+  <link slot="head" rel="canonical" href={postUrl} />
   <meta slot="head" property="og:title" content={post.title} />
   <meta slot="head" property="og:description" content={post.excerpt} />
   {post.featuredImage && <meta slot="head" property="og:image" content={post.featuredImage} />}
   <meta slot="head" name="twitter:card" content="summary_large_image" />
+  
+  <JsonLd slot="head" data={articleSchema} />
+  <JsonLd slot="head" data={breadcrumbSchema} />
 
-  <div class="max-w-[1400px] mx-auto px-6 py-12 md:py-20">
+  <!-- KaTeX for LaTeX Math Rendering -->
+  <link slot="head" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" />
+  <script slot="head" is:inline defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+  <script slot="head" is:inline defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+
+  <div class="max-w-[1300px] mx-auto px-4 py-12 md:py-16">
     <!-- Header Area -->
-    <div class="max-w-4xl mb-12 space-y-6">
-      <div class="flex flex-wrap items-center gap-4 text-[10px] md:text-xs font-mono tracking-widest text-cyan-400 uppercase">
-        <span class="px-2 py-1 bg-cyan-500/10 border border-cyan-500/20 rounded">Brief_ID: {post.id}</span>
+    <div class="max-w-4xl mb-10 space-y-5">
+      <div class="flex flex-wrap items-center gap-3 text-xs font-mono tracking-wider text-gray-500 uppercase">
+        <span class="px-2.5 py-1 bg-gray-100 border border-gray-200 rounded-md font-semibold text-gray-700">Guide_ID: {post.id}</span>
         {post.categoryLabel && (
-          <span class="px-2 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded text-emerald-400">
-            Sector: {post.categoryLabel}
-          </span>
+          <a href={categoryUrl ?? '#'} class="px-2.5 py-1 bg-blue-50 border border-blue-200 rounded-md text-primary font-bold hover:bg-blue-100 transition">
+            Pillar: {post.categoryLabel}
+          </a>
         )}
-        <span class="opacity-50">Released: {formattedDate}</span>
+        <span class="text-gray-400">|</span>
+        <span>Published: {formattedDate}</span>
       </div>
       
-      <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.1]">
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-gray-1000 leading-[1.15]">
         {post.title}
       </h1>
     </div>
 
-    <!-- Main Grid: Fluid and Responsive -->
-    <div class="flex flex-col lg:flex-row gap-12 xl:gap-20">
+    <!-- Main Grid -->
+    <div class="flex flex-col lg:flex-row gap-10 xl:gap-16">
       
       <!-- Content Column -->
       <main class="flex-1 min-w-0">
         <!-- Featured Image -->
         {post.featuredImage && (
-          <div class="relative group mb-16">
-            <div class="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-emerald-500 rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-            <div class="relative aspect-video lg:aspect-[21/9] rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
+          <div class="relative group mb-10">
+            <div class="relative aspect-video lg:aspect-[21/9] rounded-2xl overflow-hidden border border-gray-200 shadow-sm bg-gray-50">
               <img 
                 src={post.featuredImage} 
                 alt={post.featuredImageAlt}
@@ -71,81 +174,101 @@ const formattedDate = post.date ? new Date(post.date).toLocaleDateString('en-US'
           </div>
         )}
 
-        <!-- Readability Shield: Solid backing for long-form text -->
         <div class="relative">
-          <div class="prose prose-invert lg:prose-xl max-w-none">
+          <div class="prose lg:prose-lg max-w-none">
             <!-- Summary Box -->
-            <div class="font-mono text-sm md:text-base mb-12 p-8 rounded-2xl bg-slate-900/60 border border-cyan-500/20 backdrop-blur-xl text-slate-200 leading-relaxed shadow-2xl relative overflow-hidden">
-               <div class="absolute top-0 left-0 w-1 h-full bg-cyan-500"></div>
-               <span class="text-cyan-400 font-bold block mb-3 uppercase tracking-widest text-xs">Executive_Summary //</span>
-               {post.excerpt}
-            </div>
+            {post.excerpt && (
+              <div class="text-sm md:text-base mb-10 p-6 md:p-8 rounded-2xl bg-gray-50 border border-gray-200 text-gray-700 leading-relaxed relative overflow-hidden">
+                 <div class="absolute top-0 left-0 w-1.5 h-full bg-primary"></div>
+                 <span class="text-primary font-bold block mb-2 uppercase tracking-wider text-xs font-mono">Executive Summary //</span>
+                 {post.excerpt}
+              </div>
+            )}
 
             <!-- Main Content -->
-            <div class="article-body space-y-8 max-w-4xl mx-auto" set:html={post.content} />
+            <div class="article-body space-y-6 max-w-3xl leading-relaxed text-gray-800" set:html={post.content} />
+            
+            <!-- Author / Editorial Bio Card -->
+            <div class="mt-14 p-6 md:p-8 rounded-2xl border border-gray-200 bg-white flex flex-col md:flex-row gap-6 items-center shadow-sm">
+              <div class="w-16 h-16 rounded-2xl bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-1000 font-black text-xl shrink-0">
+                WR
+              </div>
+              <div class="text-center md:text-left space-y-1.5">
+                <div class="flex flex-col md:flex-row md:items-center gap-2">
+                  <h4 class="text-base font-bold text-gray-1000">WellRoost Editorial & Research</h4>
+                  <span class="hidden md:inline text-gray-300">•</span>
+                  <p class="text-xs font-mono text-primary uppercase tracking-wider font-semibold">Home Analytics Team</p>
+                </div>
+                <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                  WellRoost builds interactive decision engines and analytical frameworks to help homeowners evaluate remodeling ROI, optimize energy upgrades, and make objective property choices.
+                </p>
+                <div class="pt-1">
+                  <a href="/calculators/" class="text-xs font-semibold text-primary hover:underline">
+                    Browse interactive calculators &rarr;
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </main>
 
       <!-- Sidebar Column -->
-      <aside class="w-full lg:w-70 xl:w-75 shrink-0">
-        <div class="sticky top-24 space-y-8">
+      <aside class="w-full lg:w-72 xl:w-80 shrink-0">
+        <div class="sticky top-24 space-y-6">
           <!-- Decision Metrics Card -->
-          <div class="p-8 rounded-3xl bg-slate-900/40 border border-white/10 backdrop-blur-md shadow-2xl">
-            <h3 class="font-mono text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-8 flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></span>
-              Decision_Metrics
+          <div class="p-6 rounded-2xl bg-white border border-gray-200 shadow-sm">
+            <h3 class="font-mono text-xs uppercase tracking-wider text-gray-500 font-semibold mb-6 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-primary"></span>
+              Decision Metrics
             </h3>
             
-            <div class="space-y-8">
+            <div class="space-y-6">
               <div>
-                <div class="flex justify-between text-[11px] font-mono text-slate-400 mb-3 tracking-wider">
+                <div class="flex justify-between text-xs font-mono text-gray-600 mb-2 tracking-wider">
                   <span>EST_ROI</span>
-                  <span class="text-emerald-400">High</span>
+                  <span class="text-gray-1000 font-bold">{estRoi}</span>
                 </div>
-                <div class="h-1.5 bg-slate-800/50 rounded-full overflow-hidden">
-                  <div class="h-full bg-gradient-to-r from-emerald-600 to-emerald-400 w-[85%]"></div>
+                <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-primary" style={`width: ${estRoiWidth}`}></div>
                 </div>
               </div>
 
               <div>
-                <div class="flex justify-between text-[11px] font-mono text-slate-400 mb-3 tracking-wider">
+                <div class="flex justify-between text-xs font-mono text-gray-600 mb-2 tracking-wider">
                   <span>IMPLEMENTATION_EFFORT</span>
-                  <span class="text-cyan-400">Medium</span>
+                  <span class="text-gray-1000 font-bold">{implementationEffort}</span>
                 </div>
-                <div class="h-1.5 bg-slate-800/50 rounded-full overflow-hidden">
-                  <div class="h-full bg-gradient-to-r from-cyan-600 to-cyan-400 w-[45%]"></div>
+                <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-amber-500" style={`width: ${implementationWidth}`}></div>
                 </div>
               </div>
 
               <div>
-                <div class="flex justify-between text-[11px] font-mono text-slate-400 mb-3 tracking-wider">
+                <div class="flex justify-between text-xs font-mono text-gray-600 mb-2 tracking-wider">
                   <span>STRATEGIC_VALUE</span>
-                  <span class="text-violet-400">Max</span>
+                  <span class="text-gray-1000 font-bold">{strategicValue}</span>
                 </div>
-                <div class="h-1.5 bg-slate-800/50 rounded-full overflow-hidden">
-                  <div class="h-full bg-gradient-to-r from-violet-600 to-violet-400 w-[95%]"></div>
+                <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-emerald-600" style={`width: ${strategicWidth}`}></div>
                 </div>
               </div>
             </div>
 
-            <div class="mt-10 pt-8 border-t border-slate-800/50">
-              <button class="w-full py-4 px-6 rounded-2xl bg-white text-slate-950 font-bold text-sm hover:bg-cyan-400 transition-all active:scale-95 shadow-lg shadow-white/5">
-                Deploy Framework
-              </button>
+            <div class="mt-8 pt-6 border-t border-gray-100">
+              <a href="/calculators/" class="block w-full py-3 px-4 rounded-xl bg-gray-1000 text-white font-semibold text-xs text-center hover:bg-gray-900 transition active:scale-95 shadow-sm">
+                Open Calculator Hub
+              </a>
             </div>
           </div>
 
-          <!-- Share/Action Tool -->
-          <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/20 text-center">
-            <p class="text-xs font-mono text-slate-500 uppercase tracking-widest mb-4">Transmission</p>
-            <div class="flex justify-center gap-4">
-               <div class="w-10 h-10 rounded-full border border-slate-800 flex items-center justify-center hover:bg-white hover:text-black cursor-pointer transition-all">
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-1.015-2.174-1.649-3.594-1.649-2.719 0-4.923 2.204-4.923 4.923 0 .385.043.76.127 1.119-4.091-.205-7.719-2.165-10.148-5.144-.424.656-.667 1.432-.667 2.268 0 1.708 1.1 3.214 2.772 3.86-.717-.023-1.391-.219-1.981-.547v.062c0 2.385 1.697 4.374 3.946 4.828-.413.111-.849.171-1.296.171-.317 0-.626-.03-.927-.086.626 1.956 2.444 3.379 4.6 3.419-1.685 1.321-3.808 2.108-6.115 2.108-.397 0-.79-.023-1.175-.068 2.179 1.396 4.768 2.212 7.548 2.212 9.057 0 14.01-7.507 14.01-14.01 0-.213-.005-.426-.014-.637.962-.695 1.797-1.562 2.457-2.549z"/></svg>
-               </div>
-               <div class="w-10 h-10 rounded-full border border-slate-800 flex items-center justify-center hover:bg-white hover:text-black cursor-pointer transition-all">
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-               </div>
+          <!-- Quick Navigation -->
+          <div class="p-6 rounded-2xl border border-gray-200 bg-gray-50/50">
+            <p class="text-xs font-mono text-gray-500 uppercase tracking-wider font-semibold mb-3">Explore Categories</p>
+            <div class="space-y-2 text-xs text-gray-600">
+              <a href="/categories/" class="block text-primary hover:underline font-medium">
+                View all decision pillars &rarr;
+              </a>
             </div>
           </div>
         </div>
@@ -153,3 +276,26 @@ const formattedDate = post.date ? new Date(post.date).toLocaleDateString('en-US'
     </div>
   </div>
 </BaseLayout>
+
+<script>
+  const initKaTeX = () => {
+    // @ts-ignore - renderMathInElement is loaded globally via CDN
+    if (typeof renderMathInElement !== 'undefined') {
+      const articleBody = document.querySelector('.article-body');
+      if (articleBody) {
+        // @ts-ignore
+        renderMathInElement(articleBody, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '\\[', right: '\\]', display: true},
+            {left: '\\(', right: '\\)', display: false}
+          ]
+        });
+      }
+    } else {
+      setTimeout(initKaTeX, 100);
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', initKaTeX);
+</script>

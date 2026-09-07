@@ -17,6 +17,7 @@ interface WordPressPostResponse {
 	id: number;
 	link?: string;
 	date?: string;
+	modified?: string;
 	title?: WordPressRenderedField;
 	excerpt?: WordPressRenderedField;
 	content?: WordPressRenderedField;
@@ -44,6 +45,7 @@ export interface WordPressPost {
 	slug: string;
 	link: string;
 	date: string | null;
+	modified: string | null;
 	featuredImage: string | null;
 	featuredImageAlt: string;
 	categoryLabel: string | null;
@@ -62,6 +64,9 @@ export interface WordPressCategory {
 const HTML_ENTITY_MAP: Record<string, string> = {
 	'&amp;': '&',
 	'&quot;': '"',
+	'&lt;': '<',
+	'&gt;': '>',
+	'&apos;': "'",
 	'&#039;': "'",
 	'&#8217;': "'",
 	'&#8211;': '–',
@@ -73,15 +78,26 @@ const HTML_ENTITY_MAP: Record<string, string> = {
 
 function getWordPressApiBase() {
 	const baseUrl =
-		import.meta.env.PUBLIC_WORDPRESS_API_BASE ?? import.meta.env.WORDPRESS_API_BASE ?? '';
+		import.meta.env.PUBLIC_WORDPRESS_API_BASE ?? import.meta.env.WORDPRESS_API_BASE ?? 'https://cms.wellroost.com';
 	return baseUrl.replace(/\/$/, '');
 }
 
 function decodeHtmlEntities(value: string) {
-	return value.replace(
-		/&amp;|&quot;|&#039;|&#8217;|&#8211;|&#8220;|&#8221;|&#8230;|&nbsp;/g,
-		(entity) => HTML_ENTITY_MAP[entity] ?? entity
-	);
+	if (!value) return '';
+	return value.replace(/&[#a-zA-Z0-9]+;/g, (entity) => {
+		if (entity in HTML_ENTITY_MAP) {
+			return HTML_ENTITY_MAP[entity];
+		}
+		if (entity.startsWith('&#x') || entity.startsWith('&#X')) {
+			const num = parseInt(entity.slice(3, -1), 16);
+			return !isNaN(num) ? String.fromCharCode(num) : entity;
+		}
+		if (entity.startsWith('&#')) {
+			const num = parseInt(entity.slice(2, -1), 10);
+			return !isNaN(num) ? String.fromCharCode(num) : entity;
+		}
+		return entity;
+	});
 }
 
 function stripHtml(value: string | undefined) {
@@ -105,14 +121,32 @@ function normalizePost(post: WordPressPostResponse): WordPressPost {
 		featuredImage = `${apiBase}${featuredImage}`;
 	}
 
+	let htmlContent = post.content?.rendered || '';
+	
+	// Remove redundant WordPress article wrapper fragments if present
+	htmlContent = htmlContent
+		.replace(/<div class="article-context"[^>]*>[\s\S]*?<\/div>\s*<\/div>/ig, '');
+
+	// Clean up wpautop formatting inside LaTeX blocks so KaTeX doesn't choke on <br> tags
+	htmlContent = htmlContent.replace(/(\$\$|\\\[)([\s\S]*?)(\$\$|\\\])/g, (_match, open, content, close) => {
+		let cleanContent = content
+			.replace(/<[^>]+>/g, '') 
+			.replace(/&nbsp;/g, ' ')
+			.replace(/&amp;/g, '&')
+			.replace(/&lt;/g, '<')
+			.replace(/&gt;/g, '>');
+		return `${open}${cleanContent}${close}`;
+	});
+
 	return {
 		id: post.id,
 		title: stripHtml(post.title?.rendered) || 'Untitled post',
 		excerpt: stripHtml(post.excerpt?.rendered),
-		content: post.content?.rendered || '',
+		content: htmlContent,
 		slug: post.slug || '',
 		link: post.link ?? '#',
 		date: post.date ?? null,
+		modified: post.modified ?? post.date ?? null,
 		featuredImage,
 		featuredImageAlt: featuredMedia?.alt_text || '',
 		categoryLabel: category?.name ?? null,
@@ -133,8 +167,18 @@ async function fetchWordPress(endpoint: string, query: Record<string, string | n
 		}
 	}
 
+	// Add a cache-buster parameter to prevent CDN/Edge nodes from serving stale JSON
+	url.searchParams.set('_t', Date.now().toString());
+
 	try {
-		const response = await fetch(url);
+		const response = await fetch(url, {
+			headers: {
+				'Cache-Control': 'no-cache, no-store, must-revalidate',
+				Pragma: 'no-cache'
+			},
+			cache: 'no-store',
+			signal: AbortSignal.timeout(8000)
+		});
 		if (!response.ok) {
 			return [];
 		}
@@ -196,6 +240,7 @@ export async function searchPosts(query: string, limit = 8) {
 	});
 	return posts.map(normalizePost);
 }
+
 export async function fetchPostBySlug(slug: string) {
 	const posts = await fetchWordPress('posts', {
 		_embed: 1,

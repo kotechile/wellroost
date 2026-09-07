@@ -8,23 +8,28 @@ const topCategories = await getTopLevelCategories();
 	<div class="mx-auto grid max-w-6xl gap-12 px-4 lg:grid-cols-[1fr_auto] lg:px-8">
 		<div class="grid gap-12 md:grid-cols-2">
 			<div>
-				<p class="font-mono text-xs uppercase tracking-widest text-primary">WellRoost</p>
-				<h2 class="mt-4 text-2xl font-bold tracking-tight text-gray-1000">
+				<div class="flex items-center gap-2 mb-3">
+					<span class="inline-flex h-6 w-6 items-center justify-center rounded-md bg-gray-1000 text-white text-xs font-black">
+						W
+					</span>
+					<span class="font-bold text-gray-1000">WellRoost</span>
+				</div>
+				<h2 class="text-xl font-bold tracking-tight text-gray-1000">
 					The Decision Engine for Your Home.
 				</h2>
-				<p class="mt-4 text-sm leading-7 text-gray-600">
+				<p class="mt-3 text-sm leading-6 text-gray-600">
 					Objective, high-ROI choices for your property, budget, and lifestyle.
 				</p>
 			</div>
 			
 			<!-- Core Focus Section -->
 			<div class="rounded-xl border border-gray-200 bg-gray-50 p-6">
-				<div class="flex items-center gap-2 mb-4">
-					<svg class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-					<p class="font-mono text-xs uppercase tracking-widest text-gray-500">Stop Guessing</p>
+				<div class="flex items-center gap-2 mb-2">
+					<svg class="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+					<p class="font-mono text-xs uppercase tracking-wider text-gray-500 font-semibold">Stop Guessing</p>
 				</div>
 				<h3 class="font-bold text-gray-1000">Start Calculating</h3>
-				<p class="mt-2 text-sm text-gray-600">
+				<p class="mt-2 text-sm text-gray-600 leading-relaxed">
 					We don't just give you opinions; we give you the tools to analyze the data. Welcome to smarter homeownership.
 				</p>
 			</div>
@@ -32,24 +37,29 @@ const topCategories = await getTopLevelCategories();
 
 		<div class="grid gap-8 sm:grid-cols-2 lg:ml-12">
 			<div>
-				<p class="font-mono text-xs uppercase tracking-widest text-gray-500">System Map</p>
-				<div class="mt-4 grid gap-3 text-sm text-gray-600">
-					<a href="/" class="transition hover:text-gray-1000">Home</a>
-					<a href="/calculators/" class="transition hover:text-gray-1000">Calculators</a>
-					<a href="/about/" class="transition hover:text-gray-1000">About</a>
+				<p class="font-mono text-xs uppercase tracking-wider text-gray-400 font-semibold">System Map</p>
+				<div class="mt-4 grid gap-2.5 text-sm text-gray-600">
+					<a href="/" class="transition hover:text-primary">Home</a>
+					<a href="/calculators/" class="transition hover:text-primary">Calculators</a>
+					<a href="/categories/" class="transition hover:text-primary">Categories</a>
+					<a href="/about/" class="transition hover:text-primary">About</a>
 				</div>
 			</div>
 			<div>
-				<p class="font-mono text-xs uppercase tracking-widest text-gray-500">Active Modules</p>
-				<div class="mt-4 grid gap-3 text-sm text-gray-600">
-					{topCategories.slice(0, 3).map((category) => <span>{category.name}</span>)}
-					<a href="/calculators/" class="transition hover:text-gray-1000">Calculator Hub</a>
+				<p class="font-mono text-xs uppercase tracking-wider text-gray-400 font-semibold">Pillars</p>
+				<div class="mt-4 grid gap-2.5 text-sm text-gray-600">
+					{topCategories.slice(0, 4).map((category) => (
+						<a href={`/categories/${category.slug}/`} class="transition hover:text-primary">
+							{category.name}
+						</a>
+					))}
 				</div>
 			</div>
 		</div>
 	</div>
 	
-	<div class="mx-auto max-w-6xl px-4 lg:px-8 mt-12 pt-8 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-gray-400">
+	<div class="mx-auto max-w-6xl px-4 lg:px-8 mt-12 pt-8 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-gray-500">
 		<p>&copy; {new Date().getFullYear()} WellRoost. All rights reserved.</p>
+		<p class="font-mono">Decisions backed by data.</p>
 	</div>
 </footer>

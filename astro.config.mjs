@@ -6,9 +6,12 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
-  site: process.env.PUBLIC_SITE_URL ?? 'https://giniloh.com',
+  site: process.env.PUBLIC_SITE_URL ?? 'https://wellroost.com',
   integrations: [react()],
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [/** @type {any} */ (tailwindcss())],
+    optimizeDeps: {
+      include: ['react', 'react-dom', 'react-dom/client']
+    }
   }
 });

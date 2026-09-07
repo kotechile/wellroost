@@ -16,22 +16,16 @@ function findExistingFile(candidates: string[]) {
 
 export function resolveCategoryCsvPath() {
 	return findExistingFile([
+		'wellroost_categories.csv',
 		'wordpress_categories.csv',
 		'wordpress _categories.csv',
-		'categories.csv',
-		'Documents/_giniloh_front_end/wordpress_categories.csv',
-		'Documents/_giniloh_front_end/wordpress _categories.csv',
-		'Documents/_giniloh_front_end/categories.csv'
+		'categories.csv'
 	]);
 }
 
 export function resolveOverviewPath() {
 	return findExistingFile([
-		'giniloh_overview.md',
-		'giniloh overview.md',
-		'overview.md',
-		'Documents/_giniloh_front_end/giniloh_overview.md',
-		'Documents/_giniloh_front_end/giniloh overview.md',
-		'Documents/_giniloh_front_end/overview.md'
+		'wellroost_overview.md',
+		'overview.md'
 	]);
 }
