@@ -15,10 +15,10 @@ It is designed for the current Astro + React island architecture in this reposit
 
 Today the following files power the tool:
 
-- [src/pages/tools/remodelytics.astro](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/pages/tools/remodelytics.astro)
-- [src/components/calculators/react/RemodelyticsPlatform.tsx](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/components/calculators/react/RemodelyticsPlatform.tsx)
-- [src/lib/calculators/remodelytics.ts](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/calculators/remodelytics.ts)
-- [src/lib/calculators/types.ts](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/calculators/types.ts)
+- [src/pages/tools/remodelytics.astro](/Users/jorgefernandezilufi/Documents/wellroost front end/src/pages/tools/remodelytics.astro)
+- [src/components/calculators/react/RemodelyticsPlatform.tsx](/Users/jorgefernandezilufi/Documents/wellroost front end/src/components/calculators/react/RemodelyticsPlatform.tsx)
+- [src/lib/calculators/remodelytics.ts](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/calculators/remodelytics.ts)
+- [src/lib/calculators/types.ts](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/calculators/types.ts)
 
 Current behavior:
 
@@ -40,11 +40,11 @@ The main design change is to split the current flat manual state into three laye
 
 Recommended new module area:
 
-- [src/lib/remodelytics/types.ts](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/remodelytics/types.ts)
-- [src/lib/remodelytics/merge.ts](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/remodelytics/merge.ts)
-- [src/lib/remodelytics/sources.ts](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/remodelytics/sources.ts)
-- [src/lib/remodelytics/adapters/](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/remodelytics)
-- [src/lib/remodelytics/program-rules/](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/remodelytics)
+- [src/lib/remodelytics/types.ts](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/remodelytics/types.ts)
+- [src/lib/remodelytics/merge.ts](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/remodelytics/merge.ts)
+- [src/lib/remodelytics/sources.ts](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/remodelytics/sources.ts)
+- [src/lib/remodelytics/adapters/](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/remodelytics)
+- [src/lib/remodelytics/program-rules/](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/remodelytics)
 
 ## Shared Types
 
@@ -157,18 +157,18 @@ Split the current single-component manual state into lookup input, fetched conte
 
 Files to add:
 
-- [src/lib/remodelytics/types.ts](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/remodelytics/types.ts)
-- [src/lib/remodelytics/merge.ts](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/remodelytics/merge.ts)
-- [src/lib/remodelytics/sources.ts](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/remodelytics/sources.ts)
+- [src/lib/remodelytics/types.ts](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/remodelytics/types.ts)
+- [src/lib/remodelytics/merge.ts](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/remodelytics/merge.ts)
+- [src/lib/remodelytics/sources.ts](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/remodelytics/sources.ts)
 
 Files to update:
 
-- [src/components/calculators/react/RemodelyticsPlatform.tsx](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/components/calculators/react/RemodelyticsPlatform.tsx)
-- [src/lib/calculators/types.ts](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/calculators/types.ts)
+- [src/components/calculators/react/RemodelyticsPlatform.tsx](/Users/jorgefernandezilufi/Documents/wellroost front end/src/components/calculators/react/RemodelyticsPlatform.tsx)
+- [src/lib/calculators/types.ts](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/calculators/types.ts)
 
 Implementation notes:
 
-- Keep [src/lib/calculators/remodelytics.ts](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/calculators/remodelytics.ts) pure.
+- Keep [src/lib/calculators/remodelytics.ts](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/calculators/remodelytics.ts) pure.
 - Do not mix fetch logic into the calculation engine.
 - `merge.ts` should convert fetched context + overrides into the existing `RemodelyticsInputs` shape.
 
@@ -185,12 +185,12 @@ Change the user journey from manual-first to property-first.
 
 Files to add:
 
-- [src/components/calculators/react/AddressLookupPanel.tsx](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/components/calculators/react/AddressLookupPanel.tsx)
-- [src/lib/remodelytics/lookup-state.ts](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/remodelytics/lookup-state.ts)
+- [src/components/calculators/react/AddressLookupPanel.tsx](/Users/jorgefernandezilufi/Documents/wellroost front end/src/components/calculators/react/AddressLookupPanel.tsx)
+- [src/lib/remodelytics/lookup-state.ts](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/remodelytics/lookup-state.ts)
 
 Files to update:
 
-- [src/components/calculators/react/RemodelyticsPlatform.tsx](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/components/calculators/react/RemodelyticsPlatform.tsx)
+- [src/components/calculators/react/RemodelyticsPlatform.tsx](/Users/jorgefernandezilufi/Documents/wellroost front end/src/components/calculators/react/RemodelyticsPlatform.tsx)
 
 Implementation notes:
 
@@ -215,7 +215,7 @@ Fetch normalized property facts and baseline valuation context.
 
 Files to add:
 
-- [src/lib/remodelytics/adapters/property.ts](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/remodelytics/adapters/property.ts)
+- [src/lib/remodelytics/adapters/property.ts](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/remodelytics/adapters/property.ts)
 
 Suggested interface:
 
@@ -252,7 +252,7 @@ Support `AVM`, comp averages, and neighborhood ceiling logic.
 
 Files to add:
 
-- [src/lib/remodelytics/adapters/valuation.ts](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/remodelytics/adapters/valuation.ts)
+- [src/lib/remodelytics/adapters/valuation.ts](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/remodelytics/adapters/valuation.ts)
 
 Suggested interface:
 
@@ -289,7 +289,7 @@ Replace manual baseline cost and local cost index entry with live localized pric
 
 Files to add:
 
-- [src/lib/remodelytics/adapters/costs.ts](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/remodelytics/adapters/costs.ts)
+- [src/lib/remodelytics/adapters/costs.ts](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/remodelytics/adapters/costs.ts)
 
 Suggested interface:
 
@@ -332,8 +332,8 @@ Turn rebate logic into a location-aware estimate.
 
 Files to add:
 
-- [src/lib/remodelytics/adapters/ami.ts](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/remodelytics/adapters/ami.ts)
-- [src/lib/remodelytics/adapters/incentives.ts](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/remodelytics/adapters/incentives.ts)
+- [src/lib/remodelytics/adapters/ami.ts](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/remodelytics/adapters/ami.ts)
+- [src/lib/remodelytics/adapters/incentives.ts](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/remodelytics/adapters/incentives.ts)
 
 Suggested interface:
 
@@ -374,7 +374,7 @@ Improve the energy engine with local rates and usage assumptions.
 
 Files to add:
 
-- [src/lib/remodelytics/adapters/utilities.ts](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/remodelytics/adapters/utilities.ts)
+- [src/lib/remodelytics/adapters/utilities.ts](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/remodelytics/adapters/utilities.ts)
 
 Suggested interface:
 
@@ -410,7 +410,7 @@ Improve `ADU` and conversion scenarios with local rental assumptions.
 
 Files to add:
 
-- [src/lib/remodelytics/adapters/rentals.ts](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/remodelytics/adapters/rentals.ts)
+- [src/lib/remodelytics/adapters/rentals.ts](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/remodelytics/adapters/rentals.ts)
 
 Suggested interface:
 
@@ -446,10 +446,10 @@ Replace generic warning thresholds with program-specific rule evaluation.
 
 Files to add:
 
-- [src/lib/remodelytics/loan-programs.ts](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/remodelytics/loan-programs.ts)
-- [src/lib/remodelytics/program-rules/fha203k.ts](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/remodelytics/program-rules/fha203k.ts)
-- [src/lib/remodelytics/program-rules/homestyle.ts](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/remodelytics/program-rules/homestyle.ts)
-- [src/lib/remodelytics/program-rules/heloc.ts](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/remodelytics/program-rules/heloc.ts)
+- [src/lib/remodelytics/loan-programs.ts](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/remodelytics/loan-programs.ts)
+- [src/lib/remodelytics/program-rules/fha203k.ts](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/remodelytics/program-rules/fha203k.ts)
+- [src/lib/remodelytics/program-rules/homestyle.ts](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/remodelytics/program-rules/homestyle.ts)
+- [src/lib/remodelytics/program-rules/heloc.ts](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/remodelytics/program-rules/heloc.ts)
 
 Suggested interfaces:
 
@@ -480,8 +480,8 @@ export function evaluateLoanProgram(
 
 Files to update:
 
-- [src/lib/calculators/remodelytics.ts](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/calculators/remodelytics.ts)
-- [src/components/calculators/react/RemodelyticsPlatform.tsx](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/components/calculators/react/RemodelyticsPlatform.tsx)
+- [src/lib/calculators/remodelytics.ts](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/calculators/remodelytics.ts)
+- [src/components/calculators/react/RemodelyticsPlatform.tsx](/Users/jorgefernandezilufi/Documents/wellroost front end/src/components/calculators/react/RemodelyticsPlatform.tsx)
 
 Acceptance criteria:
 
@@ -495,13 +495,13 @@ Expose source confidence and freshness directly in the interface.
 
 Files to add:
 
-- [src/components/calculators/react/SourceBadge.tsx](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/components/calculators/react/SourceBadge.tsx)
-- [src/components/calculators/react/ConfidenceTag.tsx](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/components/calculators/react/LastUpdatedTag.tsx)
-- [src/components/calculators/react/ValueWithSource.tsx](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/components/calculators/react/ValueWithSource.tsx)
+- [src/components/calculators/react/SourceBadge.tsx](/Users/jorgefernandezilufi/Documents/wellroost front end/src/components/calculators/react/SourceBadge.tsx)
+- [src/components/calculators/react/ConfidenceTag.tsx](/Users/jorgefernandezilufi/Documents/wellroost front end/src/components/calculators/react/LastUpdatedTag.tsx)
+- [src/components/calculators/react/ValueWithSource.tsx](/Users/jorgefernandezilufi/Documents/wellroost front end/src/components/calculators/react/ValueWithSource.tsx)
 
 Files to update:
 
-- [src/components/calculators/react/RemodelyticsPlatform.tsx](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/components/calculators/react/RemodelyticsPlatform.tsx)
+- [src/components/calculators/react/RemodelyticsPlatform.tsx](/Users/jorgefernandezilufi/Documents/wellroost front end/src/components/calculators/react/RemodelyticsPlatform.tsx)
 
 Acceptance criteria:
 
@@ -515,8 +515,8 @@ Replace the current clipboard export with a formal underwriting packet.
 
 Files to add:
 
-- [src/lib/remodelytics/export.ts](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/remodelytics/export.ts)
-- [src/components/calculators/react/ExportPacketButton.tsx](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/components/calculators/react/ExportPacketButton.tsx)
+- [src/lib/remodelytics/export.ts](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/remodelytics/export.ts)
+- [src/components/calculators/react/ExportPacketButton.tsx](/Users/jorgefernandezilufi/Documents/wellroost front end/src/components/calculators/react/ExportPacketButton.tsx)
 
 Later optional files:
 
@@ -530,12 +530,12 @@ Acceptance criteria:
 
 To support the above phases without letting the main calculator component sprawl further, split the existing component into smaller surfaces:
 
-- [src/components/calculators/react/AddressLookupPanel.tsx](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/components/calculators/react/AddressLookupPanel.tsx)
-- [src/components/calculators/react/PropertyContextPanel.tsx](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/components/calculators/react/PropertyContextPanel.tsx)
-- [src/components/calculators/react/ScenarioInputsPanel.tsx](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/components/calculators/react/ScenarioInputsPanel.tsx)
-- [src/components/calculators/react/UnderwritingPanel.tsx](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/components/calculators/react/UnderwritingPanel.tsx)
-- [src/components/calculators/react/IncentivesPanel.tsx](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/components/calculators/react/IncentivesPanel.tsx)
-- [src/components/calculators/react/ResultsPanel.tsx](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/components/calculators/react/ResultsPanel.tsx)
+- [src/components/calculators/react/AddressLookupPanel.tsx](/Users/jorgefernandezilufi/Documents/wellroost front end/src/components/calculators/react/AddressLookupPanel.tsx)
+- [src/components/calculators/react/PropertyContextPanel.tsx](/Users/jorgefernandezilufi/Documents/wellroost front end/src/components/calculators/react/PropertyContextPanel.tsx)
+- [src/components/calculators/react/ScenarioInputsPanel.tsx](/Users/jorgefernandezilufi/Documents/wellroost front end/src/components/calculators/react/ScenarioInputsPanel.tsx)
+- [src/components/calculators/react/UnderwritingPanel.tsx](/Users/jorgefernandezilufi/Documents/wellroost front end/src/components/calculators/react/UnderwritingPanel.tsx)
+- [src/components/calculators/react/IncentivesPanel.tsx](/Users/jorgefernandezilufi/Documents/wellroost front end/src/components/calculators/react/IncentivesPanel.tsx)
+- [src/components/calculators/react/ResultsPanel.tsx](/Users/jorgefernandezilufi/Documents/wellroost front end/src/components/calculators/react/ResultsPanel.tsx)
 
 ## Dependency Order
 

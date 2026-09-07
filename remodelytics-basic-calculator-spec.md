@@ -416,10 +416,10 @@ Avoid using these in the Basic UI unless hidden in a help section:
 
 Suggested implementation shape:
 
-- [src/pages/tools/remodeling-roi-calculator.astro](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/pages/tools/remodeling-roi-calculator.astro)
-- [src/components/calculators/react/BasicRemodelingCalculator.tsx](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/components/calculators/react/BasicRemodelingCalculator.tsx)
-- [src/lib/calculators/basicRemodeling.ts](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/calculators/basicRemodeling.ts)
-- [src/lib/calculators/basicRemodelingTypes.ts](/Users/jorgefernandezilufi/Documents/_giniloh_front_end/src/lib/calculators/basicRemodelingTypes.ts)
+- [src/pages/tools/remodeling-roi-calculator.astro](/Users/jorgefernandezilufi/Documents/wellroost front end/src/pages/tools/remodeling-roi-calculator.astro)
+- [src/components/calculators/react/BasicRemodelingCalculator.tsx](/Users/jorgefernandezilufi/Documents/wellroost front end/src/components/calculators/react/BasicRemodelingCalculator.tsx)
+- [src/lib/calculators/basicRemodeling.ts](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/calculators/basicRemodeling.ts)
+- [src/lib/calculators/basicRemodelingTypes.ts](/Users/jorgefernandezilufi/Documents/wellroost front end/src/lib/calculators/basicRemodelingTypes.ts)
 
 ## Suggested Types
 

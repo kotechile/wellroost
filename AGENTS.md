@@ -10,19 +10,19 @@ WordPress remains the content system for posts, categories, featured images, and
 
 Before writing or changing code, inspect these files if they exist in the repository:
 
-* `giniloh_overview.md`
+* `wellroost_overview.md`
 * `design-language.md`
 
 Use WordPress categories as the source of truth for the category menu, category pages, category labels, category slugs, hierarchy, and category IDs.
 
-Use `giniloh_overview.md` as the source of truth for the site concept, audience, tone, positioning, homepage copy direction, and any content hierarchy.
+Use `wellroost_overview.md` as the source of truth for the site concept, audience, tone, positioning, homepage copy direction, and any content hierarchy.
 
 Use `design-language.md` as the directional reference for palette, spacing, tone, and visual composition. It is not the source of truth for content, but it should guide aesthetic decisions.
 
 If any supporting content file is missing, search the repository for similar names before proceeding:
 
-* `giniloh_overview.md`
-* `giniloh overview.md`
+* `wellroost_overview.md`
+* `wellroost overview.md`
 * `overview.md`
 
 If the files cannot be found, continue with a safe placeholder implementation and add a clear TODO near the data-loading code explaining what file is expected.
@@ -91,7 +91,7 @@ The homepage must include:
 
 1. A sticky floating island navigation bar at the top.
 2. A glassmorphism hero section.
-3. A clear brand headline and subheadline based on `giniloh_overview.md`.
+3. A clear brand headline and subheadline based on `wellroost_overview.md`.
 4. Primary CTA and secondary CTA.
 5. A responsive bento-style section introducing the main site themes or categories.
 6. A `Latest Posts` grid powered by the WordPress REST API.
@@ -332,7 +332,7 @@ Before editing:
 1. Inspect the current repo structure.
 2. Inspect `package.json`, `astro.config.*`, `tailwind.config.*`, and existing layout/components.
 3. Read `wordpress_categories.csv` or `wordpress _categories.csv` if present.
-4. Read `giniloh_overview.md`.
+4. Read `wellroost_overview.md`.
 5. Read `design-language.md` for visual direction.
 6. Identify the safest minimal file changes.
 7. Briefly summarize the plan before coding.
@@ -384,7 +384,7 @@ The work is complete when:
 * Categories are sourced from the live WordPress taxonomy.
 * Category pages are generated from the WordPress-backed category list.
 * Local article pages can be generated from WordPress post slugs when `src/pages/[slug].astro` is in scope.
-* The About page reflects `giniloh_overview.md`.
+* The About page reflects `wellroost_overview.md`.
 * The site builds successfully.
 * Missing WordPress API data does not break the page.
 
