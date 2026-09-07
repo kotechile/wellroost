@@ -5,13 +5,17 @@ WORKDIR /app
 # Install curl for debugging
 RUN apk add --no-cache curl
 
-ARG PUBLIC_WORDPRESS_API_BASE
-ENV PUBLIC_WORDPRESS_API_BASE=$PUBLIC_WORDPRESS_API_BASE
+ARG PUBLIC_WORDPRESS_API_BASE=https://cms.wellroost.com
+ENV PUBLIC_WORDPRESS_API_BASE=${PUBLIC_WORDPRESS_API_BASE:-https://cms.wellroost.com}
+
+ARG PUBLIC_SITE_URL=https://wellroost.com
+ENV PUBLIC_SITE_URL=${PUBLIC_SITE_URL:-https://wellroost.com}
+
 # This helps if the server has trouble with its own SSL certificate during build
 ENV NODE_TLS_REJECT_UNAUTHORIZED=0
 
 COPY package*.json ./
-RUN npm install
+RUN npm ci || npm install
 COPY . .
 
 # Debug: Try to connect to WordPress before building
@@ -32,12 +36,19 @@ RUN echo 'server { \
     # 1. Handle Astro Subpages and Static Files \
     location / { \
         try_files $uri $uri/ $uri.html /index.html; \
+        add_header Cache-Control "no-cache, no-store, must-revalidate"; \
     } \
 \
-    # 2. Proxy ALL WordPress Backend paths \
+    # 2. Cache hashed static assets \
+    location /_astro/ { \
+        expires 1y; \
+        add_header Cache-Control "public, max-age=31536000, immutable"; \
+    } \
+\
+    # 3. Proxy ALL WordPress Backend paths \
     location ~* ^/(wp-content|wp-includes|wp-json|wp-admin|wp-login\.php|wp-cron\.php) { \
-        proxy_pass https://cms.giniloh.com; \
-        proxy_set_header Host cms.giniloh.com; \
+        proxy_pass https://cms.wellroost.com; \
+        proxy_set_header Host cms.wellroost.com; \
         proxy_set_header X-Real-IP $remote_addr; \
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; \
         proxy_set_header X-Forwarded-Proto $scheme; \

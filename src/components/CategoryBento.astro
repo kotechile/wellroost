@@ -32,7 +32,7 @@ const accentPresets = [
 	}
 ];
 
-const featuredCategories = categories.slice(0, 3);
+const featuredCategories = categories.slice(0, 4);
 const activeCategory = featuredCategories[0] ?? null;
 
 function truncate(value: string, maxLength = 140) {
@@ -56,7 +56,7 @@ function truncate(value: string, maxLength = 140) {
 		</a>
 	</div>
 
-	<div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+	<div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 		{
 			featuredCategories.map((category, index) => {
 				const preset = accentPresets[index % accentPresets.length];
