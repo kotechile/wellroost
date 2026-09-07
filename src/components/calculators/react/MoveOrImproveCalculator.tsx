@@ -120,22 +120,22 @@ export default function MoveOrImproveCalculator() {
       {/* ============================================================ */}
       {/* 1. HEADER SPOTLIGHT — Plain-English verdict                  */}
       {/* ============================================================ */}
-      <div className="overflow-hidden rounded-[1.8rem] border border-emerald-500/20 bg-[linear-gradient(135deg,rgba(2,44,23,0.92),rgba(2,6,23,0.98)_70%,rgba(16,185,129,0.12))] p-6 shadow-[0_0_40px_rgba(16,185,129,0.08)] sm:p-8">
+      <div className="overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/80 via-teal-50/40 to-white p-6 shadow-sm sm:p-8">
         <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
           <div>
-            <p className="font-mono text-xs uppercase tracking-[0.3em] text-emerald-200/80">
+            <p className="font-mono text-xs uppercase tracking-[0.3em] font-semibold text-emerald-800">
               Your 5-Year Projection
             </p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-gray-1000 sm:text-4xl">
               {improveIsBetter
                 ? `Renovating Wins by ${formatCurrency(variance)}`
                 : `Moving Wins by ${formatCurrency(variance)}`}
             </h2>
-            <p className="mt-4 text-sm leading-7 text-slate-300">
+            <p className="mt-4 text-sm leading-7 text-gray-600">
               {improveIsBetter ? (
                 <>
                   If you stay and renovate, you're projected to have{' '}
-                  <span className="font-semibold text-emerald-400">
+                  <span className="font-bold text-emerald-700">
                     {formatCurrency(variance)} more
                   </span>{' '}
                   in home equity after 5 years compared to selling and buying a new place.
@@ -143,7 +143,7 @@ export default function MoveOrImproveCalculator() {
               ) : (
                 <>
                   If you sell and buy a new home, you're projected to have{' '}
-                  <span className="font-semibold text-cyan-400">
+                  <span className="font-bold text-blue-700">
                     {formatCurrency(variance)} more
                   </span>{' '}
                   in home equity after 5 years, even after commissions and closing costs.
@@ -151,44 +151,44 @@ export default function MoveOrImproveCalculator() {
               )}
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 font-mono text-[0.68rem] uppercase tracking-[0.24em] text-slate-200">
+              <span className="rounded-full border border-gray-200 bg-white px-3.5 py-1.5 font-mono text-[0.68rem] uppercase tracking-[0.24em] font-medium text-gray-700 shadow-xs">
                 Holding Period: 60 Months
               </span>
-              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 font-mono text-[0.68rem] uppercase tracking-[0.24em] text-slate-200">
+              <span className="rounded-full border border-gray-200 bg-white px-3.5 py-1.5 font-mono text-[0.68rem] uppercase tracking-[0.24em] font-medium text-gray-700 shadow-xs">
                 ZIP: {inputs.friction.zipCode}
               </span>
             </div>
           </div>
 
-          <div className="rounded-[1.6rem] border border-white/10 bg-slate-950/45 p-6 flex flex-col justify-between">
+          <div className="rounded-2xl border border-emerald-200/80 bg-white/95 p-6 shadow-xs flex flex-col justify-between">
             <div>
-              <p className="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-slate-400">
+              <p className="font-mono text-[0.68rem] uppercase tracking-[0.24em] font-medium text-gray-500">
                 The Difference (Year 5)
               </p>
-              <h3 className={`mt-2 text-4xl font-semibold tracking-tight tabular-nums ${improveIsBetter ? 'text-emerald-400' : 'text-cyan-400'}`}>
+              <h3 className={`mt-2 text-4xl font-bold tracking-tight tabular-nums ${improveIsBetter ? 'text-emerald-700' : 'text-blue-700'}`}>
                 {formatCurrency(variance)}
               </h3>
-              <p className="mt-2 text-xs text-slate-400">
+              <p className="mt-2 text-xs leading-5 text-gray-500">
                 {improveIsBetter
                   ? 'Renovating outperforms moving after all transaction costs, interest, and remodeling overruns.'
                   : 'Moving builds higher equity despite commissions and transfer taxes.'}
               </p>
             </div>
 
-            <div className="mt-6 border-t border-white/10 pt-4 grid grid-cols-2 gap-4">
+            <div className="mt-6 border-t border-gray-200 pt-4 grid grid-cols-2 gap-4">
               <div>
-                <p className="font-mono text-[0.62rem] uppercase tracking-[0.2em] text-slate-500">
+                <p className="font-mono text-[0.62rem] uppercase tracking-[0.2em] font-medium text-gray-500">
                   Equity if You Renovate
                 </p>
-                <p className="mt-1 text-lg font-semibold text-white tabular-nums">
+                <p className="mt-1 text-lg font-bold text-gray-900 tabular-nums">
                   {formatCurrency(improveEquityYear5)}
                 </p>
               </div>
               <div>
-                <p className="font-mono text-[0.62rem] uppercase tracking-[0.2em] text-slate-500">
+                <p className="font-mono text-[0.62rem] uppercase tracking-[0.2em] font-medium text-gray-500">
                   Equity if You Move
                 </p>
-                <p className="mt-1 text-lg font-semibold text-white tabular-nums">
+                <p className="mt-1 text-lg font-bold text-gray-900 tabular-nums">
                   {formatCurrency(moveEquityYear5)}
                 </p>
               </div>
@@ -200,16 +200,16 @@ export default function MoveOrImproveCalculator() {
       {/* ============================================================ */}
       {/* 2. INTERACTIVE INPUT PANEL                                    */}
       {/* ============================================================ */}
-      <div className="rounded-[1.8rem] border border-slate-800/90 bg-slate-950/40 p-5">
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         {/* Tab Buttons */}
-        <div className="flex border-b border-slate-800 pb-4">
+        <div className="flex border-b border-gray-200 pb-4">
           <nav className="flex flex-wrap gap-2" aria-label="Calculator steps">
             <button
               onClick={() => setActiveTab('current')}
               className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wider transition cursor-pointer ${
                 activeTab === 'current'
-                  ? 'bg-emerald-900 border border-emerald-800 text-white shadow-md shadow-emerald-950/50'
-                  : 'bg-slate-900 border border-slate-800 text-slate-200 hover:text-white hover:bg-slate-800 hover:border-slate-700'
+                  ? 'bg-emerald-700 border border-emerald-700 text-white shadow-xs'
+                  : 'bg-gray-100 border border-gray-200 text-gray-700 hover:bg-gray-200 hover:text-gray-900'
               }`}
             >
               1 · Your Home
@@ -218,8 +218,8 @@ export default function MoveOrImproveCalculator() {
               onClick={() => setActiveTab('improve')}
               className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wider transition cursor-pointer ${
                 activeTab === 'improve'
-                  ? 'bg-emerald-900 border border-emerald-800 text-white shadow-md shadow-emerald-950/50'
-                  : 'bg-slate-900 border border-slate-800 text-slate-200 hover:text-white hover:bg-slate-800 hover:border-slate-700'
+                  ? 'bg-emerald-700 border border-emerald-700 text-white shadow-xs'
+                  : 'bg-gray-100 border border-gray-200 text-gray-700 hover:bg-gray-200 hover:text-gray-900'
               }`}
             >
               2 · Renovation
@@ -228,8 +228,8 @@ export default function MoveOrImproveCalculator() {
               onClick={() => setActiveTab('move')}
               className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wider transition cursor-pointer ${
                 activeTab === 'move'
-                  ? 'bg-emerald-900 border border-emerald-800 text-white shadow-md shadow-emerald-950/50'
-                  : 'bg-slate-900 border border-slate-800 text-slate-200 hover:text-white hover:bg-slate-800 hover:border-slate-700'
+                  ? 'bg-emerald-700 border border-emerald-700 text-white shadow-xs'
+                  : 'bg-gray-100 border border-gray-200 text-gray-700 hover:bg-gray-200 hover:text-gray-900'
               }`}
             >
               3 · Relocation
@@ -238,7 +238,7 @@ export default function MoveOrImproveCalculator() {
         </div>
 
         {/* Tab description */}
-        <p className="mt-4 text-sm text-slate-400 leading-6">
+        <p className="mt-4 text-sm text-gray-600 leading-6">
           {TAB_DESCRIPTIONS[activeTab]}
         </p>
 
@@ -263,10 +263,10 @@ export default function MoveOrImproveCalculator() {
               onChange={(val) => updateLegacyDebt('principalBalance', val)}
               helpText="How much you still owe on your existing mortgage."
             />
-            <label className="grid gap-3 rounded-[1.5rem] border border-slate-800/80 bg-slate-950/45 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] hover:border-slate-700/90">
+            <label className="grid gap-3 rounded-2xl border border-gray-200 bg-gray-50/70 p-4 shadow-xs hover:border-gray-300 transition">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-slate-100">Your current mortgage rate</span>
-                <span className="font-mono text-sm text-emerald-400">{formatPercent(Number((inputs.legacyDebt.interestRate * 100).toFixed(2)))}</span>
+                <span className="text-sm font-semibold text-gray-900">Your current mortgage rate</span>
+                <span className="font-mono text-sm font-bold text-emerald-700">{formatPercent(Number((inputs.legacyDebt.interestRate * 100).toFixed(2)))}</span>
               </div>
               <input
                 type="range"
@@ -275,9 +275,9 @@ export default function MoveOrImproveCalculator() {
                 step="0.001"
                 value={inputs.legacyDebt.interestRate}
                 onChange={(e) => updateLegacyDebt('interestRate', parseFloat(e.target.value))}
-                className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-400"
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
               />
-              <p className="text-sm leading-6 text-slate-400">The low locked rate you'd give up if you sell.</p>
+              <p className="text-xs leading-5 text-gray-500">The low locked rate you'd give up if you sell.</p>
             </label>
             <StepperInput
               id={`${fieldId}-legacy-term`}
@@ -297,8 +297,8 @@ export default function MoveOrImproveCalculator() {
         {/* Tab 2 Content: Renovation Pathway */}
         {activeTab === 'improve' && (
           <div className="mt-5 grid gap-5">
-            <div className="grid gap-3 rounded-[1.5rem] border border-slate-800/80 bg-slate-950/45 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
-              <span className="text-sm font-semibold text-slate-100">What kind of project?</span>
+            <div className="grid gap-3 rounded-2xl border border-gray-200 bg-gray-50/50 p-5">
+              <span className="text-sm font-semibold text-gray-900">What kind of project?</span>
               <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {PROJECT_TYPE_OPTIONS.map((option) => (
                   <button
@@ -306,12 +306,12 @@ export default function MoveOrImproveCalculator() {
                     onClick={() => updateRenovation('projectType', option.value)}
                     className={`p-3 rounded-xl border text-left text-xs transition cursor-pointer ${
                       inputs.renovation.projectType === option.value
-                        ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
-                        : 'border-slate-800 bg-slate-950/60 text-slate-200 hover:border-slate-700'
+                        ? 'border-emerald-600 bg-emerald-50 text-emerald-950 ring-2 ring-emerald-500/20 shadow-xs'
+                        : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50/80'
                     }`}
                   >
-                    <div className="font-semibold text-white">{option.label}</div>
-                    <div className="mt-1 flex justify-between text-slate-300">
+                    <div className="font-semibold text-gray-900">{option.label}</div>
+                    <div className="mt-1 flex justify-between text-gray-500">
                       <span>Est. ROI: {formatPercent(Number((option.roi * 100).toFixed(2)))}</span>
                       <span>Permits: ${option.permit}</span>
                     </div>
@@ -331,10 +331,10 @@ export default function MoveOrImproveCalculator() {
                 helpText="The builder's estimated contract cost."
               />
 
-              <label className="grid gap-3 rounded-[1.5rem] border border-slate-800/80 bg-slate-950/45 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] hover:border-slate-700/90">
+              <label className="grid gap-3 rounded-2xl border border-gray-200 bg-gray-50/70 p-4 shadow-xs hover:border-gray-300 transition">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold text-slate-100">Budget buffer for overruns</span>
-                  <span className="font-mono text-sm text-emerald-400">+{formatPercent(Number((inputs.renovation.overrunRate * 100).toFixed(2)))}</span>
+                  <span className="text-sm font-semibold text-gray-900">Budget buffer for overruns</span>
+                  <span className="font-mono text-sm font-bold text-emerald-700">+{formatPercent(Number((inputs.renovation.overrunRate * 100).toFixed(2)))}</span>
                 </div>
                 <input
                   type="range"
@@ -343,17 +343,17 @@ export default function MoveOrImproveCalculator() {
                   step="0.05"
                   value={inputs.renovation.overrunRate}
                   onChange={(e) => updateRenovation('overrunRate', parseFloat(e.target.value))}
-                  className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-400"
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
                 />
-                <p className="text-sm leading-6 text-slate-400">Extra margin for unexpected cost spikes (10–15% is typical).</p>
+                <p className="text-xs leading-5 text-gray-500">Extra margin for unexpected cost spikes (10–15% is typical).</p>
               </label>
             </div>
 
             <div className="grid gap-5 md:grid-cols-2">
-              <div className="rounded-[1.5rem] border border-slate-800/80 bg-slate-950/45 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] flex flex-col justify-between">
+              <div className="rounded-2xl border border-gray-200 bg-gray-50/70 p-4 shadow-xs flex flex-col justify-between">
                 <div>
-                  <span className="text-sm font-semibold text-slate-100">Additional scope</span>
-                  <p className="mt-1 text-xs text-slate-400">These options change the projected cost and ROI.</p>
+                  <span className="text-sm font-semibold text-gray-900">Additional scope</span>
+                  <p className="mt-1 text-xs text-gray-500">These options change the projected cost and ROI.</p>
                 </div>
                 <div className="mt-4 space-y-3">
                   <label className="flex items-center space-x-3 cursor-pointer">
@@ -361,62 +361,62 @@ export default function MoveOrImproveCalculator() {
                       type="checkbox"
                       checked={inputs.renovation.addBedBath}
                       onChange={(e) => updateRenovation('addBedBath', e.target.checked)}
-                      className="rounded border-slate-800 bg-slate-950 text-emerald-500 focus:ring-emerald-500/20"
+                      className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500/20"
                     />
-                    <span className="text-xs text-slate-200">Adding a bedroom or bathroom (+20% ROI lift)</span>
+                    <span className="text-xs text-gray-700">Adding a bedroom or bathroom (+20% ROI lift)</span>
                   </label>
                   <label className="flex items-center space-x-3 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={inputs.renovation.isSecondStory}
                       onChange={(e) => updateRenovation('isSecondStory', e.target.checked)}
-                      className="rounded border-slate-800 bg-slate-950 text-emerald-500 focus:ring-emerald-500/20"
+                      className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500/20"
                     />
-                    <span className="text-xs text-slate-200">Second-story addition (+50% cost, 6 months temp rent)</span>
+                    <span className="text-xs text-gray-700">Second-story addition (+50% cost, 6 months temp rent)</span>
                   </label>
                   <label className="flex items-center space-x-3 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={inputs.renovation.isAddition}
                       onChange={(e) => updateRenovation('isAddition', e.target.checked)}
-                      className="rounded border-slate-800 bg-slate-950 text-emerald-500 focus:ring-emerald-500/20"
+                      className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500/20"
                     />
-                    <span className="text-xs text-slate-200">This includes a physical addition (adding square footage)</span>
+                    <span className="text-xs text-gray-700">This includes a physical addition (adding square footage)</span>
                   </label>
                 </div>
               </div>
 
-              <div className="rounded-[1.5rem] border border-slate-800/80 bg-slate-950/45 p-4 flex flex-col justify-between">
+              <div className="rounded-2xl border border-gray-200 bg-gray-50/70 p-4 shadow-xs flex flex-col justify-between">
                 <div>
-                  <span className="text-sm font-semibold text-slate-100">How you'll pay for it</span>
-                  <p className="mt-1 text-xs text-slate-400">Assumes a standard renovation loan.</p>
+                  <span className="text-sm font-semibold text-gray-900">How you'll pay for it</span>
+                  <p className="mt-1 text-xs text-gray-500">Assumes a standard renovation loan.</p>
                 </div>
-                <div className="mt-4 p-3 bg-slate-900/60 rounded-xl border border-slate-800">
-                  <div className="flex justify-between text-xs text-slate-300">
+                <div className="mt-4 p-3.5 bg-white rounded-xl border border-gray-200">
+                  <div className="flex justify-between text-xs text-gray-600">
                     <span>Funding Type:</span>
-                    <span className="text-white font-medium">Renovation HELOC</span>
+                    <span className="text-gray-900 font-semibold">Renovation HELOC</span>
                   </div>
-                  <div className="mt-2 flex justify-between text-xs text-slate-300">
+                  <div className="mt-2 flex justify-between text-xs text-gray-600">
                     <span>HELOC Rate:</span>
-                    <span className="text-white font-semibold">{formatPercent(Number(((inputs.newMortgageRate + 0.01) * 100).toFixed(2)))}</span>
+                    <span className="text-gray-900 font-bold">{formatPercent(Number(((inputs.newMortgageRate + 0.01) * 100).toFixed(2)))}</span>
                   </div>
-                  <div className="mt-2 flex justify-between text-xs text-slate-300">
+                  <div className="mt-2 flex justify-between text-xs text-gray-600">
                     <span>HELOC Term:</span>
-                    <span className="text-white font-semibold">180 Months (15 Yrs)</span>
+                    <span className="text-gray-900 font-bold">180 Months (15 Yrs)</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {inputs.renovation.isAddition && (
-              <div className="rounded-[1.5rem] border border-emerald-500/20 bg-emerald-950/15 p-5 grid gap-4 md:grid-cols-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+              <div className="rounded-2xl border border-emerald-200 bg-emerald-50/50 p-5 grid gap-4 md:grid-cols-2 shadow-xs">
                 <div>
-                  <h4 className="text-sm font-semibold text-slate-100">Addition Footprint Details</h4>
-                  <p className="mt-1 text-xs text-slate-400">Values are scaled using local comps per square foot.</p>
+                  <h4 className="text-sm font-semibold text-gray-900">Addition Footprint Details</h4>
+                  <p className="mt-1 text-xs text-gray-500">Values are scaled using local comps per square foot.</p>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <label className="grid gap-1.5">
-                    <span className="text-xs text-slate-300">Current Home Size (sqft)</span>
+                    <span className="text-xs text-gray-600 font-medium">Current Home Size (sqft)</span>
                     <input
                       type="number"
                       min="500"
@@ -424,11 +424,11 @@ export default function MoveOrImproveCalculator() {
                       step="100"
                       value={inputs.renovation.currentSqft}
                       onChange={(e) => updateRenovation('currentSqft', parseInt(e.target.value) || 0)}
-                      className="rounded-xl border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-white focus:border-emerald-500 outline-none"
+                      className="rounded-xl border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-900 focus:border-emerald-600 outline-none"
                     />
                   </label>
                   <label className="grid gap-1.5">
-                    <span className="text-xs text-slate-300">Addition Size (sqft)</span>
+                    <span className="text-xs text-gray-600 font-medium">Addition Size (sqft)</span>
                     <input
                       type="number"
                       min="0"
@@ -436,12 +436,12 @@ export default function MoveOrImproveCalculator() {
                       step="50"
                       value={inputs.renovation.addedSqft}
                       onChange={(e) => updateRenovation('addedSqft', parseInt(e.target.value) || 0)}
-                      className="rounded-xl border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-white focus:border-emerald-500 outline-none"
+                      className="rounded-xl border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-900 focus:border-emerald-600 outline-none"
                     />
                   </label>
                 </div>
                 {inputs.renovation.currentSqft > 0 && inputs.renovation.addedSqft > 0 && (
-                  <div className="md:col-span-2 text-xs text-emerald-400 font-semibold bg-emerald-950/40 p-2.5 rounded-xl border border-emerald-800/40">
+                  <div className="md:col-span-2 text-xs text-emerald-800 font-semibold bg-emerald-100/70 p-2.5 rounded-xl border border-emerald-300">
                     (+{((inputs.renovation.addedSqft / inputs.renovation.currentSqft) * 100).toFixed(0)}% space added to your home footprint)
                   </div>
                 )}
@@ -464,10 +464,10 @@ export default function MoveOrImproveCalculator() {
                 helpText="The purchase price of the home you'd move to."
               />
 
-              <label className="grid gap-3 rounded-[1.5rem] border border-slate-800/80 bg-slate-950/45 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] hover:border-slate-700/90">
+              <label className="grid gap-3 rounded-2xl border border-gray-200 bg-gray-50/70 p-4 shadow-xs hover:border-gray-300 transition">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold text-slate-100">New mortgage interest rate</span>
-                  <span className="font-mono text-sm text-cyan-400">{formatPercent(Number((inputs.newMortgageRate * 100).toFixed(2)))}</span>
+                  <span className="text-sm font-semibold text-gray-900">New mortgage interest rate</span>
+                  <span className="font-mono text-sm font-bold text-blue-700">{formatPercent(Number((inputs.newMortgageRate * 100).toFixed(2)))}</span>
                 </div>
                 <input
                   type="range"
@@ -476,29 +476,29 @@ export default function MoveOrImproveCalculator() {
                   step="0.001"
                   value={inputs.newMortgageRate}
                   onChange={(e) => updateInput('newMortgageRate', parseFloat(e.target.value))}
-                  className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400"
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
                 />
-                <p className="text-sm leading-6 text-slate-400">Today's prevailing mortgage rates for new loans.</p>
+                <p className="text-xs leading-5 text-gray-500">Today's prevailing mortgage rates for new loans.</p>
               </label>
             </div>
 
             <div className="grid gap-5 md:grid-cols-3">
-              <label className="grid gap-3 rounded-[1.5rem] border border-slate-800/80 bg-slate-950/45 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] hover:border-slate-700/90">
-                <span className="text-sm font-semibold text-slate-100">Your ZIP Code</span>
+              <label className="grid gap-3 rounded-2xl border border-gray-200 bg-gray-50/70 p-4 shadow-xs hover:border-gray-300 transition">
+                <span className="text-sm font-semibold text-gray-900">Your ZIP Code</span>
                 <input
                   type="text"
                   value={inputs.friction.zipCode}
                   onChange={(e) => updateFriction('zipCode', e.target.value)}
                   placeholder="20814"
-                  className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white focus:border-cyan-500 outline-none"
+                  className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-900 focus:border-blue-600 outline-none"
                 />
-                <p className="text-sm leading-6 text-slate-400">Used to estimate local transfer taxes and recording fees (default: Montgomery County, MD).</p>
+                <p className="text-xs leading-5 text-gray-500">Used to estimate local transfer taxes and recording fees (default: Montgomery County, MD).</p>
               </label>
 
-              <label className="grid gap-3 rounded-[1.5rem] border border-slate-800/80 bg-slate-950/45 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] hover:border-slate-700/90">
+              <label className="grid gap-3 rounded-2xl border border-gray-200 bg-gray-50/70 p-4 shadow-xs hover:border-gray-300 transition">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold text-slate-100">Broker commissions</span>
-                  <span className="font-mono text-xs text-cyan-400">{formatPercent(Number((inputs.friction.brokerCommissionRate * 100).toFixed(2)))}</span>
+                  <span className="text-sm font-semibold text-gray-900">Broker commissions</span>
+                  <span className="font-mono text-xs font-bold text-blue-700">{formatPercent(Number((inputs.friction.brokerCommissionRate * 100).toFixed(2)))}</span>
                 </div>
                 <input
                   type="range"
@@ -507,15 +507,15 @@ export default function MoveOrImproveCalculator() {
                   step="0.005"
                   value={inputs.friction.brokerCommissionRate}
                   onChange={(e) => updateFriction('brokerCommissionRate', parseFloat(e.target.value))}
-                  className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400"
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
                 />
-                <p className="text-sm leading-6 text-slate-400">Total seller-side agent commissions.</p>
+                <p className="text-xs leading-5 text-gray-500">Total seller-side agent commissions.</p>
               </label>
 
-              <label className="grid gap-3 rounded-[1.5rem] border border-slate-800/80 bg-slate-950/45 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] hover:border-slate-700/90">
+              <label className="grid gap-3 rounded-2xl border border-gray-200 bg-gray-50/70 p-4 shadow-xs hover:border-gray-300 transition">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold text-slate-100">Closing costs</span>
-                  <span className="font-mono text-xs text-cyan-400">{formatPercent(Number((inputs.friction.buyerClosingCostRate * 100).toFixed(2)))}</span>
+                  <span className="text-sm font-semibold text-gray-900">Closing costs</span>
+                  <span className="font-mono text-xs font-bold text-blue-700">{formatPercent(Number((inputs.friction.buyerClosingCostRate * 100).toFixed(2)))}</span>
                 </div>
                 <input
                   type="range"
@@ -524,9 +524,9 @@ export default function MoveOrImproveCalculator() {
                   step="0.005"
                   value={inputs.friction.buyerClosingCostRate}
                   onChange={(e) => updateFriction('buyerClosingCostRate', parseFloat(e.target.value))}
-                  className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400"
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
                 />
-                <p className="text-sm leading-6 text-slate-400">Buyer-side fees (lender, escrow, title).</p>
+                <p className="text-xs leading-5 text-gray-500">Buyer-side fees (lender, escrow, title).</p>
               </label>
             </div>
 
@@ -541,19 +541,19 @@ export default function MoveOrImproveCalculator() {
                 helpText="Physical moving, packing, and setup costs."
               />
 
-              <label className="grid gap-3 rounded-[1.5rem] border border-slate-800/80 bg-slate-950/45 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] hover:border-slate-700/90 flex flex-col justify-between">
+              <label className="grid gap-3 rounded-2xl border border-gray-200 bg-gray-50/70 p-4 shadow-xs hover:border-gray-300 transition flex flex-col justify-between">
                 <div>
-                  <span className="text-sm font-semibold text-slate-100">First-time homebuyer?</span>
-                  <p className="mt-1 text-xs text-slate-400">May waive transfer taxes in some jurisdictions.</p>
+                  <span className="text-sm font-semibold text-gray-900">First-time homebuyer?</span>
+                  <p className="mt-1 text-xs text-gray-500">May waive transfer taxes in some jurisdictions.</p>
                 </div>
                 <label className="flex items-center space-x-3 cursor-pointer mt-3">
                   <input
                     type="checkbox"
                     checked={inputs.friction.isFirstTimeBuyer}
                     onChange={(e) => updateFriction('isFirstTimeBuyer', e.target.checked)}
-                    className="rounded border-slate-800 bg-slate-950 text-emerald-500 focus:ring-emerald-500/20"
+                    className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500/20"
                   />
-                  <span className="text-xs text-slate-200">Yes, I qualify for the first-time buyer exemption</span>
+                  <span className="text-xs text-gray-700">Yes, I qualify for the first-time buyer exemption</span>
                 </label>
               </label>
             </div>
@@ -562,26 +562,27 @@ export default function MoveOrImproveCalculator() {
       </div>
 
       {/* ============================================================ */}
+      {/* ============================================================ */}
       {/* 3. SENSITIVITY — "What if home prices change?"               */}
       {/* ============================================================ */}
-      <div className="rounded-[1.8rem] border border-slate-800 bg-slate-950/30 p-6">
+      <div className="rounded-2xl border border-gray-200 bg-gray-50/60 p-6 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="font-mono text-xs uppercase tracking-[0.28em] text-emerald-400 font-semibold">
+            <p className="font-mono text-xs uppercase tracking-[0.28em] font-semibold text-emerald-800">
               Market Scenario
             </p>
-            <h3 className="mt-2 text-lg font-semibold text-white">
+            <h3 className="mt-2 text-lg font-bold text-gray-1000">
               What if home prices change?
             </h3>
           </div>
           {/* Preset Buttons */}
-          <div className="flex bg-slate-950 p-1 rounded-full border border-slate-800 space-x-1">
+          <div className="flex bg-white p-1 rounded-full border border-gray-200 space-x-1 shadow-xs">
             <button
               onClick={() => handleSensitivityChange('low')}
               className={`px-3 py-1.5 text-xs font-semibold rounded-full transition cursor-pointer ${
                 sensitivityPreset === 'low'
-                  ? 'bg-slate-800 text-white'
-                  : 'text-slate-300 hover:text-white'
+                  ? 'bg-gray-900 text-white'
+                  : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               Flat (1.5%)
@@ -590,8 +591,8 @@ export default function MoveOrImproveCalculator() {
               onClick={() => handleSensitivityChange('base')}
               className={`px-3 py-1.5 text-xs font-semibold rounded-full transition cursor-pointer ${
                 sensitivityPreset === 'base'
-                  ? 'bg-slate-800 text-white'
-                  : 'text-slate-300 hover:text-white'
+                  ? 'bg-gray-900 text-white'
+                  : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               Base (3.0%)
@@ -600,8 +601,8 @@ export default function MoveOrImproveCalculator() {
               onClick={() => handleSensitivityChange('high')}
               className={`px-3 py-1.5 text-xs font-semibold rounded-full transition cursor-pointer ${
                 sensitivityPreset === 'high'
-                  ? 'bg-slate-800 text-white'
-                  : 'text-slate-300 hover:text-white'
+                  ? 'bg-gray-900 text-white'
+                  : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               High (5.5%)
@@ -612,9 +613,9 @@ export default function MoveOrImproveCalculator() {
         {/* Custom Appreciation Slider */}
         <div className="mt-6 grid gap-4 md:grid-cols-2 items-center">
           <label className="grid gap-2">
-            <div className="flex justify-between text-xs font-mono text-slate-200">
-              <span className="font-semibold text-slate-200">Annual home price growth:</span>
-              <span className="text-emerald-400 font-bold">{formatPercent(Number((inputs.annualAppreciation * 100).toFixed(2)))}</span>
+            <div className="flex justify-between text-xs font-mono">
+              <span className="font-semibold text-gray-700">Annual home price growth:</span>
+              <span className="text-emerald-700 font-bold">{formatPercent(Number((inputs.annualAppreciation * 100).toFixed(2)))}</span>
             </div>
             <input
               type="range"
@@ -626,18 +627,18 @@ export default function MoveOrImproveCalculator() {
                 setSensitivityPreset('custom');
                 updateInput('annualAppreciation', parseFloat(e.target.value));
               }}
-              className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-400"
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
             />
           </label>
-          <div className="p-3 bg-slate-900/40 rounded-xl border border-slate-800/80 text-xs text-slate-200 leading-6">
-            <span className="inline-flex items-center gap-1.5 text-amber-400 font-semibold mb-1">
+          <div className="p-3.5 bg-white rounded-xl border border-gray-200 text-xs text-gray-600 leading-relaxed shadow-xs">
+            <span className="inline-flex items-center gap-1.5 text-amber-800 font-semibold mb-1">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5">
                 <path d="M8 1.5A4.5 4.5 0 0 0 3.5 6c0 1.56.806 2.933 2.024 3.726a.75.75 0 0 1 .351.636v1.888h4.25V10.36a.75.75 0 0 1 .352-.637A4.5 4.5 0 0 0 8 1.5ZM5.75 13.5a.75.75 0 0 0 0 1.5h4.5a.75.75 0 0 0 0-1.5h-4.5Z" />
               </svg>
               Rule of Thumb
             </span>
-            <p className="text-slate-300">
-              High-appreciation markets tend to favor <strong className="text-white">moving</strong> (larger asset base = bigger absolute gains). Flat or slow markets favor <strong className="text-white">renovating</strong> (transaction fees eat into the move).
+            <p>
+              High-appreciation markets tend to favor <strong className="text-gray-900 font-semibold">moving</strong> (larger asset base = bigger absolute gains). Flat or slow markets favor <strong className="text-gray-900 font-semibold">renovating</strong> (transaction fees eat into the move).
             </p>
           </div>
         </div>
@@ -646,17 +647,17 @@ export default function MoveOrImproveCalculator() {
       {/* ============================================================ */}
       {/* 4. LEDGER — "Your 5-Year Comparison"                         */}
       {/* ============================================================ */}
-      <div className="rounded-[1.8rem] border border-slate-800/90 bg-slate-900/45 p-6 shadow-2xl backdrop-blur-md">
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
-          <p className="font-mono text-xs uppercase tracking-[0.28em] text-slate-200 font-semibold">Your 5-Year Comparison</p>
+          <p className="font-mono text-xs uppercase tracking-[0.28em] font-semibold text-gray-900">Your 5-Year Comparison</p>
           {/* Color Legend */}
-          <div className="flex items-center gap-4 text-xs text-slate-400">
+          <div className="flex items-center gap-4 text-xs text-gray-600">
             <span className="flex items-center gap-1.5">
-              <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
               Renovate
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="inline-block w-2.5 h-2.5 rounded-full bg-cyan-500"></span>
+              <span className="inline-block w-2.5 h-2.5 rounded-full bg-blue-600"></span>
               Move
             </span>
           </div>
@@ -665,90 +666,90 @@ export default function MoveOrImproveCalculator() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-slate-700 text-slate-300 uppercase tracking-wider font-mono bg-slate-950/40">
-                <th className="py-3 px-3">Metric</th>
-                <th className="py-3 px-3">Year 0</th>
-                <th className="py-3 px-3">Year 1</th>
-                <th className="py-3 px-3">Year 3</th>
-                <th className="py-3 px-3">Year 5</th>
-                <th className="py-3 px-3 text-right">5-Year Total Sum</th>
+              <tr className="border-b border-gray-200 text-gray-500 uppercase tracking-wider font-mono bg-gray-50">
+                <th className="py-3 px-3 font-semibold">Metric</th>
+                <th className="py-3 px-3 font-semibold">Year 0</th>
+                <th className="py-3 px-3 font-semibold">Year 1</th>
+                <th className="py-3 px-3 font-semibold">Year 3</th>
+                <th className="py-3 px-3 font-semibold">Year 5</th>
+                <th className="py-3 px-3 text-right font-semibold">5-Year Total Sum</th>
               </tr>
             </thead>
-            <tbody className="font-medium text-white">
+            <tbody className="font-medium text-gray-900">
               {/* ——— Home Value Group ——— */}
-              <tr className="border-t-2 border-slate-700/50 bg-slate-950/65">
-                <td colSpan={6} className="py-2 px-3 text-[0.7rem] font-mono uppercase tracking-widest text-slate-200 font-extrabold">Home Value</td>
+              <tr className="border-t-2 border-gray-200 bg-gray-100/80">
+                <td colSpan={6} className="py-2 px-3 text-[0.7rem] font-mono uppercase tracking-widest text-gray-800 font-bold">Home Value</td>
               </tr>
-              <tr className="bg-slate-950/40 hover:bg-slate-950/60 border-b border-slate-800/40">
-                <td className="py-3.5 px-3 font-semibold"><span className="text-emerald-400 font-bold mr-1.5">Renovate:</span>Home Value</td>
+              <tr className="bg-white hover:bg-gray-50/60 border-b border-gray-100">
+                <td className="py-3.5 px-3 font-semibold"><span className="text-emerald-700 font-bold mr-1.5">Renovate:</span>Home Value</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.improvePathway[0].grossValue)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.improvePathway[1].grossValue)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.improvePathway[3].grossValue)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.improvePathway[5].grossValue)}</td>
-                <td className="py-3.5 px-3 tabular-nums text-right text-slate-400">—</td>
+                <td className="py-3.5 px-3 tabular-nums text-right text-gray-400">—</td>
               </tr>
-              <tr className="bg-slate-900/30 hover:bg-slate-900/50 border-b border-slate-800/40">
-                <td className="py-3.5 px-3 font-semibold"><span className="text-cyan-400 font-bold mr-1.5">Move:</span>Home Value</td>
+              <tr className="bg-gray-50/40 hover:bg-gray-50/70 border-b border-gray-100">
+                <td className="py-3.5 px-3 font-semibold"><span className="text-blue-700 font-bold mr-1.5">Move:</span>Home Value</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[0].grossValue)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[1].grossValue)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[3].grossValue)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[5].grossValue)}</td>
-                <td className="py-3.5 px-3 tabular-nums text-right text-slate-400">—</td>
+                <td className="py-3.5 px-3 tabular-nums text-right text-gray-400">—</td>
               </tr>
 
               {/* ——— Debt Group ——— */}
-              <tr className="border-t-2 border-slate-700/50 bg-slate-950/65">
-                <td colSpan={6} className="py-2 px-3 text-[0.7rem] font-mono uppercase tracking-widest text-slate-200 font-extrabold">What You Owe</td>
+              <tr className="border-t-2 border-gray-200 bg-gray-100/80">
+                <td colSpan={6} className="py-2 px-3 text-[0.7rem] font-mono uppercase tracking-widest text-gray-800 font-bold">What You Owe</td>
               </tr>
-              <tr className="bg-slate-950/40 hover:bg-slate-950/60 border-b border-slate-800/40">
-                <td className="py-3.5 px-3 font-semibold"><span className="text-emerald-400 font-bold mr-1.5">Renovate:</span>Debt</td>
-                <td className="py-3.5 px-3 tabular-nums text-rose-400">{formatCurrency(result.improvePathway[0].outstandingDebt)}</td>
+              <tr className="bg-white hover:bg-gray-50/60 border-b border-gray-100">
+                <td className="py-3.5 px-3 font-semibold"><span className="text-emerald-700 font-bold mr-1.5">Renovate:</span>Debt</td>
+                <td className="py-3.5 px-3 tabular-nums text-rose-600 font-semibold">{formatCurrency(result.improvePathway[0].outstandingDebt)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.improvePathway[1].outstandingDebt)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.improvePathway[3].outstandingDebt)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.improvePathway[5].outstandingDebt)}</td>
-                <td className="py-3.5 px-3 tabular-nums text-right text-slate-400">—</td>
+                <td className="py-3.5 px-3 tabular-nums text-right text-gray-400">—</td>
               </tr>
-              <tr className="bg-slate-900/30 hover:bg-slate-900/50 border-b border-slate-800/40">
-                <td className="py-3.5 px-3 font-semibold"><span className="text-cyan-400 font-bold mr-1.5">Move:</span>Debt</td>
-                <td className="py-3.5 px-3 tabular-nums text-rose-400">{formatCurrency(result.movePathway[0].outstandingDebt)}</td>
+              <tr className="bg-gray-50/40 hover:bg-gray-50/70 border-b border-gray-100">
+                <td className="py-3.5 px-3 font-semibold"><span className="text-blue-700 font-bold mr-1.5">Move:</span>Debt</td>
+                <td className="py-3.5 px-3 tabular-nums text-rose-600 font-semibold">{formatCurrency(result.movePathway[0].outstandingDebt)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[1].outstandingDebt)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[3].outstandingDebt)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[5].outstandingDebt)}</td>
-                <td className="py-3.5 px-3 tabular-nums text-right text-slate-400">—</td>
+                <td className="py-3.5 px-3 tabular-nums text-right text-gray-400">—</td>
               </tr>
 
               {/* ——— Net Equity Group (hero rows) ——— */}
-              <tr className="border-t-2 border-slate-700/50 bg-slate-950/65">
-                <td colSpan={6} className="py-2 px-3 text-[0.7rem] font-mono uppercase tracking-widest text-slate-200 font-extrabold">Net Equity (Value − Debt)</td>
+              <tr className="border-t-2 border-gray-200 bg-gray-100/80">
+                <td colSpan={6} className="py-2 px-3 text-[0.7rem] font-mono uppercase tracking-widest text-gray-800 font-bold">Net Equity (Value − Debt)</td>
               </tr>
-              <tr className="bg-emerald-950 border-y border-emerald-800/80">
-                <td className="py-3.5 px-3 font-bold"><span className="text-emerald-300 font-bold mr-1.5">Renovate:</span>Net Equity</td>
-                <td className="py-3.5 px-3 tabular-nums font-semibold text-emerald-100">{formatCurrency(result.improvePathway[0].netEquity)}</td>
-                <td className="py-3.5 px-3 tabular-nums font-semibold text-emerald-100">{formatCurrency(result.improvePathway[1].netEquity)}</td>
-                <td className="py-3.5 px-3 tabular-nums font-semibold text-emerald-100">{formatCurrency(result.improvePathway[3].netEquity)}</td>
-                <td className="py-3.5 px-3 tabular-nums text-emerald-300 font-bold">{formatCurrency(result.improvePathway[5].netEquity)}</td>
-                <td className="py-3.5 px-3 tabular-nums text-right text-slate-400">—</td>
+              <tr className="bg-emerald-50/90 border-y border-emerald-200">
+                <td className="py-3.5 px-3 font-bold"><span className="text-emerald-800 font-bold mr-1.5">Renovate:</span>Net Equity</td>
+                <td className="py-3.5 px-3 tabular-nums font-semibold text-emerald-950">{formatCurrency(result.improvePathway[0].netEquity)}</td>
+                <td className="py-3.5 px-3 tabular-nums font-semibold text-emerald-950">{formatCurrency(result.improvePathway[1].netEquity)}</td>
+                <td className="py-3.5 px-3 tabular-nums font-semibold text-emerald-950">{formatCurrency(result.improvePathway[3].netEquity)}</td>
+                <td className="py-3.5 px-3 tabular-nums text-emerald-800 font-extrabold">{formatCurrency(result.improvePathway[5].netEquity)}</td>
+                <td className="py-3.5 px-3 tabular-nums text-right text-gray-400">—</td>
               </tr>
-              <tr className="bg-cyan-950 border-y border-cyan-800/80">
-                <td className="py-3.5 px-3 font-bold"><span className="text-cyan-300 font-bold mr-1.5">Move:</span>Net Equity</td>
-                <td className="py-3.5 px-3 tabular-nums font-semibold text-cyan-100">{formatCurrency(result.movePathway[0].netEquity)}</td>
-                <td className="py-3.5 px-3 tabular-nums font-semibold text-cyan-100">{formatCurrency(result.movePathway[1].netEquity)}</td>
-                <td className="py-3.5 px-3 tabular-nums font-semibold text-cyan-100">{formatCurrency(result.movePathway[3].netEquity)}</td>
-                <td className="py-3.5 px-3 tabular-nums text-cyan-300 font-bold">{formatCurrency(result.movePathway[5].netEquity)}</td>
-                <td className="py-3.5 px-3 tabular-nums text-right text-slate-400">—</td>
+              <tr className="bg-blue-50/90 border-y border-blue-200">
+                <td className="py-3.5 px-3 font-bold"><span className="text-blue-800 font-bold mr-1.5">Move:</span>Net Equity</td>
+                <td className="py-3.5 px-3 tabular-nums font-semibold text-blue-950">{formatCurrency(result.movePathway[0].netEquity)}</td>
+                <td className="py-3.5 px-3 tabular-nums font-semibold text-blue-950">{formatCurrency(result.movePathway[1].netEquity)}</td>
+                <td className="py-3.5 px-3 tabular-nums font-semibold text-blue-950">{formatCurrency(result.movePathway[3].netEquity)}</td>
+                <td className="py-3.5 px-3 tabular-nums text-blue-800 font-extrabold">{formatCurrency(result.movePathway[5].netEquity)}</td>
+                <td className="py-3.5 px-3 tabular-nums text-right text-gray-400">—</td>
               </tr>
 
               {/* ——— Out-of-Pocket Cash Spent Group ——— */}
-              <tr className="border-t-2 border-slate-700/50 bg-slate-950/65">
-                <td colSpan={6} className="py-2 px-3 text-[0.7rem] font-mono uppercase tracking-widest text-slate-200 font-extrabold">OUT-OF-POCKET CASH SPENT (PER YEAR)</td>
+              <tr className="border-t-2 border-gray-200 bg-gray-100/80">
+                <td colSpan={6} className="py-2 px-3 text-[0.7rem] font-mono uppercase tracking-widest text-gray-800 font-bold">OUT-OF-POCKET CASH SPENT (PER YEAR)</td>
               </tr>
-              <tr className="bg-slate-950/40 hover:bg-slate-950/60 border-b border-slate-800/40">
+              <tr className="bg-white hover:bg-gray-50/60 border-b border-gray-100">
                 <td className="py-3.5 px-3 font-semibold">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-emerald-400 font-bold">Renovate:</span>
+                    <span className="text-emerald-700 font-bold">Renovate:</span>
                     <span>Out-of-pocket</span>
                     <span 
-                      className="inline-flex cursor-help text-slate-400 hover:text-white transition"
+                      className="inline-flex cursor-help text-gray-400 hover:text-gray-700 transition"
                       title="Year 0: $0 (HELOC funding covers quote + permits). Years 1–5: 12 months of your current mortgage payment + the new renovation HELOC payment (+ temporary rental costs, if applicable)."
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5">
@@ -761,15 +762,15 @@ export default function MoveOrImproveCalculator() {
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.improvePathway[1].yearlySpent)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.improvePathway[3].yearlySpent)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.improvePathway[5].yearlySpent)}</td>
-                <td className="py-3.5 px-3 tabular-nums text-right font-extrabold text-sm text-emerald-300 bg-emerald-900 border border-emerald-700/80 rounded px-2.5 py-1.5 shadow-[inset_0_0_12px_rgba(16,185,129,0.3)]">{formatCurrency(result.variance.fiveYearTotalImprove)}</td>
+                <td className="py-3.5 px-3 tabular-nums text-right font-bold text-sm text-emerald-800 bg-emerald-100 border border-emerald-300 rounded px-2.5 py-1">{formatCurrency(result.variance.fiveYearTotalImprove)}</td>
               </tr>
-              <tr className="bg-slate-900/30 hover:bg-slate-900/50">
+              <tr className="bg-gray-50/40 hover:bg-gray-50/70">
                 <td className="py-3.5 px-3 font-semibold">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-cyan-400 font-bold">Move:</span>
+                    <span className="text-blue-700 font-bold">Move:</span>
                     <span>Out-of-pocket</span>
                     <span 
-                      className="inline-flex cursor-help text-slate-400 hover:text-white transition"
+                      className="inline-flex cursor-help text-gray-400 hover:text-gray-700 transition"
                       title="Year 0: Upfront selling friction (broker commission, transfer taxes, moving expenses) + recordation fees on the new loan. Years 1–5: 12 months of new mortgage payments."
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5">
@@ -782,62 +783,62 @@ export default function MoveOrImproveCalculator() {
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[1].yearlySpent)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[3].yearlySpent)}</td>
                 <td className="py-3.5 px-3 tabular-nums">{formatCurrency(result.movePathway[5].yearlySpent)}</td>
-                <td className="py-3.5 px-3 tabular-nums text-right font-extrabold text-sm text-cyan-300 bg-cyan-900 border border-cyan-700/80 rounded px-2.5 py-1.5 shadow-[inset_0_0_12px_rgba(34,211,238,0.3)]">{formatCurrency(result.variance.fiveYearTotalMove)}</td>
+                <td className="py-3.5 px-3 tabular-nums text-right font-bold text-sm text-blue-800 bg-blue-100 border border-blue-300 rounded px-2.5 py-1">{formatCurrency(result.variance.fiveYearTotalMove)}</td>
               </tr>
             </tbody>
           </table>
         </div>
 
         {/* ——— OUT-OF-POCKET EXPLANATION GUIDE ——— */}
-        <div className="mt-5 p-5 rounded-2xl border border-slate-800/80 bg-slate-950/45 grid gap-5 md:grid-cols-2 text-xs leading-6 text-slate-300">
+        <div className="mt-5 p-5 rounded-2xl border border-gray-200 bg-gray-50/70 grid gap-5 md:grid-cols-2 text-xs leading-6 text-gray-600">
           <div>
-            <span className="font-semibold text-emerald-400 flex items-center gap-1.5 mb-2 font-mono uppercase tracking-wider text-[0.7rem]">
-              <span className="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span className="font-bold text-emerald-800 flex items-center gap-1.5 mb-2 font-mono uppercase tracking-wider text-[0.7rem]">
+              <span className="inline-block w-2 h-2 rounded-full bg-emerald-600"></span>
               Renovate Out-of-Pocket Breakdown
             </span>
             <p>
-              <strong>Year 0 ($0):</strong> Upfront construction and permit fees are fully covered by the HELOC loan, requiring $0 initial out-of-pocket cash.
+              <strong className="text-gray-900">Year 0 ($0):</strong> Upfront construction and permit fees are fully covered by the HELOC loan, requiring $0 initial out-of-pocket cash.
             </p>
             <p className="mt-2">
-              <strong>Years 1–5 (Ongoing):</strong> Consists of 12 months of your primary legacy mortgage payments plus the new HELOC loan payments (plus temporary rent in Year 1 if a second-story addition is selected).
+              <strong className="text-gray-900">Years 1–5 (Ongoing):</strong> Consists of 12 months of your primary legacy mortgage payments plus the new HELOC loan payments (plus temporary rent in Year 1 if a second-story addition is selected).
             </p>
           </div>
-          <div className="border-t border-slate-800/60 pt-4 md:border-t-0 md:pt-0 md:border-l md:border-slate-800/60 md:pl-5">
-            <span className="font-semibold text-cyan-400 flex items-center gap-1.5 mb-2 font-mono uppercase tracking-wider text-[0.7rem]">
-              <span className="inline-block w-2 h-2 rounded-full bg-cyan-500"></span>
+          <div className="border-t border-gray-200 pt-4 md:border-t-0 md:pt-0 md:border-l md:border-gray-200 md:pl-5">
+            <span className="font-bold text-blue-800 flex items-center gap-1.5 mb-2 font-mono uppercase tracking-wider text-[0.7rem]">
+              <span className="inline-block w-2 h-2 rounded-full bg-blue-600"></span>
               Move Out-of-Pocket Breakdown
             </span>
             <p>
-              <strong>Year 0 (Upfront fees):</strong> Selling friction transaction fees (broker commissions, transfer taxes, physical moving expenses) plus recordation taxes for the new property mortgage.
+              <strong className="text-gray-900">Year 0 (Upfront fees):</strong> Selling friction transaction fees (broker commissions, transfer taxes, physical moving expenses) plus recordation taxes for the new property mortgage.
             </p>
             <p className="mt-2">
-              <strong>Years 1–5 (Ongoing):</strong> Consists of 12 months of mortgage payments on your new loan (based on the new purchase rate and loan balance).
+              <strong className="text-gray-900">Years 1–5 (Ongoing):</strong> Consists of 12 months of mortgage payments on your new loan (based on the new purchase rate and loan balance).
             </p>
           </div>
         </div>
 
         {/* ——— BOTTOM-LINE SUMMARY ——— */}
-        <div className={`mt-6 rounded-[1.3rem] p-5 border ${
+        <div className={`mt-6 rounded-2xl p-5 border ${
           improveIsBetter
-            ? 'border-emerald-700/50 bg-emerald-950/60'
-            : 'border-cyan-700/50 bg-cyan-950/60'
+            ? 'border-emerald-200 bg-emerald-50/80'
+            : 'border-blue-200 bg-blue-50/80'
         }`}>
           <div className="flex items-start gap-3">
             <span className="text-2xl mt-0.5">{improveIsBetter ? '🏠' : '🚚'}</span>
-            <div className="text-sm leading-7 text-slate-200">
+            <div className="text-sm leading-7 text-gray-700">
               {improveIsBetter ? (
                 <>
-                  <strong className="text-emerald-300">Bottom line: Staying and renovating</strong> is projected to leave you with{' '}
-                  <strong className="text-white">{formatCurrency(improveEquityYear5)}</strong> in equity after 5 years — that's{' '}
-                  <strong className="text-emerald-400">{formatCurrency(variance)} more</strong> than if you sold and bought a new home.
-                  You'd pay <strong className="text-white">{formatCurrency(result.variance.fiveYearTotalImprove)}</strong> total over 60 months in mortgage and HELOC payments, but your home's value grows to{' '}
-                  <strong className="text-white">{formatCurrency(result.improvePathway[5].grossValue)}</strong>.
+                  <strong className="text-emerald-950 font-bold">Bottom line: Staying and renovating</strong> is projected to leave you with{' '}
+                  <strong className="text-gray-900 font-bold">{formatCurrency(improveEquityYear5)}</strong> in equity after 5 years — that's{' '}
+                  <strong className="text-emerald-800 font-bold">{formatCurrency(variance)} more</strong> than if you sold and bought a new home.
+                  You'd pay <strong className="text-gray-900 font-bold">{formatCurrency(result.variance.fiveYearTotalImprove)}</strong> total over 60 months in mortgage and HELOC payments, but your home's value grows to{' '}
+                  <strong className="text-gray-900 font-bold">{formatCurrency(result.improvePathway[5].grossValue)}</strong>.
                 </>
               ) : (
                 <>
-                  <strong className="text-cyan-300">Bottom line: Selling and buying a new home</strong> is projected to leave you with{' '}
-                  <strong className="text-white">{formatCurrency(moveEquityYear5)}</strong> in equity after 5 years — that's{' '}
-                  <strong className="text-cyan-400">{formatCurrency(variance)} more</strong> than if you stayed and renovated, even after broker commissions, transfer taxes, and closing costs.
+                  <strong className="text-blue-950 font-bold">Bottom line: Selling and buying a new home</strong> is projected to leave you with{' '}
+                  <strong className="text-gray-900 font-bold">{formatCurrency(moveEquityYear5)}</strong> in equity after 5 years — that's{' '}
+                  <strong className="text-blue-800 font-bold">{formatCurrency(variance)} more</strong> than if you stayed and renovated, even after broker commissions, transfer taxes, and closing costs.
                 </>
               )}
             </div>
@@ -845,59 +846,59 @@ export default function MoveOrImproveCalculator() {
         </div>
 
         {/* Tax Detail Cards */}
-        <div className="mt-6 border-t border-slate-800 pt-5 grid gap-4 sm:grid-cols-3 text-xs">
-          <div className="rounded-xl border border-slate-800 bg-slate-950/30 p-3">
-            <span className="font-mono text-slate-400 uppercase tracking-wider block">State Transfer Tax</span>
-            <span className="mt-1 block text-sm font-semibold text-white tabular-nums">
+        <div className="mt-6 border-t border-gray-200 pt-5 grid gap-4 sm:grid-cols-3 text-xs">
+          <div className="rounded-xl border border-gray-200 bg-gray-50 p-3.5">
+            <span className="font-mono text-gray-500 uppercase tracking-wider block font-medium">State Transfer Tax</span>
+            <span className="mt-1 block text-sm font-bold text-gray-900 tabular-nums">
               {formatCurrency(result.taxDetails.transferTax)}
             </span>
           </div>
-          <div className="rounded-xl border border-slate-800 bg-slate-950/30 p-3">
-            <span className="font-mono text-slate-400 uppercase tracking-wider block">Recording Fees</span>
-            <span className="mt-1 block text-sm font-semibold text-white tabular-nums">
+          <div className="rounded-xl border border-gray-200 bg-gray-50 p-3.5">
+            <span className="font-mono text-gray-500 uppercase tracking-wider block font-medium">Recording Fees</span>
+            <span className="mt-1 block text-sm font-bold text-gray-900 tabular-nums">
               {formatCurrency(result.taxDetails.recordationTax)}
             </span>
           </div>
-          <div className="rounded-xl border border-slate-800 bg-slate-950/30 p-3">
-            <span className="font-mono text-slate-400 uppercase tracking-wider block">Tax Exemptions</span>
-            <span className={`mt-1 block text-xs font-bold ${result.taxDetails.statutoryExemptionApplied ? 'text-emerald-400' : 'text-slate-300'}`}>
+          <div className="rounded-xl border border-gray-200 bg-gray-50 p-3.5">
+            <span className="font-mono text-gray-500 uppercase tracking-wider block font-medium">Tax Exemptions</span>
+            <span className={`mt-1 block text-xs font-bold ${result.taxDetails.statutoryExemptionApplied ? 'text-emerald-700' : 'text-gray-600'}`}>
               {result.taxDetails.statutoryExemptionApplied ? 'Montgomery County Exemption Applied' : 'No Local Exemptions'}
             </span>
           </div>
         </div>
 
         {/* Collapsible Accordion for Calculation Logic */}
-        <div className="mt-6 border-t border-slate-800/60 pt-5">
+        <div className="mt-6 border-t border-gray-200 pt-5">
           <button
             onClick={() => setShowLogic(!showLogic)}
-            className="flex items-center justify-between w-full py-2 text-xs font-mono uppercase tracking-wider text-slate-300 hover:text-white transition focus:outline-none cursor-pointer"
+            className="flex items-center justify-between w-full py-2 text-xs font-mono uppercase tracking-wider text-gray-600 hover:text-gray-900 transition focus:outline-none cursor-pointer"
           >
-            <span>{showLogic ? '▼' : '▶'} How we calculated this</span>
-            <span className="text-slate-500 text-[10px]">{showLogic ? 'Collapse' : 'Expand'}</span>
+            <span className="font-semibold">{showLogic ? '▼' : '▶'} How we calculated this</span>
+            <span className="text-gray-500 text-[10px] font-medium">{showLogic ? 'Collapse' : 'Expand'}</span>
           </button>
 
           {showLogic && (
-            <div className="mt-4 p-5 rounded-2xl border border-slate-800/80 bg-slate-950/60 font-sans text-xs leading-6 text-slate-200 space-y-4">
-              <p className="text-slate-400 text-[11px]">
+            <div className="mt-4 p-5 rounded-2xl border border-gray-200 bg-gray-50 font-sans text-xs leading-6 text-gray-700 space-y-4">
+              <p className="text-gray-500 text-[11px]">
                 Here's the math behind your projection, broken into the two pathways.
               </p>
               <div>
-                <h4 className="font-bold text-white text-sm mb-2">1. Renovation Pathway</h4>
+                <h4 className="font-bold text-gray-900 text-sm mb-2">1. Renovation Pathway</h4>
                 <p>Models your home's future value based on your renovation cost and its expected ROI, compounded over time with annual appreciation.</p>
-                <div className="mt-2 font-mono text-[11px] bg-slate-900/80 p-3 rounded-lg border border-slate-800 text-emerald-400">
+                <div className="mt-2 font-mono text-[11px] bg-white p-3 rounded-lg border border-gray-200 text-emerald-800">
                   Home Value(y) = (Current Value + Quote × ROI) × (1 + Growth)^y<br />
                   Net Equity(5) = Home Value(5) − Mortgage Balance(60) − HELOC Balance(60)
                 </div>
               </div>
               <div>
-                <h4 className="font-bold text-white text-sm mb-2">2. Relocation Pathway</h4>
+                <h4 className="font-bold text-gray-900 text-sm mb-2">2. Relocation Pathway</h4>
                 <p>Models selling your current property, paying localized transaction taxes and commissions, and purchasing a new asset with a new market-rate loan.</p>
-                <div className="mt-2 font-mono text-[11px] bg-slate-900/80 p-3 rounded-lg border border-slate-800 text-cyan-400">
+                <div className="mt-2 font-mono text-[11px] bg-white p-3 rounded-lg border border-gray-200 text-blue-800">
                   Home Value(y) = New Purchase Price × (1 + Growth)^y<br />
                   Net Equity(5) = Home Value(5) − New Mortgage Balance(60)
                 </div>
               </div>
-              <div className="text-slate-400 text-[10px] border-t border-slate-800/80 pt-3">
+              <div className="text-gray-500 text-[10px] border-t border-gray-200 pt-3">
                 * The engine calculates full amortization schedules for legacy mortgage, HELOC, and new relocation loan over a 60-month holding period using standard fixed-rate amortization formulas.
               </div>
             </div>

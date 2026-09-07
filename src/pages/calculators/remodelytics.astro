@@ -48,42 +48,42 @@ const engineNotes = [
 		</div>
 
 		<div slot="aside" class="grid gap-6">
-			<article class="overflow-hidden rounded-[1.8rem] border border-cyan-500/20 bg-[linear-gradient(135deg,rgba(0,11,80,0.96),rgba(2,6,23,0.98)_70%,rgba(10,37,100,0.96))] p-6 shadow-[0_0_40px_rgba(34,211,238,0.08)]">
-				<p class="font-mono text-xs uppercase tracking-[0.28em] text-cyan-200">PRD implementation</p>
-				<h2 class="mt-3 text-2xl font-semibold tracking-tight text-white">
+			<article class="overflow-hidden rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50/80 via-white to-indigo-50/50 p-6 shadow-sm">
+				<p class="font-mono text-xs uppercase tracking-[0.28em] font-semibold text-blue-700">PRD implementation</p>
+				<h2 class="mt-3 text-2xl font-bold tracking-tight text-gray-900">
 					Built as an API-ready first version
 				</h2>
-				<p class="mt-4 text-sm leading-7 text-slate-200">
+				<p class="mt-4 text-sm leading-relaxed text-gray-700">
 					This release keeps the calculations local and transparent while shaping the interface around
 					the future data broker: RSMeans or XactRemodel costs, <Fragment set:html={acronym('AVM', 'Automated Valuation Model: a computer-generated property value estimate.')} /> feeds, HUD <Fragment set:html={acronym('AMI', 'Area Median Income: the local midpoint household income used for program eligibility.')} />, EIA utility rates,
 					and DSIRE or state rebate programs.
 				</p>
-				<div class="mt-6 rounded-[1.3rem] border border-white/10 bg-white/5 p-4">
-					<p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-slate-400">
+				<div class="mt-6 rounded-xl border border-blue-200/70 bg-white/90 p-4 shadow-xs">
+					<p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] font-semibold text-blue-800">
 						Current data mode
 					</p>
-					<p class="mt-2 text-sm leading-7 text-slate-100">
+					<p class="mt-2 text-sm leading-relaxed text-gray-700">
 						User-entered scenario assumptions with defensible default formulas. No external cost,
 						valuation, rebate, or credit API is called yet.
 					</p>
 				</div>
 			</article>
 
-			<article class="panel-soft rounded-[1.8rem] border border-slate-800/90 bg-slate-900/45 p-6 shadow-2xl backdrop-blur-md">
-				<p class="font-mono text-xs uppercase tracking-[0.28em] text-emerald-300">Core engines</p>
+			<article class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+				<p class="font-mono text-xs uppercase tracking-[0.28em] font-semibold text-emerald-700">Core engines</p>
 				<div class="mt-5 grid gap-4">
 					{engineNotes.map((item) => (
-						<div class="rounded-[1.2rem] border border-slate-800/80 bg-slate-950/55 p-4">
-							<h2 class="text-base font-semibold text-white">{item.title}</h2>
-							<p class="mt-2 text-sm leading-7 text-slate-300" set:html={item.body}></p>
+						<div class="rounded-xl border border-gray-200 bg-gray-50/70 p-4">
+							<h2 class="text-base font-semibold text-gray-900">{item.title}</h2>
+							<p class="mt-2 text-sm leading-relaxed text-gray-600" set:html={item.body}></p>
 						</div>
 					))}
 				</div>
 			</article>
 
-			<article class="panel-soft rounded-[1.8rem] border border-slate-800/90 bg-slate-900/45 p-6 shadow-2xl backdrop-blur-md">
-				<p class="font-mono text-xs uppercase tracking-[0.28em] text-cyan-300">Formula stack</p>
-				<div class="mt-4 rounded-[1.3rem] border border-slate-800/90 bg-slate-950/60 p-5 font-mono text-sm leading-7 text-slate-100">
+			<article class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+				<p class="font-mono text-xs uppercase tracking-[0.28em] font-semibold text-blue-700">Formula stack</p>
+				<div class="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-5 font-mono text-xs leading-relaxed text-gray-800">
 					<p>Local cost = baseline x local <Fragment set:html={acronym('CCI', 'City Cost Index: a multiplier used to localize national construction costs.')} /> / baseline <Fragment set:html={acronym('CCI', 'City Cost Index: a multiplier used to localize national construction costs.')} /></p>
 					<p class="mt-2"><Fragment set:html={acronym('MAO', 'Maximum Allowable Offer: the highest price an investor should pay before repairs.')} /> = <Fragment set:html={acronym('ARV', 'After-Repair Value: the estimated home value after the renovation is completed.')} /> x 70% - repair cost</p>
 					<p class="mt-2"><Fragment set:html={acronym('CLTV', 'Combined Loan-to-Value: total debt secured by the home divided by the home value.')} /> = (mortgage balance + <Fragment set:html={acronym('HELOC', 'Home Equity Line of Credit: a revolving loan secured by home equity.')} />) / <Fragment set:html={acronym('ARV', 'After-Repair Value: the estimated home value after the renovation is completed.')} /></p>
@@ -91,10 +91,10 @@ const engineNotes = [
 				</div>
 			</article>
 
-			<article class="rounded-[1.8rem] border border-amber-400/15 bg-[linear-gradient(180deg,rgba(120,53,15,0.96),rgba(2,6,23,0.98))] p-6 shadow-[0_0_40px_rgba(245,158,11,0.08)]">
-				<p class="font-mono text-xs uppercase tracking-[0.28em] text-amber-200">Planning note</p>
-				<h2 class="mt-3 text-xl font-semibold text-white">Not a live appraisal or loan approval</h2>
-				<p class="mt-3 text-sm leading-7 text-slate-200">
+			<article class="rounded-2xl border border-amber-200 bg-amber-50/70 p-6 shadow-sm">
+				<p class="font-mono text-xs uppercase tracking-[0.28em] font-semibold text-amber-800">Planning note</p>
+				<h2 class="mt-3 text-xl font-bold text-gray-900">Not a live appraisal or loan approval</h2>
+				<p class="mt-3 text-sm leading-relaxed text-gray-700">
 					Remodelytics is a scenario model. Actual valuation, rebates, lending eligibility, and tax
 					outcomes depend on verified comps, program rules, documentation, and lender overlays.
 				</p>

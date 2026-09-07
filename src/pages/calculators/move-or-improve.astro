@@ -39,39 +39,39 @@ const quickNotes = [
 		</div>
 
 		<div slot="aside" class="grid gap-6">
-			<article class="overflow-hidden rounded-[1.8rem] border border-emerald-500/20 bg-[linear-gradient(135deg,rgba(2,44,23,0.92),rgba(2,6,23,0.98)_70%,rgba(16,185,129,0.12))] p-6 shadow-[0_0_40px_rgba(16,185,129,0.08)]">
-				<p class="font-mono text-xs uppercase tracking-[0.28em] text-emerald-200 font-semibold">How It Works</p>
-				<h2 class="mt-3 text-2xl font-semibold tracking-tight text-white">
+			<article class="overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/80 via-teal-50/40 to-white p-6 shadow-sm">
+				<p class="font-mono text-xs uppercase tracking-[0.28em] font-semibold text-emerald-800">How It Works</p>
+				<h2 class="mt-3 text-2xl font-bold tracking-tight text-gray-1000">
 					5-Year Side-by-Side Comparison
 				</h2>
-				<p class="mt-4 text-sm leading-7 text-slate-200">
+				<p class="mt-4 text-sm leading-7 text-gray-600">
 					Unlike simple calculators that use generic national averages, this tool models your actual mortgage amortization, renovation ROI, transaction costs, and home appreciation — all side by side.
 				</p>
-				<div class="mt-6 rounded-[1.3rem] border border-white/10 bg-white/5 p-4">
-					<p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-slate-300 font-semibold">
+				<div class="mt-6 rounded-xl border border-emerald-200/70 bg-white/90 p-4 shadow-xs">
+					<p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] font-semibold text-emerald-800">
 						Why Appreciation Matters
 					</p>
-					<p class="mt-2 text-sm leading-7 text-white font-medium">
+					<p class="mt-2 text-sm leading-relaxed text-gray-700">
 						High appreciation rates typically favor moving because appreciation applies to a larger base price (e.g. $700k new property vs $500k current property), whereas low growth environments favor staying put due to heavy transaction friction.
 					</p>
 				</div>
 			</article>
 
-			<article class="panel-soft rounded-[1.8rem] border border-slate-800/90 bg-slate-900/45 p-6 shadow-2xl backdrop-blur-md">
-				<p class="font-mono text-xs uppercase tracking-[0.28em] text-emerald-400 font-semibold">Decision Guide</p>
+			<article class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+				<p class="font-mono text-xs uppercase tracking-[0.28em] font-semibold text-emerald-800">Decision Guide</p>
 				<div class="mt-5 grid gap-4">
 					{quickNotes.map((item) => (
-						<div class="rounded-[1.2rem] border border-slate-800/80 bg-slate-950/55 p-4">
-							<h2 class="text-base font-semibold text-white">{item.title}</h2>
-							<p class="mt-2 text-sm leading-7 text-slate-300">{item.body}</p>
+						<div class="rounded-xl border border-gray-200 bg-gray-50/70 p-4">
+							<h2 class="text-base font-semibold text-gray-900">{item.title}</h2>
+							<p class="mt-2 text-sm leading-relaxed text-gray-600">{item.body}</p>
 						</div>
 					))}
 				</div>
 			</article>
 
-			<article class="panel-soft rounded-[1.8rem] border border-slate-800/90 bg-slate-900/45 p-6 shadow-2xl backdrop-blur-md">
-				<p class="font-mono text-xs uppercase tracking-[0.28em] text-emerald-400/80 font-semibold">Formula Reference</p>
-				<div class="mt-4 rounded-[1.3rem] border border-slate-800/90 bg-slate-950/60 p-5 font-mono text-xs leading-7 text-slate-100">
+			<article class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+				<p class="font-mono text-xs uppercase tracking-[0.28em] font-semibold text-gray-600">Formula Reference</p>
+				<div class="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-5 font-mono text-xs leading-relaxed text-gray-800">
 					<p>V_improve(y) = (V_0 + C_quote × ROI) × (1 + α)^y</p>
 					<p class="mt-2">V_move(y) = P_new × (1 + α)^y</p>
 					<p class="mt-2">Equity_A = V_improve(5) − LegacyMortgage(60) − HELOC(60)</p>

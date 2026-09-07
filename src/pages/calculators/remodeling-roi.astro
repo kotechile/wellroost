@@ -39,41 +39,41 @@ const quickNotes = [
 		</div>
 
 		<div slot="aside" class="grid gap-6">
-			<article class="overflow-hidden rounded-[1.8rem] border border-cyan-500/20 bg-[linear-gradient(135deg,rgba(8,47,73,0.92),rgba(2,6,23,0.98)_70%,rgba(16,185,129,0.12))] p-6 shadow-[0_0_40px_rgba(34,211,238,0.08)]">
-				<p class="font-mono text-xs uppercase tracking-[0.28em] text-cyan-200/80">Basic tier</p>
-				<h2 class="mt-3 text-2xl font-semibold tracking-tight text-white">
+			<article class="overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50/80 via-slate-50/40 to-white p-6 shadow-sm">
+				<p class="font-mono text-xs uppercase tracking-[0.28em] font-semibold text-blue-700">Basic tier</p>
+				<h2 class="mt-3 text-2xl font-bold tracking-tight text-gray-1000">
 					The quick answer before the big research project
 				</h2>
-				<p class="mt-4 text-sm leading-7 text-slate-300">
+				<p class="mt-4 text-sm leading-7 text-gray-600">
 					This tool is designed for homeowners who want a fast directional answer. It keeps the math
 					honest, but it does not ask you for property-data details most people do not have handy.
 				</p>
-				<div class="mt-6 rounded-[1.3rem] border border-white/10 bg-white/5 p-4">
-					<p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-slate-500">
+				<div class="mt-6 rounded-xl border border-blue-200/70 bg-white/90 p-4 shadow-xs">
+					<p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] font-semibold text-blue-800">
 						Best use case
 					</p>
-					<p class="mt-2 text-sm leading-7 text-slate-200">
+					<p class="mt-2 text-sm leading-relaxed text-gray-700">
 						Run this first when you are comparing whether a project feels sensible at all. Move to
 						Remodelytics when you want valuation context, local cost logic, or underwriting detail.
 					</p>
 				</div>
 			</article>
 
-			<article class="panel-soft rounded-[1.8rem] border border-slate-800/90 bg-slate-900/45 p-6 shadow-2xl backdrop-blur-md">
-				<p class="font-mono text-xs uppercase tracking-[0.28em] text-emerald-300/80">Plain-English guide</p>
+			<article class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+				<p class="font-mono text-xs uppercase tracking-[0.28em] font-semibold text-emerald-700">Plain-English guide</p>
 				<div class="mt-5 grid gap-4">
 					{quickNotes.map((item) => (
-						<div class="rounded-[1.2rem] border border-slate-800/80 bg-slate-950/55 p-4">
-							<h2 class="text-base font-semibold text-white">{item.title}</h2>
-							<p class="mt-2 text-sm leading-7 text-slate-400">{item.body}</p>
+						<div class="rounded-xl border border-gray-200 bg-gray-50/70 p-4">
+							<h2 class="text-base font-semibold text-gray-900">{item.title}</h2>
+							<p class="mt-2 text-sm leading-relaxed text-gray-600">{item.body}</p>
 						</div>
 					))}
 				</div>
 			</article>
 
-			<article class="panel-soft rounded-[1.8rem] border border-slate-800/90 bg-slate-900/45 p-6 shadow-2xl backdrop-blur-md">
-				<p class="font-mono text-xs uppercase tracking-[0.28em] text-cyan-300/70">Behind the answer</p>
-				<div class="mt-4 rounded-[1.3rem] border border-slate-800/90 bg-slate-950/60 p-5 font-mono text-sm leading-7 text-slate-200">
+			<article class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+				<p class="font-mono text-xs uppercase tracking-[0.28em] font-semibold text-gray-600">Behind the answer</p>
+				<div class="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-5 font-mono text-xs leading-relaxed text-gray-800">
 					<p>value during stay = resale lift + savings + enjoyment credit</p>
 					<p class="mt-2">recommendation blends recovery, timeline, savings, and personal fit</p>
 					<p class="mt-2">answer = Worth it / Maybe / Skip</p>

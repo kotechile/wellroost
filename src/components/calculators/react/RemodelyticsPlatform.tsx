@@ -119,14 +119,14 @@ function formatNumber(value: number, suffix = '') {
 
 function getRiskTone(risk: 'Low' | 'Moderate' | 'High') {
 	if (risk === 'High') {
-		return 'border-rose-400/30 bg-rose-500/10 text-rose-100';
+		return 'border-rose-200 bg-rose-50 text-rose-800 font-semibold';
 	}
 
 	if (risk === 'Moderate') {
-		return 'border-amber-400/30 bg-amber-500/10 text-amber-100';
+		return 'border-amber-200 bg-amber-50 text-amber-800 font-semibold';
 	}
 
-	return 'border-emerald-400/30 bg-emerald-500/10 text-emerald-100';
+	return 'border-emerald-200 bg-emerald-50 text-emerald-800 font-semibold';
 }
 
 interface NumberFieldProps {
@@ -153,12 +153,12 @@ function NumberField({
 	return (
 		<label
 			htmlFor={id}
-			className="grid min-w-0 gap-3 rounded-[1.35rem] border border-slate-800/80 bg-slate-950/45 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
+			className="grid min-w-0 gap-3 rounded-2xl border border-gray-200 bg-gray-50/70 p-4 shadow-xs transition hover:border-gray-300"
 		>
-			<span className="text-sm font-semibold tracking-wide text-slate-100">{label}</span>
+			<span className="text-sm font-semibold tracking-wide text-gray-900">{label}</span>
 			<div className="relative min-w-0">
 				{prefix ? (
-					<span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-mono text-sm text-slate-400">
+					<span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-mono text-sm font-medium text-gray-400">
 						{prefix}
 					</span>
 				) : null}
@@ -170,18 +170,18 @@ function NumberField({
 					value={value}
 					onChange={(event) => onChange(Number(event.target.value))}
 					className={[
-						'w-full min-w-0 rounded-[1rem] border border-slate-700/80 bg-slate-950/80 py-3 text-sm font-semibold tabular-nums text-white outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 sm:text-base',
+						'w-full min-w-0 rounded-xl border border-gray-300 bg-white py-3 text-sm font-semibold tabular-nums text-gray-900 shadow-xs outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 sm:text-base',
 						prefix ? 'pl-10' : 'pl-4',
 						suffix ? 'pr-14' : 'pr-4'
 					].join(' ')}
 				/>
 				{suffix ? (
-					<span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 font-mono text-xs text-slate-400">
+					<span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 font-mono text-xs font-semibold text-gray-500">
 						{suffix}
 					</span>
 				) : null}
 			</div>
-			<span className="text-xs leading-5 text-slate-400">{helpText}</span>
+			<span className="text-xs leading-5 text-gray-500">{helpText}</span>
 		</label>
 	);
 }
@@ -195,19 +195,19 @@ interface MetricCardProps {
 
 function MetricCard({ label, value, detail, tone = 'cyan' }: MetricCardProps) {
 	const toneClass = {
-		cyan: 'text-cyan-100 border-cyan-500/20 shadow-[0_0_26px_rgba(34,211,238,0.08)]',
-		emerald: 'text-emerald-200 border-emerald-500/20 shadow-[0_0_26px_rgba(16,185,129,0.08)]',
-		amber: 'text-amber-100 border-amber-500/20 shadow-[0_0_26px_rgba(245,158,11,0.08)]',
-		rose: 'text-rose-100 border-rose-500/20 shadow-[0_0_26px_rgba(244,63,94,0.08)]'
+		cyan: 'text-blue-950 border-blue-200 bg-blue-50/50 shadow-xs',
+		emerald: 'text-emerald-950 border-emerald-200 bg-emerald-50/50 shadow-xs',
+		amber: 'text-amber-950 border-amber-200 bg-amber-50/50 shadow-xs',
+		rose: 'text-rose-950 border-rose-200 bg-rose-50/50 shadow-xs'
 	}[tone];
 
 	return (
-		<div className={`min-w-0 overflow-hidden rounded-[1.35rem] border bg-slate-950/55 p-4 ${toneClass}`}>
-			<p className="font-mono text-[0.66rem] uppercase tracking-[0.22em] text-slate-400">{label}</p>
-			<p className="mt-3 text-[clamp(1.7rem,2.4vw,2.35rem)] leading-none font-semibold tracking-tight tabular-nums">
+		<div className={`min-w-0 overflow-hidden rounded-2xl border p-4 ${toneClass}`}>
+			<p className="font-mono text-[0.66rem] uppercase tracking-[0.22em] font-medium text-gray-500">{label}</p>
+			<p className="mt-2.5 text-[clamp(1.7rem,2.4vw,2.35rem)] leading-none font-bold tracking-tight tabular-nums text-gray-1000">
 				{value}
 			</p>
-			<p className="mt-2 text-sm leading-6 text-slate-300">{detail}</p>
+			<p className="mt-2 text-xs leading-5 text-gray-600">{detail}</p>
 		</div>
 	);
 }
@@ -314,16 +314,16 @@ export default function RemodelyticsPlatform() {
 			/>
 			*/}
 
-			<div className="overflow-hidden rounded-[1.8rem] border border-cyan-500/20 bg-[linear-gradient(135deg,rgba(0,11,80,0.96),rgba(2,6,23,0.98)_58%,rgba(10,37,100,0.95))]">
+			<div className="overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50/70 via-slate-50/50 to-white shadow-sm">
 				<div className="grid gap-6 px-6 py-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)] xl:px-7">
 					<div>
-						<p className="font-mono text-xs uppercase tracking-[0.3em] text-cyan-200">
+						<p className="font-mono text-xs uppercase tracking-[0.28em] font-semibold text-blue-700">
 							Multi-engine platform
 						</p>
-						<h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+						<h2 className="mt-3 text-3xl font-bold tracking-tight text-gray-1000 sm:text-4xl">
 							Model the remodel like an underwriter, investor, and homeowner at once
 						</h2>
-						<p className="mt-4 max-w-2xl text-sm leading-7 text-slate-200">
+						<p className="mt-4 max-w-2xl text-sm leading-7 text-gray-600">
 							Segment a renovation across resale lift, energy <Acronym term="NPV" />, income potential, over-improvement
 							guardrails, and loan leverage. Values are live-calculated from your assumptions and ready
 							for pressure testing.
@@ -337,10 +337,10 @@ export default function RemodelyticsPlatform() {
 									aria-selected={inputs.engine === engine}
 									onClick={() => updateInput('engine', engine)}
 									className={[
-										'rounded-full border px-4 py-2 font-mono text-[0.68rem] uppercase tracking-[0.22em] transition focus:outline-none focus:ring-2 focus:ring-cyan-400/30',
+										'rounded-full border px-4 py-2 font-mono text-[0.68rem] uppercase tracking-[0.22em] font-semibold transition focus:outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer',
 										inputs.engine === engine
-											? 'border-cyan-300/40 bg-cyan-300/20 text-cyan-50'
-											: 'border-white/20 bg-white/5 text-slate-200 hover:bg-white/10'
+											? 'border-blue-600 bg-blue-600 text-white shadow-xs'
+											: 'border-gray-200 bg-white text-gray-700 hover:bg-gray-100 hover:text-gray-900'
 									].join(' ')}
 								>
 									{ENGINE_LABELS[engine]}
@@ -348,13 +348,13 @@ export default function RemodelyticsPlatform() {
 							))}
 						</div>
 					</div>
-					<div className="grid content-between gap-4 rounded-[1.6rem] border border-white/10 bg-slate-950/45 p-4">
+					<div className="grid content-between gap-4 rounded-2xl border border-gray-200/80 bg-white/95 p-5 shadow-xs">
 						<div className="flex items-start justify-between gap-4">
 							<div>
-								<p className="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-slate-400">
+								<p className="font-mono text-[0.68rem] uppercase tracking-[0.24em] font-medium text-gray-500">
 									Selected project
 								</p>
-								<p className="mt-2 text-2xl font-semibold text-white">
+								<p className="mt-2 text-2xl font-bold text-gray-900">
 									{PROJECT_OPTIONS.find((option) => option.value === inputs.projectType)?.label}
 								</p>
 							</div>
@@ -389,15 +389,15 @@ export default function RemodelyticsPlatform() {
 				</div>
 			</div>
 
-			<div className="grid grid-cols-[repeat(auto-fit,minmax(14rem,1fr))] gap-5 rounded-[1.8rem] border border-slate-800/90 bg-slate-950/55 p-5">
-				<label className="grid min-w-0 gap-3 rounded-[1.35rem] border border-slate-800/80 bg-slate-950/45 p-4">
-					<span className="text-sm font-semibold tracking-wide text-slate-100">Project type</span>
+			<div className="grid grid-cols-[repeat(auto-fit,minmax(14rem,1fr))] gap-5 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+				<label className="grid min-w-0 gap-3 rounded-2xl border border-gray-200 bg-gray-50/70 p-4 shadow-xs transition hover:border-gray-300">
+					<span className="text-sm font-semibold tracking-wide text-gray-900">Project type</span>
 					<select
 						value={inputs.projectType}
 						onChange={(event) =>
 							updateInput('projectType', event.target.value as RemodelyticsProjectType)
 						}
-						className="min-w-0 rounded-[1rem] border border-slate-700/80 bg-slate-950/80 px-4 py-3 text-sm font-semibold text-white outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 sm:text-base"
+						className="min-w-0 rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm font-semibold text-gray-900 shadow-xs outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 sm:text-base"
 					>
 						{PROJECT_OPTIONS.map((option) => (
 							<option key={option.value} value={option.value}>
@@ -405,16 +405,16 @@ export default function RemodelyticsPlatform() {
 							</option>
 						))}
 					</select>
-					<span className="text-xs leading-5 text-slate-400">Routes the remodel into the best-fit engine.</span>
+					<span className="text-xs leading-5 text-gray-500">Routes the remodel into the best-fit engine.</span>
 				</label>
-				<label className="grid min-w-0 gap-3 rounded-[1.35rem] border border-slate-800/80 bg-slate-950/45 p-4">
-					<span className="text-sm font-semibold tracking-wide text-slate-100">Material tier</span>
+				<label className="grid min-w-0 gap-3 rounded-2xl border border-gray-200 bg-gray-50/70 p-4 shadow-xs transition hover:border-gray-300">
+					<span className="text-sm font-semibold tracking-wide text-gray-900">Material tier</span>
 					<select
 						value={inputs.materialTier}
 						onChange={(event) =>
 							updateInput('materialTier', event.target.value as RemodelyticsMaterialTier)
 						}
-						className="min-w-0 rounded-[1rem] border border-slate-700/80 bg-slate-950/80 px-4 py-3 text-sm font-semibold text-white outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 sm:text-base"
+						className="min-w-0 rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm font-semibold text-gray-900 shadow-xs outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 sm:text-base"
 					>
 						{MATERIAL_OPTIONS.map((option) => (
 							<option key={option.value} value={option.value}>
@@ -422,20 +422,20 @@ export default function RemodelyticsPlatform() {
 							</option>
 						))}
 					</select>
-					<span className="text-xs leading-5 text-slate-400">Applies a proxy finish-grade multiplier.</span>
+					<span className="text-xs leading-5 text-gray-500">Applies a proxy finish-grade multiplier.</span>
 				</label>
 				<label
 					htmlFor={`${fieldId}-zip`}
-					className="grid min-w-0 gap-3 rounded-[1.35rem] border border-slate-800/80 bg-slate-950/45 p-4"
+					className="grid min-w-0 gap-3 rounded-2xl border border-gray-200 bg-gray-50/70 p-4 shadow-xs transition hover:border-gray-300"
 				>
-					<span className="text-sm font-semibold tracking-wide text-slate-100">ZIP code</span>
+					<span className="text-sm font-semibold tracking-wide text-gray-900">ZIP code</span>
 					<input
 						id={`${fieldId}-zip`}
 						value={inputs.zipCode}
 						onChange={(event) => updateInput('zipCode', event.target.value)}
-						className="min-w-0 rounded-[1rem] border border-slate-700/80 bg-slate-950/80 px-4 py-3 text-sm font-semibold text-white outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 sm:text-base"
+						className="min-w-0 rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm font-semibold text-gray-900 shadow-xs outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 sm:text-base"
 					/>
-					<span className="text-xs leading-5 text-slate-400">
+					<span className="text-xs leading-5 text-gray-500">
 						Placeholder for RSMeans, <Acronym term="AVM" />, <Acronym term="AMI" />, and DSIRE lookups.
 					</span>
 				</label>
@@ -488,13 +488,13 @@ export default function RemodelyticsPlatform() {
 				/>
 			</div>
 
-			<div className="grid gap-4 rounded-[1.8rem] border border-cyan-500/20 bg-[linear-gradient(180deg,rgba(8,47,73,0.97),rgba(2,6,23,0.98))] p-6">
+			<div className="grid gap-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
 				<div className="flex flex-wrap items-end justify-between gap-4">
 					<div>
-						<p className="font-mono text-xs uppercase tracking-[0.28em] text-cyan-200">
+						<p className="font-mono text-xs uppercase tracking-[0.28em] font-semibold text-blue-700">
 							Engine output
 						</p>
-						<h3 className="mt-3 text-3xl font-semibold tracking-tight text-white">
+						<h3 className="mt-2 text-3xl font-bold tracking-tight text-gray-1000">
 							{ENGINE_LABELS[inputs.engine]} analytics
 						</h3>
 					</div>
@@ -502,14 +502,14 @@ export default function RemodelyticsPlatform() {
 						<button
 							type="button"
 							onClick={exportPacket}
-							className="rounded-full border border-cyan-400/35 bg-cyan-400/20 px-4 py-2 text-sm font-semibold text-cyan-50 transition hover:bg-cyan-400/25 focus:outline-none focus:ring-2 focus:ring-cyan-400/30"
+							className="rounded-full border border-blue-600 bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 shadow-xs cursor-pointer"
 						>
 							{copied ? 'Packet copied' : 'Copy underwriting packet'}
 						</button>
 						<button
 							type="button"
 							onClick={() => window.print()}
-							className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-cyan-400/30"
+							className="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 shadow-xs cursor-pointer"
 						>
 							Print / save PDF
 						</button>
@@ -543,22 +543,22 @@ export default function RemodelyticsPlatform() {
 				</div>
 
 				<div className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
-					<div className="rounded-[1.5rem] border border-slate-800/90 bg-slate-950/75 p-5">
-						<p className="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-slate-400">
+					<div className="rounded-2xl border border-gray-200 bg-gray-50/70 p-5 shadow-xs">
+						<p className="font-mono text-[0.68rem] uppercase tracking-[0.24em] font-medium text-gray-500">
 							Engine confidence map
 						</p>
 						<div className="mt-5 grid gap-4">
 							{(Object.keys(breakdown.engineScores) as RemodelyticsEngine[]).map((engine) => (
 								<div key={engine} className="grid gap-2">
 									<div className="flex items-center justify-between gap-3">
-										<span className="text-sm font-semibold text-slate-200">{ENGINE_LABELS[engine]}</span>
-										<span className="font-mono text-xs text-cyan-200">
+										<span className="text-sm font-semibold text-gray-800">{ENGINE_LABELS[engine]}</span>
+										<span className="font-mono text-xs font-bold text-blue-700">
 											{Math.round(breakdown.engineScores[engine])}
 										</span>
 									</div>
-									<div className="h-2 rounded-full bg-white/8">
+									<div className="h-2 rounded-full bg-gray-200">
 										<div
-											className="h-full rounded-full bg-gradient-to-r from-cyan-400 via-blue-400 to-emerald-400"
+											className="h-full rounded-full bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-500"
 											style={{ width: `${Math.min(breakdown.engineScores[engine], 100)}%` }}
 										/>
 									</div>
@@ -567,21 +567,21 @@ export default function RemodelyticsPlatform() {
 						</div>
 					</div>
 
-					<div className="rounded-[1.5rem] border border-slate-800/90 bg-slate-950/75 p-5">
-						<p className="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-slate-400">
+					<div className="rounded-2xl border border-gray-200 bg-gray-50/70 p-5 shadow-xs">
+						<p className="font-mono text-[0.68rem] uppercase tracking-[0.24em] font-medium text-gray-500">
 							Safeguards and underwriting flags
 						</p>
 						<div className="mt-4 grid gap-3">
-							<div className="rounded-[1.1rem] border border-slate-800 bg-slate-950/70 p-4">
+							<div className="rounded-xl border border-gray-200 bg-white p-4 shadow-xs">
 								<div className="flex items-center justify-between gap-4">
-									<p className="text-sm font-semibold text-white"><Acronym term="NKBA" /> budget warning meter</p>
+									<p className="text-sm font-semibold text-gray-900"><Acronym term="NKBA" /> budget warning meter</p>
 									<span className={`rounded-full border px-3 py-1 text-xs ${getRiskTone(breakdown.overImprovementRisk)}`}>
 										{formatNumber(breakdown.nkbaSpendRatio, '%')}
 									</span>
 								</div>
-								<div className="mt-3 h-2 rounded-full bg-white/8">
+								<div className="mt-3 h-2 rounded-full bg-gray-200">
 									<div
-										className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-amber-300 to-rose-400"
+										className="h-full rounded-full bg-gradient-to-r from-emerald-500 via-amber-400 to-rose-500"
 										style={{ width: `${Math.min(Math.max(breakdown.nkbaSpendRatio * 4, 8), 100)}%` }}
 									/>
 								</div>
@@ -590,13 +590,13 @@ export default function RemodelyticsPlatform() {
 								breakdown.underwritingWarnings.map((warning) => (
 									<p
 										key={warning}
-										className="rounded-[1.1rem] border border-amber-400/20 bg-amber-500/10 p-4 text-sm leading-6 text-amber-100"
+										className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950 font-medium"
 									>
 										{warning}
 									</p>
 								))
 							) : (
-								<p className="rounded-[1.1rem] border border-emerald-400/20 bg-emerald-500/10 p-4 text-sm leading-6 text-emerald-100">
+								<p className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm leading-6 text-emerald-950 font-medium">
 									No underwriting stress warnings triggered by the current assumptions.
 								</p>
 							)}
@@ -644,15 +644,15 @@ export default function RemodelyticsPlatform() {
 				/>
 			</div>
 
-			<div className="grid gap-5 rounded-[1.8rem] border border-slate-800/90 bg-slate-950/55 p-5">
+			<div className="grid gap-5 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
 				<div className="flex flex-wrap items-end justify-between gap-4">
 					<div>
-						<p className="font-mono text-xs uppercase tracking-[0.28em] text-cyan-200">
+						<p className="font-mono text-xs uppercase tracking-[0.28em] font-semibold text-blue-700">
 							Underwriting assumptions
 						</p>
-						<h3 className="mt-2 text-xl font-semibold text-white">As-completed valuation and leverage</h3>
+						<h3 className="mt-2 text-xl font-bold text-gray-1000">As-completed valuation and leverage</h3>
 					</div>
-					<span className="rounded-full border border-white/20 bg-white/8 px-3 py-1 font-mono text-[0.64rem] uppercase tracking-[0.22em] text-slate-300">
+					<span className="rounded-full border border-gray-200 bg-gray-50 px-3.5 py-1 font-mono text-[0.64rem] uppercase tracking-[0.22em] font-medium text-gray-600">
 						<Acronym term="FHA" /> / HomeStyle / <Acronym term="HELOC" /> stress
 					</span>
 				</div>
@@ -705,15 +705,15 @@ export default function RemodelyticsPlatform() {
 				</div>
 			</div>
 
-			<div className="grid gap-5 rounded-[1.8rem] border border-slate-800/90 bg-slate-950/55 p-5">
+			<div className="grid gap-5 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
 				<div className="flex flex-wrap items-end justify-between gap-4">
 					<div>
-						<p className="font-mono text-xs uppercase tracking-[0.28em] text-emerald-300">
+						<p className="font-mono text-xs uppercase tracking-[0.28em] font-semibold text-emerald-800">
 							Income and energy assumptions
 						</p>
-						<h3 className="mt-2 text-xl font-semibold text-white">ADU cash flow and green appraisal inputs</h3>
+						<h3 className="mt-2 text-xl font-bold text-gray-1000">ADU cash flow and green appraisal inputs</h3>
 					</div>
-					<span className="rounded-full border border-white/20 bg-white/8 px-3 py-1 font-mono text-[0.64rem] uppercase tracking-[0.22em] text-slate-300">
+					<span className="rounded-full border border-gray-200 bg-gray-50 px-3.5 py-1 font-mono text-[0.64rem] uppercase tracking-[0.22em] font-medium text-gray-600">
 						30-year lifecycle
 					</span>
 				</div>
