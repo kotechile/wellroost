@@ -138,6 +138,22 @@ function normalizePost(post: WordPressPostResponse): WordPressPost {
 		return `${open}${cleanContent}${close}`;
 	});
 
+	// Convert markdown bolding pairs and stray orphan markdown colons (e.g., "Built after 2010:**") into proper HTML <strong>
+	htmlContent = htmlContent
+		.replace(/\*\*([^*<]+)\*\*/g, '<strong>$1</strong>')
+		.replace(/(^|>|\s)([A-Z0-9][^<:\n]{1,60}):\*\*/g, '$1<strong>$2:</strong>')
+		.replace(/\*\*/g, '');
+
+	// Remove duplicate identical adjacent <li> items injected by optimizer tools
+	htmlContent = htmlContent.replace(/(<li[^>]*>[\s\S]*?<\/li>)\s*(<li[^>]*>[\s\S]*?<\/li>)/gi, (match, li1, li2) => {
+		const text1 = stripHtml(li1).toLowerCase();
+		const text2 = stripHtml(li2).toLowerCase();
+		if (text1 && text1 === text2) {
+			return li1;
+		}
+		return match;
+	});
+
 	return {
 		id: post.id,
 		title: stripHtml(post.title?.rendered) || 'Untitled post',
