@@ -18,6 +18,9 @@ COPY package*.json ./
 RUN npm ci || npm install
 COPY . .
 
+# Invalidate cache so every redeployment fetches fresh posts from the CMS
+ARG CACHEBUST=1
+
 # Debug: Try to connect to WordPress before building
 RUN echo "Checking connection to $PUBLIC_WORDPRESS_API_BASE..." && \
     curl -v -I "$PUBLIC_WORDPRESS_API_BASE/wp-json/wp/v2/posts" || echo "Connection check failed, but proceeding with build..."
