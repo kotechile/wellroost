@@ -154,6 +154,25 @@ function normalizePost(post: WordPressPostResponse): WordPressPost {
 		return match;
 	});
 
+	// 1. Strip <p>, </p>, and <br> tags injected INSIDE <svg> blocks by wpautop
+	htmlContent = htmlContent.replace(/<svg([\s\S]*?)<\/svg>/gi, (_match, inner) => {
+		const cleanInner = inner
+			.replace(/<\/?p[^>]*>/gi, '')
+			.replace(/<br\s*\/?>/gi, '');
+		return `<svg${cleanInner}</svg>`;
+	});
+
+	// 2. Unwrap any <svg> accidentally wrapped inside an outer <p>...</p>
+	htmlContent = htmlContent.replace(/<p>\s*(<svg[\s\S]*?<\/svg>)\s*<\/p>/gi, '$1');
+
+	// 3. Remove any empty leftover <p></p> tags
+	htmlContent = htmlContent.replace(/<p>\s*<\/p>/gi, '');
+
+	// 4. Ensure relative media paths starting with /wp-content/ point to WordPress API host
+	if (apiBase) {
+		htmlContent = htmlContent.replace(/src=(["'])\/wp-content\//gi, `src=$1${apiBase}/wp-content/`);
+	}
+
 	return {
 		id: post.id,
 		title: stripHtml(post.title?.rendered) || 'Untitled post',
