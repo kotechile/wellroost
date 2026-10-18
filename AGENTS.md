@@ -356,6 +356,13 @@ After editing:
 4. Run the Astro build.
 5. Fix errors before reporting completion.
 
+## Crawling and indexing
+
+See `docs/crawl-and-indexing.md`. Crawl artifacts (`robots.txt`, `sitemap.xml`, canonical tags,
+404 status) are generated, not hand-written, and are asserted by `npm run check:crawl <origin>`.
+A push to `main` does not deploy on its own while the Coolify deploy webhook returns 401 — verify on
+the live origin, not just in `dist`.
+
 ## Commands
 
 Use the commands available in `package.json`. Common commands may be:
