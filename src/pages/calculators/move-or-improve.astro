@@ -26,7 +26,6 @@ const quickNotes = [
 	title="Should You Renovate or Move? | Move or Improve Calculator | WellRoost"
 	description="Find out whether renovating your home or selling and buying a new one builds more equity over 5 years. Professional-grade side-by-side net equity projection."
 >
-	<link slot="head" rel="canonical" href={new URL('/calculators/move-or-improve/', Astro.site).toString()} />
 	{schema ? <JsonLd slot="head" data={schema} /> : null}
 
 	<CalculatorShell

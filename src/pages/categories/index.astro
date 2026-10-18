@@ -47,7 +47,6 @@ const breadcrumbSchema = {
 	title="Categories | WellRoost"
 	description="Browse editorial pillars for high-ROI home investments, remodeling strategy, and system optimization."
 >
-	<link slot="head" rel="canonical" href={new URL('/categories/', Astro.site).toString()} />
 	<JsonLd slot="head" data={collectionSchema} />
 	<JsonLd slot="head" data={breadcrumbSchema} />
 

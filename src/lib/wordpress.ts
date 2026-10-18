@@ -290,11 +290,36 @@ export async function fetchPostBySlug(slug: string) {
 }
 
 export async function fetchAllPosts(limit = 100) {
-	const posts = await fetchWordPress('posts', {
-		_embed: 1,
-		per_page: limit
-	});
-	return posts.map(normalizePost);
+	const perPage = 100; // WordPress caps per_page at 100
+	const collected: WordPressPostResponse[] = [];
+
+	while (collected.length < limit) {
+		const batch = await fetchWordPress('posts', {
+			_embed: 1,
+			per_page: Math.min(perPage, limit - collected.length),
+			page: Math.floor(collected.length / perPage) + 1
+		});
+
+		if (batch.length === 0) {
+			break;
+		}
+
+		collected.push(...batch);
+
+		if (batch.length < perPage) {
+			break;
+		}
+	}
+
+	// A silent empty sitemap is the failure mode we care about: the build stays green and the site
+	// ships with no articles. Say it loudly so it shows up in the deploy log.
+	if (collected.length === 0) {
+		console.warn(
+			`[wordpress] fetchAllPosts returned 0 posts from ${getWordPressApiBase()} — article routes and the sitemap will be empty.`
+		);
+	}
+
+	return collected.map(normalizePost);
 }
 
 export async function fetchAllCategories(limit = 100) {

@@ -120,15 +120,16 @@ const breadcrumbSchema = {
 
 <BaseLayout 
   title={`${post.title} | WellRoost`}
-  description={post.excerpt}
+  description={post.excerpt || `A WellRoost guide to ${post.title}.`}
+  image={post.featuredImage}
+  type="article"
 >
-  <!-- SEO & Social Meta Tags -->
-  <link slot="head" rel="canonical" href={postUrl} />
-  <meta slot="head" property="og:title" content={post.title} />
-  <meta slot="head" property="og:description" content={post.excerpt} />
-  {post.featuredImage && <meta slot="head" property="og:image" content={post.featuredImage} />}
-  <meta slot="head" name="twitter:card" content="summary_large_image" />
-  
+  <!-- Social/canonical head is owned by BaseLayout; only article-specific meta lives here. -->
+  <meta slot="head" property="article:published_time" content={post.date ?? undefined} />
+  <meta slot="head" property="article:modified_time" content={post.modified ?? post.date ?? undefined} />
+  {post.categoryLabel && <meta slot="head" property="article:section" content={post.categoryLabel} />}
+  {post.featuredImage && <meta slot="head" property="og:image:alt" content={post.featuredImageAlt || post.title} />}
+
   <JsonLd slot="head" data={articleSchema} />
   <JsonLd slot="head" data={breadcrumbSchema} />
 

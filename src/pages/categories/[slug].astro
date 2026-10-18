@@ -71,7 +71,6 @@ const breadcrumbSchema = {
 	title={`${category.name} | WellRoost`}
 	description={category.description || `Browse articles, guides, and tools related to ${category.name}.`}
 >
-	<link slot="head" rel="canonical" href={categoryUrl} />
 	<JsonLd slot="head" data={categorySchema} />
 	<JsonLd slot="head" data={breadcrumbSchema} />
 

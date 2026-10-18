@@ -7,9 +7,34 @@ import '../styles/global.css';
 interface Props {
 	title: string;
 	description?: string;
+	/** Absolute or site-relative social preview image. Omit to fall back to the site mark. */
+	image?: string | null;
+	/** og:type — 'article' on posts, 'website' everywhere else. */
+	type?: 'website' | 'article';
+	/** Emitted as noindex,follow. Set on the 404 page so it cannot be indexed as content. */
+	noindex?: boolean;
 }
 
-const { title, description = 'WellRoost—The Decision Engine for Your Home. Built around a core ecosystem of interactive calculators and data-driven insights.' } = Astro.props;
+const {
+	title,
+	description = 'WellRoost—The Decision Engine for Your Home. Built around a core ecosystem of interactive calculators and data-driven insights.',
+	image = null,
+	type = 'website',
+	noindex = false
+} = Astro.props;
+
+const site = Astro.site ?? new URL(Astro.url.origin);
+
+// Canonical is derived from the route, never hand-written per page: a page cannot ship without
+// one, and it cannot disagree with the URL the sitemap advertises. Astro builds directory-style
+// routes, so the canonical always carries the trailing slash the sitemap emits.
+const pathname = Astro.url.pathname;
+const canonicalPath = pathname === '/' || pathname.endsWith('/') ? pathname : `${pathname}/`;
+const canonical = new URL(canonicalPath, site).toString();
+
+// og:image must be absolute for every consumer (Slack, X, Facebook, Bing).
+const ogImage = image ? new URL(image, site).toString() : new URL('/favicon.svg', site).toString();
+const ogImageIsRaster = /\.(png|jpe?g|webp|avif|gif)$/i.test(new URL(ogImage).pathname);
 ---
 
 <!doctype html>
@@ -21,10 +46,29 @@ const { title, description = 'WellRoost—The Decision Engine for Your Home. Bui
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content={description} />
-		<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-		<meta http-equiv="Pragma" content="no-cache" />
-		<meta http-equiv="Expires" content="0" />
 		<title>{title}</title>
+
+		<!-- Crawl contract: one canonical, one robots directive, one set of social cards. -->
+		<link rel="canonical" href={canonical} />
+		{noindex ? (
+			<meta name="robots" content="noindex, follow" />
+		) : (
+			<meta name="robots" content="index, follow, max-image-preview:large" />
+		)}
+
+		<meta property="og:site_name" content="WellRoost" />
+		<meta property="og:type" content={type} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:image" content={ogImage} />
+		{ogImageIsRaster && <meta property="og:image:alt" content={title} />}
+
+		<meta name="twitter:card" content={ogImageIsRaster ? 'summary_large_image' : 'summary'} />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={ogImage} />
+
 		<slot name="head" />
 	</head>
 	<body class="min-h-screen text-gray-900 antialiased selection:bg-black selection:text-white">
