@@ -1,14 +1,42 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { calculatorTools } from '../../lib/calculators/metadata';
+import VibeAssetCard from '../../components/VibeAssetCard';
+
+const vibeAssets = [
+	{
+		title: 'Equity ARV Recovery Engine',
+		category: 'EQUITY ARV',
+		description: 'Underwrite $20k–$150k remodeling projects against hyper-local comp appreciation before signing contractor agreements.',
+		metricsPreview: 'Comp ARV = Base Appraised Value + (CapEx × Recovery Rate) - Carry Depreciation',
+		slug: 'equity-arv-recovery-engine',
+		href: '/calculators/remodeling-roi/'
+	},
+	{
+		title: '5-Year Relocation Friction Ledger',
+		category: 'MOVE VS IMPROVE',
+		description: 'Compare 8-10% selling commissions, transfer taxes, and interest rate step-ups against expanding your current footprint.',
+		metricsPreview: 'Relocation Friction Delta = Net Sale Carry - In-Place Renovation ROI',
+		slug: 'relocation-friction-ledger',
+		href: '/calculators/move-or-improve/'
+	},
+	{
+		title: 'Remodelytics Multi-Engine Underwriter',
+		category: 'CAPEX UNDERWRITING',
+		description: 'Pressure-test ADU rental yields, combined LTV ceilings, and contractor over-improvement risk in a single dashboard.',
+		metricsPreview: 'MAO Underwriting = (Comp ARV × 70%) - Total CapEx - Financing Friction',
+		slug: 'remodelytics-underwriter',
+		href: '/calculators/remodelytics/'
+	}
+];
 ---
 
 <BaseLayout
 	title="Calculators | WellRoost"
-	description="Free public calculators for renters, homeowners, and investors making expensive housing and remodeling decisions."
+	description="Free public calculators and interactive decision engines for homeowners, buyers, and investors making expensive property choices."
 >
 	<section class="pt-24 sm:pt-32">
-		<p class="text-sm font-semibold tracking-wide uppercase text-gray-500">Free calculators</p>
+		<p class="text-sm font-semibold tracking-wide uppercase text-gray-500">Free Decision Engines</p>
 		<h1 class="mt-4 max-w-4xl text-5xl font-bold tracking-tight text-gray-1000 sm:text-6xl">
 			Practical money tools for expensive decisions
 		</h1>
@@ -16,6 +44,34 @@ import { calculatorTools } from '../../lib/calculators/metadata';
 			Start with the numbers. These public calculators are crawlable Astro pages with server-rendered
 			titles, copy, and internal links, then React only where the input experience needs to update live.
 		</p>
+	</section>
+
+	<!-- Interactive Micro-Assets (Vibe Marketing Architecture) -->
+	<section class="mt-14" aria-label="Interactive Acquisition Engines">
+		<div class="flex items-center justify-between mb-6">
+			<div>
+				<h2 class="text-xl font-bold tracking-tight text-gray-1000">Interactive Acquisition Engines</h2>
+				<p class="text-sm text-gray-600 mt-1">
+					Empirical decision tools designed to solve high-stakes property calculations in under 60 seconds.
+				</p>
+			</div>
+			<span class="hidden sm:inline-flex items-center text-xs font-mono uppercase tracking-wider bg-zinc-100 text-zinc-700 px-3 py-1 rounded-full border border-zinc-200">
+				Telemetry Enabled
+			</span>
+		</div>
+		<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+			{vibeAssets.map((asset) => (
+				<VibeAssetCard
+					client:visible
+					title={asset.title}
+					category={asset.category}
+					description={asset.description}
+					metricsPreview={asset.metricsPreview}
+					slug={asset.slug}
+					href={asset.href}
+				/>
+			))}
+		</div>
 	</section>
 
 	<section class="mt-16 grid gap-6 lg:grid-cols-3" aria-label="Calculator library">
