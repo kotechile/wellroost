@@ -8,7 +8,15 @@
  *   naming that purpose sits under the submit button, and nothing else is subscribed.
  * - If no sink is configured the form says so. It must not show "Sent" for a request that went
  *   nowhere — the same rule as the telemetry sink.
+ *
+ * SINK: `vibe_lead_intents`, the estate's existing lead table (session-based, `status` defaults to
+ * `pending_n8n_sync` so an n8n branch can pick it up). Deliberately NOT a new `vibe_asset_leads`
+ * table: the project already carries two telemetry schemas, and a third table for the same fact
+ * would make "did anyone convert" a three-way join.
  */
+
+const VERTICAL = 'wellroost';
+const SESSION_KEY = 'wr:sid';
 
 export interface ScenarioLead {
 	email: string;
@@ -22,13 +30,33 @@ export type LeadResult =
 	| { ok: true }
 	| { ok: false; reason: 'not_configured' | 'invalid_email' | 'server' | 'network'; detail?: string };
 
+/** Version of the consent wording on screen. Bump when the notice text changes. */
+export const CONSENT_TEXT_VERSION = '2026-10-20';
+
 export function isLeadCaptureConfigured(): boolean {
 	return Boolean(import.meta.env?.PUBLIC_SUPABASE_URL && import.meta.env?.PUBLIC_SUPABASE_ANON_KEY);
 }
 
 /**
- * Deliberately permissive. Rejecting a plausible address loses a real person; the server-side check
- * and the bounce are the real filters. This only catches obvious typos.
+ * A per-tab session id, so a lead can be joined to the interaction events from the same visit.
+ * sessionStorage, not localStorage: this is a visit, not a person.
+ */
+export function telemetrySessionId(): string {
+	if (typeof window === 'undefined') return 'server';
+	try {
+		const existing = window.sessionStorage.getItem(SESSION_KEY);
+		if (existing) return existing;
+		const id = (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`).toString();
+		window.sessionStorage.setItem(SESSION_KEY, id);
+		return id;
+	} catch {
+		return 'unavailable';
+	}
+}
+
+/**
+ * Deliberately permissive. Rejecting a plausible address loses a real person; the bounce is the
+ * real filter. This only catches obvious typos (the database policy applies the strict check).
  */
 export function isValidEmail(email: string): boolean {
 	const value = email.trim();
@@ -43,17 +71,22 @@ export async function submitScenarioEmail(lead: ScenarioLead): Promise<LeadResul
 	if (!supabaseUrl || !supabaseAnonKey) return { ok: false, reason: 'not_configured' };
 
 	const body = {
-		email: lead.email.trim().toLowerCase(),
+		session_id: telemetrySessionId(),
 		asset_slug: lead.assetSlug,
-		asset_title: lead.assetTitle ?? '',
-		scenario: lead.scenario,
-		consent_text_version: '2026-10-20',
-		source_path: typeof window !== 'undefined' ? window.location.pathname : '',
-		domain: typeof window !== 'undefined' ? window.location.hostname : 'wellroost.com'
+		vertical_slug: VERTICAL,
+		email: lead.email.trim().toLowerCase(),
+		intent_type: 'model_export',
+		consent_text_version: CONSENT_TEXT_VERSION,
+		calculated_metrics: {
+			asset_title: lead.assetTitle ?? '',
+			source_path: typeof window !== 'undefined' ? window.location.pathname : '',
+			domain: typeof window !== 'undefined' ? window.location.hostname : 'wellroost.com',
+			scenario: lead.scenario
+		}
 	};
 
 	try {
-		const res = await fetch(`${supabaseUrl}/rest/v1/vibe_asset_leads`, {
+		const res = await fetch(`${supabaseUrl}/rest/v1/vibe_lead_intents`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -63,12 +96,7 @@ export async function submitScenarioEmail(lead: ScenarioLead): Promise<LeadResul
 			},
 			body: JSON.stringify(body)
 		});
-		if (!res.ok) {
-			// 409 = the same email already asked for this asset's report; that is a success from the
-			// visitor's point of view (they will get the mail), so do not surface it as an error.
-			if (res.status === 409) return { ok: true };
-			return { ok: false, reason: 'server', detail: `${res.status}` };
-		}
+		if (!res.ok) return { ok: false, reason: 'server', detail: `${res.status}` };
 		return { ok: true };
 	} catch (error) {
 		return { ok: false, reason: 'network', detail: String(error) };
