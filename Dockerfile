@@ -19,6 +19,12 @@ ARG PUBLIC_SUPABASE_URL=
 ENV PUBLIC_SUPABASE_URL=${PUBLIC_SUPABASE_URL:-}
 ARG PUBLIC_SUPABASE_ANON_KEY=
 ENV PUBLIC_SUPABASE_ANON_KEY=${PUBLIC_SUPABASE_ANON_KEY:-}
+# The webhook sink. Coolify passes `--build-arg PUBLIC_N8N_WEBHOOK_URL=…`, so that name MUST be
+# declared here or Docker drops it as an unused build arg and the bundle inlines an empty value —
+# silently, with the variable visibly present in Coolify. Both names are declared because the
+# application reads either (see src/lib/telemetry.ts).
+ARG PUBLIC_N8N_WEBHOOK_URL=
+ENV PUBLIC_N8N_WEBHOOK_URL=${PUBLIC_N8N_WEBHOOK_URL:-}
 ARG PUBLIC_TELEMETRY_WEBHOOK_URL=
 ENV PUBLIC_TELEMETRY_WEBHOOK_URL=${PUBLIC_TELEMETRY_WEBHOOK_URL:-}
 
