@@ -1,0 +1,207 @@
+{
+  "name": "WellRoost - Vibe Marketing Telemetry & Intent Qualification",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "wellroost-vibe-telemetry",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "node-webhook-trigger",
+      "name": "Telemetry Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        220,
+        300
+      ],
+      "webhookId": "wellroost-vibe-telemetry"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"success\",\n  \"domain\": \"wellroost.com\",\n  \"received_at\": \"{{ $now.toISO() }}\",\n  \"event_id\": \"{{ $json.body?.asset_slug || 'event' }}_{{ Date.now() }}\"\n}",
+        "options": {}
+      },
+      "id": "node-respond-webhook",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        460,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// WellRoost Vibe Marketing Intent Scoring & Persona Classification\nconst item = $input.first().json.body || $input.first().json;\n\nconst assetSlug = item.asset_slug || item.assetId || 'unknown-asset';\nconst eventType = item.event_type || item.eventType || 'view';\nconst category = item.category || 'General';\nconst title = item.title || 'WellRoost Decision Engine';\nconst metadata = item.metadata || {};\nconst domain = item.domain || 'wellroost.com';\n\n// 1. Calculate Intent Score\nlet intentScore = 10;\nswitch (eventType) {\n  case 'view':\n    intentScore = 10;\n    break;\n  case 'engage':\n    intentScore = 35;\n    break;\n  case 'input_change':\n    intentScore = 60;\n    break;\n  case 'complete':\n    intentScore = 85;\n    break;\n  case 'lead_convert':\n    intentScore = 100;\n    break;\n  default:\n    intentScore = 20;\n}\n\n// Bonus score if user spends meaningful session time or tests complex inputs\nif (metadata.metricsPreview) {\n  intentScore += 10;\n}\n\n// 2. Persona Classification based on WellRoost Directives (skill.md)\nlet persona = 'General Homeowner';\nlet suggestedAction = 'Monitor general activity';\n\nif (category.includes('EQUITY') || assetSlug.includes('arv') || assetSlug.includes('remodeling-roi')) {\n  persona = 'The High-Stakes Renovator';\n  suggestedAction = 'Evaluate comp ARV uplift and contractor over-improvement risk';\n} else if (category.includes('MOVE') || assetSlug.includes('relocation') || assetSlug.includes('move-or-improve')) {\n  persona = 'The Move vs. Improve Evaluator';\n  suggestedAction = 'Model 5-year friction delta and transaction carry costs';\n} else if (category.includes('ENERGY') || assetSlug.includes('heat-pump') || assetSlug.includes('rebate')) {\n  persona = 'The Energy & Systems Optimizer';\n  suggestedAction = 'Verify Section 25C & state HOMES/HEAR rebate qualification';\n} else if (category.includes('CAPEX') || assetSlug.includes('underwrite') || assetSlug.includes('remodelytics')) {\n  persona = 'The Real Estate & Equity Investor';\n  suggestedAction = 'Underwrite 70% rule MAO and combined LTV (CLTV) thresholds';\n}\n\n// 3. Smart Brevity Notification Payload\nconst alertSummary = `*High-Intent Decision Engine Activity on ${domain}*\\n` +\n  `• *Asset*: ${title} (${category})\\n` +\n  `• *Persona*: ${persona}\\n` +\n  `• *Intent Score*: ${intentScore}/100 [Event: ${eventType.toUpperCase()}]\\n` +\n  `• *Strategic Focus*: ${suggestedAction}\\n` +\n  `• *Path*: ${metadata.pathname || '/calculators/'}`;\n\nreturn [{\n  json: {\n    asset_id: item.asset_id || assetSlug,\n    asset_slug: assetSlug,\n    event_type: eventType,\n    category,\n    title,\n    domain,\n    metadata,\n    intentScore,\n    isHighIntent: intentScore >= 70,\n    persona,\n    suggestedAction,\n    alertSummary,\n    processed_at: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "node-intent-scoring",
+      "name": "Qualify Intent & Score",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.PUBLIC_SUPABASE_URL || 'https://your-supabase-project.supabase.co' }}/rest/v1/vibe_asset_telemetry",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.SUPABASE_SERVICE_ROLE_KEY || $env.PUBLIC_SUPABASE_ANON_KEY || 'SUPABASE_KEY_PLACEHOLDER' }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY || $env.PUBLIC_SUPABASE_ANON_KEY || 'SUPABASE_KEY_PLACEHOLDER' }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=minimal"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"asset_id\": \"{{ $json.asset_id }}\",\n  \"asset_slug\": \"{{ $json.asset_slug }}\",\n  \"event_type\": \"{{ $json.event_type }}\",\n  \"category\": \"{{ $json.category }}\",\n  \"title\": \"{{ $json.title }}\",\n  \"domain\": \"{{ $json.domain }}\",\n  \"metadata\": {{ JSON.stringify($json.metadata) }}\n}",
+        "options": {}
+      },
+      "id": "node-supabase-log",
+      "name": "Log to Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        700,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.isHighIntent }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "node-high-intent-filter",
+      "name": "High Intent Filter (Score >= 70)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        920,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.HIGH_INTENT_ALERT_WEBHOOK_URL || 'https://hooks.slack.com/services/PLACEHOLDER' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": {{ JSON.stringify($json.alertSummary) }},\n  \"username\": \"WellRoost Vibe Bot\",\n  \"icon_emoji\": \":chart_with_upwards_trend:\"\n}",
+        "options": {}
+      },
+      "id": "node-high-intent-alert",
+      "name": "High Intent Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1160,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Telemetry Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Qualify Intent & Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qualify Intent & Score": {
+      "main": [
+        [
+          {
+            "node": "Log to Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log to Supabase": {
+      "main": [
+        [
+          {
+            "node": "High Intent Filter (Score >= 70)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "High Intent Filter (Score >= 70)": {
+      "main": [
+        [
+          {
+            "node": "High Intent Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "wellroost-vibe-telemetry-v1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "wellroost-vibe-marketing-engine"
+  },
+  "tags": [
+    {
+      "name": "WellRoost"
+    },
+    {
+      "name": "Vibe Marketing"
+    },
+    {
+      "name": "Telemetry"
+    }
+  ]
+}

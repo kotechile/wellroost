@@ -41,6 +41,7 @@ Located at `src/components/VibeAssetCard.tsx`:
 - **Agent Protocol**: Agents ingest `skill.md` and `lexicon.md` to guarantee tone and vocabulary adherence.
 - **Supabase Telemetry Schema**: `supabase/migrations/20261019_vibe_telemetry.sql` tracks interaction events (`view`, `engage`, `deploy`, `input_change`, `complete`).
 - **Telemetry Pipeline**: `src/lib/telemetry.ts` safely sends client interaction payloads to Supabase REST and n8n webhooks.
+- **n8n Workflow File**: `n8n/wellroost-vibe-telemetry.json` provides an importable n8n workflow for webhook handling, intent scoring, persona qualification, Supabase logging, and high-intent alerts.
 - **Agentic Automation**: `scripts/n8n-webhook-handler.mjs` ingests interaction telemetry for progressive qualification and automated follow-ups.
 
 ### Human Taste (5%):
