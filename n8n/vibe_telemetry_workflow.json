@@ -1,0 +1,194 @@
+{
+  "name": "Vibe Telemetry — giniloh / aichieve / wellroost",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "vibe-telemetry",
+        "responseMode": "onReceived",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "name": "Telemetry Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -560,
+        200
+      ],
+      "id": "telemetry-webhook",
+      "notes": "Path must stay \"vibe-telemetry\" — that is the path inside PUBLIC_N8N_WEBHOOK_URL on all three apps."
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.type }}",
+                    "rightValue": "lead_intent",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "lead_intent"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "name": "Route by Payload Type",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -300,
+        200
+      ],
+      "id": "route-by-payload-type",
+      "notes": "Clients send { type: \"lead_intent\", lead } or { type: \"telemetry_event\", event }; anything else falls through to Ignore instead of failing."
+    },
+    {
+      "parameters": {
+        "jsCode": "// giniloh/aichieve send camelCase inside `lead`; accept snake_case too.\nconst body = $json.body || $json;\nconst lead = body.lead || body;\nconst email = lead.email || '';\nconst assetSlug = lead.assetSlug || lead.asset_slug || 'unknown-asset';\nconst vertical = lead.verticalSlug || lead.vertical_slug || 'general';\nconst metrics = lead.calculatedMetrics || lead.calculated_metrics || {};\nreturn [{ json: {\n  email,\n  assetSlug,\n  vertical,\n  domain: metrics.domain || 'unknown',\n  hasEmail: email.includes('@'),\n  summary: 'New scenario request — ' + assetSlug + ' (' + vertical + ' · ' + (metrics.domain || 'unknown') + ')'\n} }];"
+      },
+      "name": "Shape Lead Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -40,
+        100
+      ],
+      "id": "shape-lead-alert",
+      "notes": "Leads are mailed by the scheduled \"Lead Reports\" workflow; this branch only alerts a human."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.hasEmail }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "Has Email?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        200,
+        100
+      ],
+      "id": "has-email-"
+    },
+    {
+      "parameters": {},
+      "name": "Notify a Human",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        440,
+        0
+      ],
+      "id": "notify-a-human",
+      "notes": "Attach Slack / email / Telegram here. Empty on purpose: a placeholder webhook used to make every execution report failure."
+    },
+    {
+      "parameters": {},
+      "name": "Ignore",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        440,
+        200
+      ],
+      "id": "ignore",
+      "notes": "Telemetry events are already written by the browser. Nothing to do."
+    }
+  ],
+  "connections": {
+    "Telemetry Webhook": {
+      "main": [
+        [
+          {
+            "node": "Route by Payload Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Payload Type": {
+      "main": [
+        [
+          {
+            "node": "Shape Lead Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ignore",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Shape Lead Alert": {
+      "main": [
+        [
+          {
+            "node": "Has Email?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Email?": {
+      "main": [
+        [
+          {
+            "node": "Notify a Human",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

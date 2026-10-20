@@ -103,7 +103,7 @@ PY
 Requirements for the browser to reach it, all three:
 
 1. **A workflow exists whose Webhook node path is exactly `vibe-telemetry`** (n8n serves production
-   webhooks at `/webhook/<path>`), and it is **Active**. Import `docs/n8n-vibe-telemetry.json`,
+   webhooks at `/webhook/<path>`), and it is **Active**. Import `n8n/vibe_telemetry_workflow.json` (see `n8n/README.md`),
    activate it, and the 404 becomes 200.
 2. **CORS on the Webhook node** (`allowedOrigins: *`). The call is cross-origin from
    `wellroost.com`; without it the OPTIONS preflight fails and the browser blocks the POST silently.
