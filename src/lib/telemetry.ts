@@ -25,11 +25,20 @@ export interface TelemetryPayload {
  *   PUBLIC_SUPABASE_ANON_KEY       anon/publishable key (browser-safe; RLS enforces writes)
  *   PUBLIC_TELEMETRY_WEBHOOK_URL   optional n8n (or other) webhook
  */
+/**
+ * Two accepted names for the webhook sink. `PUBLIC_N8N_WEBHOOK_URL` is what the Coolify app
+ * actually carries; `PUBLIC_TELEMETRY_WEBHOOK_URL` is the generic name this module documented
+ * first. A single spelling is better long-term, but silently ignoring a configured variable
+ * because it was named differently is the exact failure this module exists to avoid.
+ */
+function telemetryWebhookUrl(): string | undefined {
+	return import.meta.env?.PUBLIC_TELEMETRY_WEBHOOK_URL || import.meta.env?.PUBLIC_N8N_WEBHOOK_URL;
+}
+
 export function isTelemetryConfigured(): boolean {
 	const supabaseUrl = import.meta.env?.PUBLIC_SUPABASE_URL;
 	const supabaseAnonKey = import.meta.env?.PUBLIC_SUPABASE_ANON_KEY;
-	const webhookUrl = import.meta.env?.PUBLIC_TELEMETRY_WEBHOOK_URL;
-	return Boolean((supabaseUrl && supabaseAnonKey) || webhookUrl);
+	return Boolean((supabaseUrl && supabaseAnonKey) || telemetryWebhookUrl());
 }
 
 let warnedUnconfigured = false;
@@ -61,7 +70,7 @@ export async function trackVibeAssetEvent(payload: TelemetryPayload): Promise<vo
 
 	const supabaseUrl = import.meta.env?.PUBLIC_SUPABASE_URL;
 	const supabaseAnonKey = import.meta.env?.PUBLIC_SUPABASE_ANON_KEY;
-	const webhookUrl = import.meta.env?.PUBLIC_TELEMETRY_WEBHOOK_URL;
+	const webhookUrl = telemetryWebhookUrl();
 
 	// No silent no-op. An asset that claims to be instrumented and sends nothing is worse than one
 	// that admits it is not — that is how a missing build-time env var goes unnoticed for months.

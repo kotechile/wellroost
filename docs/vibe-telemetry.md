@@ -71,6 +71,48 @@ would emit a phantom `view` for a pseudo-asset on every mount.
   snapshot. Silently showing different numbers than last visit reads as a bug on a financial model.
 - Storage key is versioned: `wr:model:<asset>:v<n>`.
 
+## n8n webhook: the two things that make it 404
+
+The front end's second sink is a webhook (`PUBLIC_TELEMETRY_WEBHOOK_URL`, accepted alias
+`PUBLIC_N8N_WEBHOOK_URL` — the name the Coolify app actually carries). Both spellings are read;
+a variable that is configured but ignored because it was named differently is the failure mode this
+module exists to prevent.
+
+What a 404 on `https://n8n.giniloh.com/webhook/vibe-telemetry` means, and what it does not:
+
+```json
+{"code": 404, "message": "The requested webhook \"POST vibe-telemetry\" is not registered."}
+```
+
+That is n8n saying **no workflow owns that path** — not that the workflow is inactive, and not a
+network problem. Check what n8n actually holds before editing anything:
+
+```bash
+# read-only; n8n keeps its workflows in sqlite at the volume below
+python3 - <<'PY'
+import json, sqlite3
+db = "/var/lib/docker/volumes/<n8n-volume>/_data/database.sqlite"
+con = sqlite3.connect(f"file:{db}?mode=ro&immutable=1", uri=True)
+for _id, name, active, nodes in con.execute("select id,name,active,nodes from workflow_entity"):
+    paths = [ (n.get("parameters") or {}).get("path") for n in json.loads(nodes)
+              if "webhook" in (n.get("type") or "").lower() ]
+    if paths: print(_id, name, bool(active), paths)
+PY
+```
+
+Requirements for the browser to reach it, all three:
+
+1. **A workflow exists whose Webhook node path is exactly `vibe-telemetry`** (n8n serves production
+   webhooks at `/webhook/<path>`), and it is **Active**. Import `docs/n8n-vibe-telemetry.json`,
+   activate it, and the 404 becomes 200.
+2. **CORS on the Webhook node** (`allowedOrigins: *`). The call is cross-origin from
+   `wellroost.com`; without it the OPTIONS preflight fails and the browser blocks the POST silently.
+3. **`responseMode: onReceived`** for fire-and-forget telemetry — the caller should not wait on the
+   workflow's downstream nodes before the page continues.
+
+Telemetry goes to n8n for *side effects only*. Events and leads are written to Supabase directly by
+the browser, so a workflow that re-inserts them duplicates every row.
+
 ## Reading the data
 
 Funnel per asset:
