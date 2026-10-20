@@ -1,5 +1,7 @@
 import { useId, useState, useMemo } from 'react';
 import { useVibeTelemetry } from '../../../lib/useVibeTelemetry';
+import { usePersistedInputs } from '../../../lib/usePersistedInputs';
+import PersistenceNotice from '../../../components/PersistenceNotice';
 import { runCapExMatrixCalculator, PROJECT_ROI_DATABASE } from '../../../lib/calculators/moveOrImprove';
 import { formatCurrency, formatPercent } from '../../../lib/calculators/format';
 import type { MoveOrImproveInputs } from '../../../lib/calculators/moveOrImproveTypes';
@@ -53,7 +55,14 @@ const TAB_DESCRIPTIONS: Record<string, string> = {
 };
 
 export default function MoveOrImproveCalculator() {
-  const [inputs, setInputs] = useState<MoveOrImproveInputs>(INITIAL_INPUTS);
+  // Full multivariable engine (ten-plus fields across three tabs) — worth remembering between
+  // visits. Only schema-known keys are restored; the notice makes the restore explicit.
+  const persisted = usePersistedInputs<MoveOrImproveInputs>('move-or-improve', INITIAL_INPUTS, {
+    allowedKeys: Object.keys(INITIAL_INPUTS),
+    version: 1
+  });
+  const inputs = persisted.value;
+  const setInputs = persisted.setValue;
   const [activeTab, setActiveTab] = useState<'current' | 'improve' | 'move'>('current');
   const [sensitivityPreset, setSensitivityPreset] = useState<'low' | 'base' | 'high' | 'custom'>('base');
   const [showLogic, setShowLogic] = useState(false);
@@ -124,6 +133,7 @@ export default function MoveOrImproveCalculator() {
 
   return (
     <div className="grid gap-8">
+      {persisted.restored && <PersistenceNotice onReset={persisted.reset} />}
       {/* ============================================================ */}
       {/* 1. HEADER SPOTLIGHT — Plain-English verdict                  */}
       {/* ============================================================ */}

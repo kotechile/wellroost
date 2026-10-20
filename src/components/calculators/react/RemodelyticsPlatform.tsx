@@ -1,5 +1,8 @@
 import { useId, useMemo, useState, type ReactNode } from 'react';
 import { useVibeTelemetry } from '../../../lib/useVibeTelemetry';
+import { usePersistedInputs } from '../../../lib/usePersistedInputs';
+import ModelExportForm from '../../../components/ModelExportForm';
+import PersistenceNotice from '../../../components/PersistenceNotice';
 
 import { calculateRemodelytics } from '../../../lib/calculators/remodelytics';
 import { formatCurrency } from '../../../lib/calculators/format';
@@ -219,7 +222,14 @@ export default function RemodelyticsPlatform() {
 	// const [fetchedContext, setFetchedContext] = useState<any>(null);
 	// const [lookupStatus, setLookupStatus] = useState<'idle' | 'loading' | 'loaded' | 'error'>('idle');
 	// const [lookupMessage, setLookupMessage] = useState<string | null>(null);
-	const [overrides, setOverrides] = useState<RemodelyticsOverrides>({});
+	// Full multivariable engine, so inputs survive a return visit. Only keys the schema knows are
+	// restored; a renamed field cannot leak a stale value into the model.
+	const persisted = usePersistedInputs<RemodelyticsOverrides>('remodelytics-underwriter', {}, {
+		allowedKeys: Object.keys(INITIAL_INPUTS),
+		version: 1
+	});
+	const overrides = persisted.value;
+	const setOverrides = persisted.setValue;
 	const [copied, setCopied] = useState(false);
 	const fieldId = useId();
 	const { onInputChange, onComplete } = useVibeTelemetry({
@@ -232,6 +242,31 @@ export default function RemodelyticsPlatform() {
 		[overrides]
 	);
 	const breakdown = useMemo(() => calculateRemodelytics(inputs), [inputs]);
+
+	// One packet, two uses: the copy action and the optional email. Built once so the mailed report
+	// is byte-identical to the one the visitor copied.
+	const packet = useMemo(
+		() => ({
+			tool: 'Remodelytics underwriting packet',
+			property: {
+				address: INITIAL_ADDRESS,
+				zipCode: inputs.zipCode,
+				homeValue: inputs.homeValue,
+				homeSize: inputs.homeSize,
+				projectType: inputs.projectType,
+				materialTier: inputs.materialTier
+			},
+			results: breakdown,
+			greenAddendumMap: {
+				currentEfficiency: inputs.currentEfficiency,
+				proposedEfficiency: inputs.proposedEfficiency,
+				energyReductionPercent: inputs.energyReductionPercent,
+				monthlyUtilitySavingsYearOne: breakdown.monthlyUtilitySavingsYearOne,
+				greenPremiumValue: breakdown.greenPremiumValue
+			}
+		}),
+		[inputs, breakdown]
+	);
 
 	/*
 	const runPropertyLookup = async (nextAddress = address, nextProjectType = inputs.projectType) => {
@@ -283,26 +318,6 @@ export default function RemodelyticsPlatform() {
 	};
 
 	const exportPacket = async () => {
-		const packet = {
-			tool: 'Remodelytics underwriting packet',
-			property: {
-				address: INITIAL_ADDRESS,
-				zipCode: inputs.zipCode,
-				homeValue: inputs.homeValue,
-				homeSize: inputs.homeSize,
-				projectType: inputs.projectType,
-				materialTier: inputs.materialTier
-			},
-			results: breakdown,
-			greenAddendumMap: {
-				currentEfficiency: inputs.currentEfficiency,
-				proposedEfficiency: inputs.proposedEfficiency,
-				energyReductionPercent: inputs.energyReductionPercent,
-				monthlyUtilitySavingsYearOne: breakdown.monthlyUtilitySavingsYearOne,
-				greenPremiumValue: breakdown.greenPremiumValue
-			}
-		};
-
 		// `navigator.clipboard` is absent on insecure origins and can throw on a denied permission.
 		// Unhandled, that rejected the whole handler: no "Packet copied" feedback AND no completion
 		// event, so a real export looked like nothing happened. Report what actually occurred.
@@ -322,6 +337,7 @@ export default function RemodelyticsPlatform() {
 
 	return (
 		<div className="grid gap-6">
+			{persisted.restored && <PersistenceNotice onReset={persisted.reset} />}
 			{/* Temporary hidden: Property lookup panel
 			<AddressLookupPanel
 				address={address}
@@ -533,6 +549,17 @@ export default function RemodelyticsPlatform() {
 							Print / save PDF
 						</button>
 					</div>
+				</div>
+
+				{/* Optional, never a gate: the model above is complete and copyable without this. */}
+				<div className="mt-4">
+					<ModelExportForm
+						assetSlug="remodelytics-underwriter"
+						assetTitle="Remodelytics Multi-Engine Underwriter"
+						scenario={packet}
+						label="Email me this packet"
+						onSent={(meta) => onComplete({ action: 'email_scenario', ...meta })}
+					/>
 				</div>
 
 				<div className="grid grid-cols-[repeat(auto-fit,minmax(13rem,1fr))] gap-4">

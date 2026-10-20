@@ -43,6 +43,7 @@ const topCategories = await getTopLevelCategories();
 					<a href="/calculators/" class="transition hover:text-primary">Calculators</a>
 					<a href="/categories/" class="transition hover:text-primary">Categories</a>
 					<a href="/about/" class="transition hover:text-primary">About</a>
+					<a href="/privacy/" class="transition hover:text-primary">Privacy</a>
 				</div>
 			</div>
 			<div>
@@ -58,8 +59,16 @@ const topCategories = await getTopLevelCategories();
 		</div>
 	</div>
 	
-	<div class="mx-auto max-w-6xl px-4 lg:px-8 mt-12 pt-8 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-gray-500">
-		<p>&copy; {new Date().getFullYear()} WellRoost. All rights reserved.</p>
-		<p class="font-mono">Decisions backed by data.</p>
+	<div class="mx-auto max-w-6xl px-4 lg:px-8 mt-12 pt-8 border-t border-gray-100 flex flex-col gap-4">
+		<p class="text-xs leading-6 text-gray-500">
+			<strong class="font-semibold text-gray-700">Analytics &amp; Telemetry:</strong> We record anonymous
+			interaction events and model parameters to evaluate calculator accuracy and refine our decision engines. We
+			do not sell personal data or run cross-site tracking scripts. See our
+			<a href="/privacy/" class="underline underline-offset-2 transition hover:text-gray-700">Privacy Policy</a>.
+		</p>
+		<div class="flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-gray-500">
+			<p>&copy; {new Date().getFullYear()} WellRoost. All rights reserved.</p>
+			<p class="font-mono">Decisions backed by data.</p>
+		</div>
 	</div>
 </footer>

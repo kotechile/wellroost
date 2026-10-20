@@ -83,7 +83,7 @@ export const VibeAssetCard: React.FC<VibeAssetProps> = ({
 				onClick={handleAction}
 				className="w-full py-2.5 px-4 bg-zinc-100 hover:bg-white text-zinc-950 font-medium rounded-lg transition-colors flex items-center justify-center space-x-2 text-sm cursor-pointer"
 			>
-				<span>{engaged ? 'Session Active' : 'Launch Interactive Asset'}</span>
+				<span>{engaged ? 'Opening engine…' : 'Open Full Multivariable Engine →'}</span>
 			</button>
 		</div>
 	);

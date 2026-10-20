@@ -39,6 +39,38 @@ receives these as runtime env ships a bundle whose values are already `undefined
    when a sink is configured — if it is missing, the build has no sink, and the browser console says
    so on the first event.
 
+## Optional email capture
+
+`src/components/ModelExportForm.tsx`, rendered inside an engine (currently Remodelytics, the one with
+an export packet). Rules:
+
+- **Never a gate.** The model and `Copy underwriting packet` work with an empty form. The card CTA
+  reads "Open Full Multivariable Engine →" so nothing looks like a wall.
+- **One purpose, stated on the button's own line:** "We will only use your email to send this
+  scenario report. You can unsubscribe at any time." A new notice means bumping
+  `consent_text_version` in `src/lib/leads.ts`, which is what the row records.
+- **No fake success.** If `PUBLIC_SUPABASE_URL`/`ANON_KEY` are absent the form renders
+  "Email delivery is not configured on this build" and says the copy action still works.
+- Leads land in `vibe_asset_leads` (migration alongside the telemetry one), which is separate from
+  the event table: identified person + submitted scenario in one place, anonymous events in another.
+
+A lead is the strongest completion signal available, so `onSent` raises `complete{action:'email_scenario'}`
+on the parent's telemetry hook. The form itself does not call the hook — a second registration there
+would emit a phantom `view` for a pseudo-asset on every mount.
+
+## Persistence (localStorage)
+
+`src/lib/usePersistedInputs.ts`, used by the two multivariable engines (`move-or-improve`,
+`remodelytics-underwriter`). Quick or single-field surfaces deliberately reset.
+
+- Restore in an effect, never during render — a static build reading `localStorage` while rendering
+  produces a hydration mismatch.
+- Only keys the current schema knows are restored (`allowedKeys`), so a renamed field cannot inject a
+  stale value into the model.
+- The restore is **announced** with `PersistenceNotice` and a `Start fresh` escape that clears the
+  snapshot. Silently showing different numbers than last visit reads as a bug on a financial model.
+- Storage key is versioned: `wr:model:<asset>:v<n>`.
+
 ## Reading the data
 
 Funnel per asset:
