@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { trackVibeAssetEvent } from '../lib/telemetry';
 
 export interface VibeAssetProps {
@@ -21,11 +21,25 @@ export const VibeAssetCard: React.FC<VibeAssetProps> = ({
 	metricsPreview
 }) => {
 	const [engaged, setEngaged] = useState(false);
+	const assetSlug = slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+	// The card renders with `client:visible`, so this is an "actually seen" signal rather than a
+	// page-view copy. Without it a zero-click card and a card nobody scrolled to are identical in
+	// the data — and the click is the only thing this surface exists to produce.
+	useEffect(() => {
+		trackVibeAssetEvent({
+			assetSlug,
+			category,
+			title,
+			eventType: 'view',
+			metadata: { href, metricsPreview }
+		});
+		// assetSlug/category/title are static per asset.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [assetSlug]);
 
 	const handleAction = () => {
 		setEngaged(true);
-
-		const assetSlug = slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
 		// Dispatch telemetry for user engagement
 		trackVibeAssetEvent({

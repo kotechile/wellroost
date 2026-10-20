@@ -1,4 +1,5 @@
 import { useId, useState, useMemo } from 'react';
+import { useVibeTelemetry } from '../../../lib/useVibeTelemetry';
 import { runCapExMatrixCalculator, PROJECT_ROI_DATABASE } from '../../../lib/calculators/moveOrImprove';
 import { formatCurrency, formatPercent } from '../../../lib/calculators/format';
 import type { MoveOrImproveInputs } from '../../../lib/calculators/moveOrImproveTypes';
@@ -57,6 +58,11 @@ export default function MoveOrImproveCalculator() {
   const [sensitivityPreset, setSensitivityPreset] = useState<'low' | 'base' | 'high' | 'custom'>('base');
   const [showLogic, setShowLogic] = useState(false);
   const fieldId = useId();
+  const { onInputChange } = useVibeTelemetry({
+    slug: 'move-or-improve',
+    category: 'MOVE VS IMPROVE',
+    title: '5-Year Relocation Friction Ledger'
+  });
 
   // Run calculation engine
   const result = useMemo(() => {
@@ -68,6 +74,7 @@ export default function MoveOrImproveCalculator() {
     value: MoveOrImproveInputs[K]
   ) => {
     setInputs((prev) => ({ ...prev, [key]: value }));
+    onInputChange(String(key));
   };
 
   const updateLegacyDebt = <K extends keyof MoveOrImproveInputs['legacyDebt']>(

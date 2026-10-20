@@ -2,6 +2,12 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { calculatorTools } from '../../lib/calculators/metadata';
 import VibeAssetCard from '../../components/VibeAssetCard';
+import { isTelemetryConfigured } from '../../lib/telemetry';
+
+// The badge below is a claim about the system, so it is derived from the system rather than
+// hardcoded. It used to render "Telemetry Enabled" unconditionally while no sink was configured at
+// build time, i.e. the page advertised instrumentation that dropped every event on the floor.
+const telemetryLive = isTelemetryConfigured();
 
 const vibeAssets = [
 	{
@@ -55,9 +61,11 @@ const vibeAssets = [
 					Empirical decision tools designed to solve high-stakes property calculations in under 60 seconds.
 				</p>
 			</div>
-			<span class="hidden sm:inline-flex items-center text-xs font-mono uppercase tracking-wider bg-zinc-100 text-zinc-700 px-3 py-1 rounded-full border border-zinc-200">
-				Telemetry Enabled
-			</span>
+			{telemetryLive && (
+				<span class="hidden sm:inline-flex items-center text-xs font-mono uppercase tracking-wider bg-zinc-100 text-zinc-700 px-3 py-1 rounded-full border border-zinc-200">
+					Telemetry Enabled
+				</span>
+			)}
 		</div>
 		<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
 			{vibeAssets.map((asset) => (

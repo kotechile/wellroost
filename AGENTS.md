@@ -19,6 +19,31 @@ Use `wellroost_overview.md` as the source of truth for the site concept, audienc
 
 Use `design-language.md` as the directional reference for palette, spacing, tone, and visual composition. It is not the source of truth for content, but it should guide aesthetic decisions.
 
+Two further files are BINDING — read them before writing copy or scaffolding an acquisition asset:
+
+* `skill.md` — the operational protocol: audience, tone, Smart Brevity structure, the 95/5
+  generation/human-taste split, and the output rules for code and copy.
+* `lexicon.md` — preferred domain terminology and the prohibited-terms list. `npm run check:lexicon`
+  enforces it against `src/`; copy that violates it fails the check rather than shipping.
+
+## Vibe marketing contract
+
+Every acquisition asset is an **interactive micro-application**, not a static download. That means
+three things must hold together, and a missing piece is a defect rather than a nice-to-have:
+
+1. **The asset is interactive** — a React island (`client:load` for an engine, `client:visible` for
+   a card) with real inputs and computed output.
+2. **The interaction is instrumented** — `src/lib/useVibeTelemetry.ts` fires `view` on mount,
+   debounced `input_change`, and `complete` (field threshold, or an explicit export action).
+   Field NAMES are sent, never values: these inputs are home values, incomes and budgets.
+3. **The instrumentation has a sink** — `PUBLIC_SUPABASE_URL` + `PUBLIC_SUPABASE_ANON_KEY` and/or
+   `PUBLIC_TELEMETRY_WEBHOOK_URL`, set at **build** time. Without one, the app warns in the console
+   and hides the "Telemetry Enabled" badge on `/calculators/`. Never render that badge
+   unconditionally: it is a claim about the system, so it is derived from the system.
+
+Adding an asset means adding all three. `supabase/migrations/` holds the table + RLS policy that
+make the write legal for the `anon` role; the sink, not the schema, is what tends to be missing.
+
 If any supporting content file is missing, search the repository for similar names before proceeding:
 
 * `wellroost_overview.md`

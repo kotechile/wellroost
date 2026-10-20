@@ -11,6 +11,17 @@ ENV PUBLIC_WORDPRESS_API_BASE=${PUBLIC_WORDPRESS_API_BASE:-https://cms.wellroost
 ARG PUBLIC_SITE_URL=https://wellroost.com
 ENV PUBLIC_SITE_URL=${PUBLIC_SITE_URL:-https://wellroost.com}
 
+# Vibe-marketing telemetry sinks. Astro inlines PUBLIC_* at BUILD time, so these must be present
+# here — setting them on the running container ships a bundle whose values are already `undefined`
+# and every interaction event is dropped. Empty by default: the site then says so (console warning,
+# and the "Telemetry Enabled" badge on /calculators/ disappears) rather than pretending to report.
+ARG PUBLIC_SUPABASE_URL=
+ENV PUBLIC_SUPABASE_URL=${PUBLIC_SUPABASE_URL:-}
+ARG PUBLIC_SUPABASE_ANON_KEY=
+ENV PUBLIC_SUPABASE_ANON_KEY=${PUBLIC_SUPABASE_ANON_KEY:-}
+ARG PUBLIC_TELEMETRY_WEBHOOK_URL=
+ENV PUBLIC_TELEMETRY_WEBHOOK_URL=${PUBLIC_TELEMETRY_WEBHOOK_URL:-}
+
 # This helps if the server has trouble with its own SSL certificate during build
 ENV NODE_TLS_REJECT_UNAUTHORIZED=0
 
@@ -24,6 +35,11 @@ ARG CACHEBUST=1
 # Debug: Try to connect to WordPress before building
 RUN echo "Checking connection to $PUBLIC_WORDPRESS_API_BASE..." && \
     curl -v -I "$PUBLIC_WORDPRESS_API_BASE/wp-json/wp/v2/posts" || echo "Connection check failed, but proceeding with build..."
+
+# The lexicon gate runs in the image build, not just locally: lexicon.md is a brand contract, and a
+# contract that only runs when someone remembers to type the command is advisory. A violation stops
+# the deploy. Deliberate quotes opt out inline with `lexicon-allow`.
+RUN npm run check:lexicon
 
 RUN npm run build
 

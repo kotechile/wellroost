@@ -1,4 +1,5 @@
 import { useId, useMemo, useState, type ReactNode } from 'react';
+import { useVibeTelemetry } from '../../../lib/useVibeTelemetry';
 
 import { calculateRemodelytics } from '../../../lib/calculators/remodelytics';
 import { formatCurrency } from '../../../lib/calculators/format';
@@ -221,6 +222,11 @@ export default function RemodelyticsPlatform() {
 	const [overrides, setOverrides] = useState<RemodelyticsOverrides>({});
 	const [copied, setCopied] = useState(false);
 	const fieldId = useId();
+	const { onInputChange, onComplete } = useVibeTelemetry({
+		slug: 'remodelytics-underwriter',
+		category: 'CAPEX UNDERWRITING',
+		title: 'Remodelytics Multi-Engine Underwriter'
+	});
 	const inputs = useMemo(
 		() => mergeRemodelyticsInputs(INITIAL_INPUTS, null, overrides),
 		[overrides]
@@ -267,6 +273,7 @@ export default function RemodelyticsPlatform() {
 
 	const updateInput = <K extends keyof RemodelyticsInputs>(key: K, value: RemodelyticsInputs[K]) => {
 		setOverrides((current) => ({ ...current, [key]: value }));
+		onInputChange(String(key));
 
 		/*
 		if (key === 'projectType' && fetchedContext?.property?.address?.value) {
@@ -296,8 +303,20 @@ export default function RemodelyticsPlatform() {
 			}
 		};
 
-		await navigator.clipboard?.writeText(JSON.stringify(packet, null, 2));
-		setCopied(true);
+		// `navigator.clipboard` is absent on insecure origins and can throw on a denied permission.
+		// Unhandled, that rejected the whole handler: no "Packet copied" feedback AND no completion
+		// event, so a real export looked like nothing happened. Report what actually occurred.
+		let copiedOk = false;
+		try {
+			await navigator.clipboard?.writeText(JSON.stringify(packet, null, 2));
+			copiedOk = Boolean(navigator.clipboard);
+		} catch (err) {
+			console.warn('[Remodelytics] clipboard write blocked:', err);
+		}
+		setCopied(copiedOk);
+		// Copying the underwriting packet IS the conversion — the visitor walked away with a
+		// complete model — whether or not the clipboard write was permitted.
+		onComplete({ action: 'export_packet', clipboard: copiedOk });
 		window.setTimeout(() => setCopied(false), 1800);
 	};
 

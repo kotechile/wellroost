@@ -1,4 +1,5 @@
 import { useId, useState } from 'react';
+import { useVibeTelemetry } from '../../../lib/useVibeTelemetry';
 
 import { calculateBasicRemodeling } from '../../../lib/calculators/basicRemodeling';
 import { formatCurrency, formatPercent } from '../../../lib/calculators/format';
@@ -112,6 +113,11 @@ function getRecommendationSupport(recommendation: ReturnType<typeof calculateBas
 export default function BasicRemodelingCalculator() {
 	const [inputs, setInputs] = useState(INITIAL_INPUTS);
 	const fieldId = useId();
+	const { onInputChange } = useVibeTelemetry({
+		slug: 'remodeling-roi',
+		category: 'EQUITY ARV',
+		title: 'Equity ARV Recovery Engine'
+	});
 	const breakdown = calculateBasicRemodeling(inputs);
 	const selectedEnjoyment =
 		ENJOYMENT_OPTIONS.find((option) => option.value === inputs.enjoymentLevel) ?? ENJOYMENT_OPTIONS[2];
@@ -121,6 +127,7 @@ export default function BasicRemodelingCalculator() {
 		value: BasicRemodelingInputs[K]
 	) => {
 		setInputs((current) => ({ ...current, [key]: value }));
+		onInputChange(String(key));
 	};
 
 	return (
