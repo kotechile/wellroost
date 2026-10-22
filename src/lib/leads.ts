@@ -15,8 +15,9 @@
  * would make "did anyone convert" a three-way join.
  */
 
+import { telemetrySessionId } from './telemetry';
+
 const VERTICAL = 'wellroost';
-const SESSION_KEY = 'wr:sid';
 
 export interface ScenarioLead {
 	email: string;
@@ -45,21 +46,10 @@ export function isLeadCaptureConfigured(): boolean {
 }
 
 /**
- * A per-tab session id, so a lead can be joined to the interaction events from the same visit.
- * sessionStorage, not localStorage: this is a visit, not a person.
+ * The per-tab session id lives in `telemetry.ts` because every event carries it too: a lead and the
+ * events from the same visit must share one id, and a second implementation would drift.
  */
-export function telemetrySessionId(): string {
-	if (typeof window === 'undefined') return 'server';
-	try {
-		const existing = window.sessionStorage.getItem(SESSION_KEY);
-		if (existing) return existing;
-		const id = (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`).toString();
-		window.sessionStorage.setItem(SESSION_KEY, id);
-		return id;
-	} catch {
-		return 'unavailable';
-	}
-}
+export { telemetrySessionId } from './telemetry';
 
 /**
  * Deliberately permissive. Rejecting a plausible address loses a real person; the bounce is the

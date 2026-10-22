@@ -3,38 +3,17 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { calculatorTools } from '../../lib/calculators/metadata';
 import VibeAssetCard from '../../components/VibeAssetCard';
 import { isTelemetryConfigured } from '../../lib/telemetry';
+import { vibeAssetList } from '../../lib/vibeAssets';
 
 // The badge below is a claim about the system, so it is derived from the system rather than
 // hardcoded. It used to render "Telemetry Enabled" unconditionally while no sink was configured at
 // build time, i.e. the page advertised instrumentation that dropped every event on the floor.
 const telemetryLive = isTelemetryConfigured();
 
-const vibeAssets = [
-	{
-		title: 'Equity ARV Recovery Engine',
-		category: 'EQUITY ARV',
-		description: 'Underwrite $20k–$150k remodeling projects against hyper-local comp appreciation before signing contractor agreements.',
-		metricsPreview: 'Comp ARV = Base Appraised Value + (CapEx × Recovery Rate) - Carry Depreciation',
-		slug: 'equity-arv-recovery-engine',
-		href: '/calculators/remodeling-roi/'
-	},
-	{
-		title: '5-Year Relocation Friction Ledger',
-		category: 'MOVE VS IMPROVE',
-		description: 'Compare 8-10% selling commissions, transfer taxes, and interest rate step-ups against expanding your current footprint.',
-		metricsPreview: 'Relocation Friction Delta = Net Sale Carry - In-Place Renovation ROI',
-		slug: 'relocation-friction-ledger',
-		href: '/calculators/move-or-improve/'
-	},
-	{
-		title: 'Remodelytics Multi-Engine Underwriter',
-		category: 'CAPEX UNDERWRITING',
-		description: 'Pressure-test ADU rental yields, combined LTV ceilings, and contractor over-improvement risk in a single dashboard.',
-		metricsPreview: 'MAO Underwriting = (Comp ARV × 70%) - Total CapEx - Financing Friction',
-		slug: 'remodelytics-underwriter',
-		href: '/calculators/remodelytics/'
-	}
-];
+// Assets come from `src/lib/vibeAssets.ts`, the same module the engines import their identity from.
+// The cards used to carry their own slug literals, which drifted from the engine's and broke the
+// attribution join between a card click and the engine view it produced.
+const vibeAssets = vibeAssetList;
 ---
 
 <BaseLayout

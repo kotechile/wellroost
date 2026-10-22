@@ -1,5 +1,6 @@
 import { useId, useMemo, useState, type ReactNode } from 'react';
 import { useVibeTelemetry } from '../../../lib/useVibeTelemetry';
+import { vibeAssets } from '../../../lib/vibeAssets';
 import { usePersistedInputs } from '../../../lib/usePersistedInputs';
 import ModelExportForm from '../../../components/ModelExportForm';
 import PersistenceNotice from '../../../components/PersistenceNotice';
@@ -232,11 +233,7 @@ export default function RemodelyticsPlatform() {
 	const setOverrides = persisted.setValue;
 	const [copied, setCopied] = useState(false);
 	const fieldId = useId();
-	const { onInputChange, onComplete } = useVibeTelemetry({
-		slug: 'remodelytics-underwriter',
-		category: 'CAPEX UNDERWRITING',
-		title: 'Remodelytics Multi-Engine Underwriter'
-	});
+	const { onInputChange, onComplete } = useVibeTelemetry(vibeAssets.remodelytics);
 	const inputs = useMemo(
 		() => mergeRemodelyticsInputs(INITIAL_INPUTS, null, overrides),
 		[overrides]
@@ -250,7 +247,7 @@ export default function RemodelyticsPlatform() {
 			tool: 'Remodelytics underwriting packet',
 			// Carried so the lead row can record what the asset is about, not only which property it
 			// came from. The email path reads it from here rather than threading a second prop.
-			category: 'CAPEX UNDERWRITING',
+			category: vibeAssets.remodelytics.category,
 			property: {
 				address: INITIAL_ADDRESS,
 				zipCode: inputs.zipCode,
@@ -336,6 +333,15 @@ export default function RemodelyticsPlatform() {
 		// complete model — whether or not the clipboard write was permitted.
 		onComplete({ action: 'export_packet', clipboard: copiedOk });
 		window.setTimeout(() => setCopied(false), 1800);
+	};
+
+	/**
+	 * Print is the other export. It emitted nothing before, so the one click that unambiguously means
+	 * "I am keeping this" — the packet on paper or as a PDF — was invisible in the funnel.
+	 */
+	const printPacket = () => {
+		onComplete({ action: 'print_packet' });
+		window.print();
 	};
 
 	return (
@@ -546,7 +552,7 @@ export default function RemodelyticsPlatform() {
 						</button>
 						<button
 							type="button"
-							onClick={() => window.print()}
+							onClick={printPacket}
 							className="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 shadow-xs cursor-pointer"
 						>
 							Print / save PDF
@@ -557,8 +563,8 @@ export default function RemodelyticsPlatform() {
 				{/* Optional, never a gate: the model above is complete and copyable without this. */}
 				<div className="mt-4">
 					<ModelExportForm
-						assetSlug="remodelytics-underwriter"
-						assetTitle="Remodelytics Multi-Engine Underwriter"
+						assetSlug={vibeAssets.remodelytics.slug}
+						assetTitle={vibeAssets.remodelytics.title}
 						scenario={packet}
 						label="Email me this packet"
 						onSent={(meta) => onComplete({ action: 'email_scenario', ...meta })}

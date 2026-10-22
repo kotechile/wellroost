@@ -1,5 +1,6 @@
 import { useId, useState, useMemo } from 'react';
 import { useVibeTelemetry } from '../../../lib/useVibeTelemetry';
+import { vibeAssets } from '../../../lib/vibeAssets';
 import { usePersistedInputs } from '../../../lib/usePersistedInputs';
 import PersistenceNotice from '../../../components/PersistenceNotice';
 import { runCapExMatrixCalculator, PROJECT_ROI_DATABASE } from '../../../lib/calculators/moveOrImprove';
@@ -67,11 +68,7 @@ export default function MoveOrImproveCalculator() {
   const [sensitivityPreset, setSensitivityPreset] = useState<'low' | 'base' | 'high' | 'custom'>('base');
   const [showLogic, setShowLogic] = useState(false);
   const fieldId = useId();
-  const { onInputChange } = useVibeTelemetry({
-    slug: 'move-or-improve',
-    category: 'MOVE VS IMPROVE',
-    title: '5-Year Relocation Friction Ledger'
-  });
+  const { onInputChange } = useVibeTelemetry(vibeAssets.relocationFriction);
 
   // Run calculation engine
   const result = useMemo(() => {
@@ -94,6 +91,7 @@ export default function MoveOrImproveCalculator() {
       ...prev,
       legacyDebt: { ...prev.legacyDebt, [key]: value }
     }));
+    onInputChange(`legacyDebt.${String(key)}`);
   };
 
   const updateFriction = <K extends keyof MoveOrImproveInputs['friction']>(
@@ -104,6 +102,7 @@ export default function MoveOrImproveCalculator() {
       ...prev,
       friction: { ...prev.friction, [key]: value }
     }));
+    onInputChange(`friction.${String(key)}`);
   };
 
   const updateRenovation = <K extends keyof MoveOrImproveInputs['renovation']>(
@@ -114,6 +113,7 @@ export default function MoveOrImproveCalculator() {
       ...prev,
       renovation: { ...prev.renovation, [key]: value }
     }));
+    onInputChange(`renovation.${String(key)}`);
   };
 
   // Sensitivity presets

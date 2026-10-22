@@ -11,9 +11,12 @@
  *   liability and needs far more consent machinery than this needs.
  * - `view` fires once per mount (the card/page renders with `client:visible`, so this is an
  *   "actually seen" signal, not a page-view copy).
- * - `complete` fires once per mount, at COMPLETE_AFTER distinct fields — a proxy for "modelled the
- *   scenario" that works the same way across all three engines without per-engine result plumbing.
- *   An asset with an explicit export/copy action passes `onComplete` for a stronger signal.
+ * - `complete` fires at most twice per mount, and the two are different facts:
+ *   `complete{trigger:'field_threshold'}` once at COMPLETE_AFTER distinct fields (a proxy for
+ *   "modelled the scenario" that works the same way across all engines without per-engine result
+ *   plumbing), and `complete{trigger:'export'}` from an explicit export/copy/print action, which is
+ *   the real conversion. Each row carries a session id, so a funnel counts sessions per stage rather
+ *   than adding rows and calling the threshold a conversion.
  */
 import { useEffect, useRef } from 'react';
 import { trackVibeAssetEvent } from './telemetry';
@@ -29,7 +32,12 @@ export interface VibeAssetIdentity {
 
 export function useVibeTelemetry(asset: VibeAssetIdentity) {
 	const changed = useRef<Set<string>>(new Set());
-	const completed = useRef(false);
+	// Two independent refs, because these are two different facts. `complete{trigger:'field_threshold'}`
+	// is a PROXY — the visitor modelled something. `complete{trigger:'export'}` is the real thing.
+	// A single shared flag dropped the second one: in a ten-field engine the threshold always fires
+	// first, so the export that actually converted the visitor was never recorded.
+	const thresholdFired = useRef(false);
+	const exportFired = useRef(false);
 	const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	useEffect(() => {
@@ -47,6 +55,10 @@ export function useVibeTelemetry(asset: VibeAssetIdentity) {
 	}, [asset.slug]);
 
 	const flush = () => {
+		if (timer.current) {
+			clearTimeout(timer.current);
+			timer.current = null;
+		}
 		trackVibeAssetEvent({
 			assetSlug: asset.slug,
 			category: asset.category,
@@ -66,8 +78,11 @@ export function useVibeTelemetry(asset: VibeAssetIdentity) {
 		if (timer.current) clearTimeout(timer.current);
 		timer.current = setTimeout(flush, DEBOUNCE_MS);
 
-		if (!completed.current && changed.current.size >= COMPLETE_AFTER) {
-			completed.current = true;
+		if (!thresholdFired.current && changed.current.size >= COMPLETE_AFTER) {
+			thresholdFired.current = true;
+			// Flush the pending debounce first, or the funnel reads `complete` before the
+			// `input_change` that caused it and "last event per session" answers the wrong question.
+			flush();
 			trackVibeAssetEvent({
 				assetSlug: asset.slug,
 				category: asset.category,
@@ -78,10 +93,16 @@ export function useVibeTelemetry(asset: VibeAssetIdentity) {
 		}
 	};
 
-	/** Call from an explicit export/copy/print action — the strongest completion signal. */
+	/**
+	 * Call from an explicit export/copy/print action — the strongest completion signal.
+	 *
+	 * Fires even when the field threshold already reported completion: they are separate rows on
+	 * purpose, and every one of them carries the session id, so the funnel counts
+	 * `count(distinct session_id)` per stage instead of adding up rows.
+	 */
 	const onComplete = (metadata: Record<string, unknown> = {}) => {
-		if (completed.current) return;
-		completed.current = true;
+		if (exportFired.current) return;
+		exportFired.current = true;
 		trackVibeAssetEvent({
 			assetSlug: asset.slug,
 			category: asset.category,

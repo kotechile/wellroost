@@ -1,3 +1,5 @@
+import { useEffect, useState, type ChangeEvent } from 'react';
+
 interface StepperInputProps {
 	id: string;
 	label: string;
@@ -37,6 +39,34 @@ export function StepperInput({
 }: StepperInputProps) {
 	const updateValue = (nextValue: number) => onChange(clampValue(nextValue, min, max));
 
+	/**
+	 * Same reason as `CurrencyInput`: the box keeps the raw string the visitor typed, and only blur
+	 * normalises it. Without this, clearing the field or typing a first digit below `min` snapped the
+	 * value to the minimum mid-keystroke, so a twelve-month floor could not be typed into at all.
+	 */
+	const [draft, setDraft] = useState<string>(() => String(value));
+	const [editing, setEditing] = useState(false);
+
+	useEffect(() => {
+		if (!editing) setDraft(String(value));
+	}, [value, editing]);
+
+	const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+		const raw = event.target.value;
+		setDraft(raw);
+		const parsed = Number(raw);
+		// Half-typed or empty: hold the model at the floor rather than at NaN.
+		onChange(raw.trim() === '' || !Number.isFinite(parsed) ? min : clampValue(parsed, min, max));
+	};
+
+	const handleBlur = () => {
+		setEditing(false);
+		const parsed = Number(draft);
+		const normalised = draft.trim() === '' || !Number.isFinite(parsed) ? min : clampValue(parsed, min, max);
+		if (normalised !== value) onChange(normalised);
+		setDraft(String(normalised));
+	};
+
 	return (
 		<label
 			className="grid gap-3 rounded-2xl border border-gray-200 bg-gray-50/70 p-4 shadow-xs transition hover:border-gray-300"
@@ -73,8 +103,10 @@ export function StepperInput({
 					min={min}
 					max={max}
 					step={step}
-					value={value}
-					onChange={(event) => updateValue(Number(event.target.value))}
+					value={draft}
+					onChange={handleChange}
+					onFocus={() => setEditing(true)}
+					onBlur={handleBlur}
 					className="h-12 w-full bg-transparent px-4 text-center text-base font-semibold tabular-nums text-gray-900 outline-none"
 				/>
 				<button

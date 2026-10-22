@@ -6,30 +6,50 @@ acquisition channel if nothing records what a visitor did with them.
 
 ## What is already live
 
-| Surface | Island | Events |
-| --- | --- | --- |
-| `/calculators/` asset cards | `client:visible` | `view`, `engage` |
-| `/calculators/remodeling-roi/` | `client:load` | `view`, `input_change`, `complete` |
-| `/calculators/move-or-improve/` | `client:load` | `view`, `input_change`, `complete` |
-| `/calculators/remodelytics/` | `client:load` | `view`, `input_change`, `complete` (export) |
+`asset_slug` is the join key. It comes from `src/lib/vibeAssets.ts` — one declaration per asset, imported
+by both the card and the engine. Card and engine used to carry their own slug literals, and they drifted
+(`relocation-friction-ledger` on the hub vs `move-or-improve` in the engine), so a click had no matching
+engine view. Do not type a slug anywhere else.
+
+| Surface | Island | `asset_slug` | Events |
+| --- | --- | --- | --- |
+| `/calculators/` asset cards | `client:visible` | per card | `view`, `engage` |
+| `/calculators/remodeling-roi/` | `client:load` | `equity-arv-recovery-engine` | `view`, `input_change`, `complete` |
+| `/calculators/move-or-improve/` | `client:load` | `relocation-friction-ledger` | `view`, `input_change`, `complete` |
+| `/calculators/remodelytics/` | `client:load` | `remodelytics-underwriter` | `view`, `input_change`, `complete` (export) |
+
+`complete` on the two engines without an export action is the field-count proxy only
+(`trigger: field_threshold`). Remodelytics has real exports — copy, print, email — and records
+`trigger: export` with the action that fired.
 
 Event semantics:
 
 - `view` — the island hydrated on screen. Cards use `client:visible`, so this means *seen*, not
   merely served.
+- `engage` — a card CTA was clicked, immediately before the navigation.
 - `input_change` — debounced 1200 ms, with `metadata.fields` = the names of the fields the visitor
-  touched. **Field names only, never values.**
-- `complete` — either four distinct fields (proxy) or an explicit export (`action: export_packet`,
-  which also records whether the clipboard write was permitted).
+  touched. **Field names only, never values.** Nested fields are emitted with their path
+  (`friction.zipCode`, `renovation.quoteAmount`); before that fix, three of the four update paths in
+  the relocation engine emitted nothing, so most of that engine's inputs were invisible.
+- `complete` — two different facts, both under the same event type:
+  `complete{trigger:'field_threshold'}` is a **proxy** ("four distinct fields touched, they modelled
+  something"); `complete{trigger:'export'}` is the real conversion. They are separate rows on
+  purpose, and every row carries `session_id`, so the funnel counts sessions per stage rather than
+  adding rows — otherwise the proxy would inflate completion and the export would be lost.
+- `session_id` — random per tab, `sessionStorage`, no identity behind it. Also written on the lead
+  row from the same visit.
 
 ## Wiring the sink (one-time, ~5 minutes)
 
 Telemetry is build-time, not runtime: Astro inlines `PUBLIC_*` into the bundle. A container that
 receives these as runtime env ships a bundle whose values are already `undefined`.
 
-1. Apply the schema — `supabase/migrations/20261020_vibe_asset_telemetry.sql`. It creates the table
-   and an INSERT-only policy for `anon`. There is deliberately no `select` policy: the anon key is
-   public, so a select policy would publish the whole event log.
+1. Apply the migrations — `supabase/migrations/20261020_vibe_asset_telemetry.sql` (table + INSERT-only
+   policy for `anon`) and `20261023_vibe_asset_telemetry_session.sql` (`session_id`, which the funnel
+   needs). There is deliberately no `select` policy: the anon key is public, so a select policy would
+   publish the whole event log.
+   **Apply the `session_id` migration before deploying the bundle that sends it** — PostgREST answers
+   `400` to an INSERT naming a column the table lacks, and the browser only logs it.
 2. Set the build args on the Coolify application (Configuration → Environment Variables, and mark
    them as build-time / available at build):
    - `PUBLIC_SUPABASE_URL`
@@ -49,10 +69,17 @@ an export packet). Rules:
 - **One purpose, stated on the button's own line:** "We will only use your email to send this
   scenario report. You can unsubscribe at any time." A new notice means bumping
   `consent_text_version` in `src/lib/leads.ts`, which is what the row records.
-- **No fake success.** If `PUBLIC_SUPABASE_URL`/`ANON_KEY` are absent the form renders
-  "Email delivery is not configured on this build" and says the copy action still works.
-- Leads land in `vibe_asset_leads` (migration alongside the telemetry one), which is separate from
-  the event table: identified person + submitted scenario in one place, anonymous events in another.
+- **No fake success, and no fake delivery.** If `PUBLIC_SUPABASE_URL`/`ANON_KEY` are absent the form
+  renders "Email delivery is not configured on this build" and says the copy action still works.
+  When the row is accepted the label says "Request received", not "Sent": a `201` from the lead table
+  proves the row exists, and the packet is mailed by the n8n `lead_reports_workflow` poll, which runs
+  every five minutes and sets `delivered_at` only after SMTP accepts it.
+- Leads land in `vibe_lead_intents` (the estate's existing lead table — no third table for the same
+  fact), which is separate from the event table: identified person + submitted scenario in one place,
+  anonymous events in another. It must be deletable without the other. Columns this front end sets:
+  `session_id`, `asset_slug`, `vertical_slug` (`wellroost`), `domain_category`, `email`,
+  `intent_type` (`model_export`), `consent_text_version`, `calculated_metrics` (`asset_title`,
+  `source_path`, `domain`, and the scenario packet itself).
 
 A lead is the strongest completion signal available, so `onSent` raises `complete{action:'email_scenario'}`
 on the parent's telemetry hook. The form itself does not call the hook — a second registration there
@@ -115,29 +142,55 @@ the browser, so a workflow that re-inserts them duplicates every row.
 
 ## Reading the data
 
-Funnel per asset:
+Funnel per asset — **count sessions, not rows**, or a reload inflates `view` and the threshold proxy
+inflates `complete`:
 
 ```sql
+with s as (
+  select asset_slug, coalesce(session_id, 'legacy:' || id::text) as session_id, event_type
+  from vibe_asset_telemetry
+  where created_at > now() - interval '30 days'
+)
 select asset_slug,
-       count(*) filter (where event_type = 'view')         as views,
-       count(*) filter (where event_type = 'input_change') as engaged,
-       count(*) filter (where event_type = 'complete')     as completed,
-       round(100.0 * count(*) filter (where event_type = 'complete')
-             / nullif(count(*) filter (where event_type = 'view'), 0), 1) as completion_pct
-from vibe_asset_telemetry
-where created_at > now() - interval '30 days'
+       count(distinct session_id) filter (where event_type = 'view')         as views,
+       count(distinct session_id) filter (where event_type = 'engage')       as engages,
+       count(distinct session_id) filter (where event_type = 'input_change') as engaged,
+       count(distinct session_id) filter (where event_type = 'complete')     as completed,
+       round(100.0 * count(distinct session_id) filter (where event_type = 'complete')
+             / nullif(count(distinct session_id) filter (where event_type = 'view'), 0), 1) as completion_pct
+from s
 group by 1
 order by views desc;
 ```
 
+`coalesce(session_id, 'legacy:' || id)` keeps rows written before the `session_id` column from
+collapsing into a single bogus visitor; each legacy row counts as its own session, which is the best
+available assumption and never merges two real visitors.
+
+Which export actually converts:
+
+```sql
+select asset_slug, metadata->>'action' as action, count(distinct session_id) as sessions
+from vibe_asset_telemetry
+where event_type = 'complete' and metadata->>'trigger' = 'export'
+  and created_at > now() - interval '30 days'
+group by 1, 2 order by 1, 3 desc;
+```
+
 `asset_slug` is the join key between a card, an engine and its traffic. A card with high `view` and
 zero `engage` is a copy problem (see `skill.md`); an engine with high `engaged` and low `completed`
-is an input-friction problem.
+is an input-friction problem. A **missing** middle — card `engage` > 0 but engine `view` = 0 — means
+the two surfaces disagree on the slug, which is the failure `src/lib/vibeAssets.ts` now prevents.
 
 ## Adding an asset
 
-1. Build it as an island (`client:load` for an engine, `client:visible` for a card).
-2. Call `useVibeTelemetry({ slug, category, title })` and pass the field name to `onInputChange`
-   from the component's single input-update path; call `onComplete` from any export action.
-3. Never send input values — names only.
-4. `npm run check:lexicon` (also runs in the image build).
+1. Declare it once in `src/lib/vibeAssets.ts` (slug, category, title, description, metricsPreview,
+   href). The hub card and the engine both import that entry — a second copy of the slug is what
+   breaks attribution.
+2. Build it as an island (`client:load` for an engine, `client:visible` for a card), and pass the
+   registry entry straight to the hook: `useVibeTelemetry(vibeAssets.<asset>)`.
+3. Call `onInputChange(fieldName)` from the component's single input-update path — including nested
+   paths (`friction.zipCode`). A nested updater that skips it silently deletes those inputs from the
+   funnel. Call `onComplete({ action })` from every export action (copy, print, email).
+4. Never send input values — names only.
+5. `npm run check:lexicon` (also runs in the image build).

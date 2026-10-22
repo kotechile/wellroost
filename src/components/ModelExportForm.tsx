@@ -51,7 +51,14 @@ export const ModelExportForm: React.FC<ModelExportFormProps> = ({
 
 		if (result.ok) {
 			setStatus('sent');
-			setMessage(`Sent to ${email.trim()}. It should arrive within a minute.`);
+			// A 201 from the lead table means THE ROW EXISTS, nothing more. The packet is mailed by the
+			// n8n lead-reports poll, which runs every five minutes and sets `delivered_at` only once
+			// SMTP accepts it — so this label describes the queue, not the inbox. "Sent to …" for a
+			// request that has only been stored is the same class of untruth as a hardcoded
+			// "Telemetry Enabled" badge.
+			setMessage(
+				`Request received for ${email.trim()}. The packet is queued for delivery and usually arrives within a few minutes.`
+			);
 			onSent?.({ action: 'email_scenario', asset: assetSlug });
 			return;
 		}
@@ -103,7 +110,7 @@ export const ModelExportForm: React.FC<ModelExportFormProps> = ({
 					disabled={status === 'sending' || status === 'sent'}
 					className="shrink-0 rounded-lg border border-blue-600 bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/30"
 				>
-					{status === 'sending' ? 'Sending…' : status === 'sent' ? 'Sent' : label}
+					{status === 'sending' ? 'Sending…' : status === 'sent' ? 'Request received' : label}
 				</button>
 			</div>
 			<p className="mt-2 text-[0.7rem] leading-5 text-gray-500">

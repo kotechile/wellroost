@@ -27,11 +27,16 @@ Instead of offering a downloadable PDF or generic form on **wellroost.com**, Wel
 
 ### Component Architecture: `VibeAssetCard.tsx`
 Located at `src/components/VibeAssetCard.tsx`:
-- Responsive container with dark glassmorphism styling (`bg-zinc-900 border border-zinc-800 rounded-xl`).
-- High-contrast category pill (`text-emerald-400 bg-emerald-950/50`).
-- Version & domain metadata badge (`Interactive Asset v1.0 • wellroost.com`).
+- White panel matching `design-language.md` and the adjacent cards (`border-gray-200`, navy text,
+  `#1d6ae5` primary action). It was `zinc-900` glassmorphism, the only dark surface on an otherwise
+  white editorial page and a style the design language does not define.
+- Category pill (`border-blue-100 bg-blue-50 text-blue-700`).
+- Version badge (`Interactive Asset v1.0`) and, on the CTA, `data-asset-slug` so the rendered page can
+  be checked against the telemetry slug by eye.
 - Direct Smart Brevity copy hook with key formula/metrics preview.
-- Interactive action trigger switching from initial CTA to active state and logging telemetry.
+- The CTA is an `<a href>` to the engine (navigation semantics: middle-click, open-in-new-tab, visible
+  URL), instrumented with `engage` on click.
+- Identity comes from `src/lib/vibeAssets.ts`; the card carries no slug literal of its own.
 
 ---
 

@@ -41,6 +41,30 @@ export function isTelemetryConfigured(): boolean {
 	return Boolean((supabaseUrl && supabaseAnonKey) || telemetryWebhookUrl());
 }
 
+const SESSION_KEY = 'wr:sid';
+
+/**
+ * A random id for this tab, so the funnel can count *visitors* rather than rows.
+ *
+ * Without it, `view` and `complete` are only row counts: a reload doubles the views, and an asset
+ * that legitimately emits two completions (the field-threshold proxy and then the real export) is
+ * counted as two conversions. `count(distinct session_id)` per stage is the only funnel that means
+ * anything. sessionStorage, not localStorage: this is a visit, not a person — nothing here survives
+ * the tab, and the id is never linked to an identity (the lead row keeps its own reference).
+ */
+export function telemetrySessionId(): string {
+	if (typeof window === 'undefined') return 'server';
+	try {
+		const existing = window.sessionStorage.getItem(SESSION_KEY);
+		if (existing) return existing;
+		const id = (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`).toString();
+		window.sessionStorage.setItem(SESSION_KEY, id);
+		return id;
+	} catch {
+		return 'unavailable';
+	}
+}
+
 let warnedUnconfigured = false;
 
 export async function trackVibeAssetEvent(payload: TelemetryPayload): Promise<void> {
@@ -54,6 +78,7 @@ export async function trackVibeAssetEvent(payload: TelemetryPayload): Promise<vo
 		category: payload.category || 'General',
 		title: payload.title || '',
 		domain,
+		session_id: telemetrySessionId(),
 		metadata: {
 			...payload.metadata,
 			pathname: window.location.pathname,
