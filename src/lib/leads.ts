@@ -24,6 +24,13 @@ export interface ScenarioLead {
 	assetTitle?: string;
 	/** The scenario the visitor asked to have sent: their inputs plus the computed output. */
 	scenario: Record<string, unknown>;
+	/**
+	 * Topic taxonomy of the asset ('EQUITY ARV', 'CAPEX UNDERWRITING'). Stored alongside the
+	 * property, mirroring aichieve_lead_intents.domain_category: vertical_slug says who the lead
+	 * belongs to, this says what it is about. Falls back to `scenario.category`, which the
+	 * calculator packet already carries, so callers do not have to thread a second value through.
+	 */
+	domainCategory?: string;
 }
 
 export type LeadResult =
@@ -70,10 +77,14 @@ export async function submitScenarioEmail(lead: ScenarioLead): Promise<LeadResul
 	const supabaseAnonKey = import.meta.env?.PUBLIC_SUPABASE_ANON_KEY;
 	if (!supabaseUrl || !supabaseAnonKey) return { ok: false, reason: 'not_configured' };
 
+	// The packet's own category is authoritative when the caller didn't pass one explicitly.
+	const packetCategory = typeof lead.scenario?.category === 'string' ? (lead.scenario.category as string) : undefined;
+
 	const body = {
 		session_id: telemetrySessionId(),
 		asset_slug: lead.assetSlug,
 		vertical_slug: VERTICAL,
+		domain_category: lead.domainCategory ?? packetCategory,
 		email: lead.email.trim().toLowerCase(),
 		intent_type: 'model_export',
 		consent_text_version: CONSENT_TEXT_VERSION,
