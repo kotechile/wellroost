@@ -13,11 +13,13 @@ Brand and editorial consistency are maintained across automated asset generation
    - **Smart Brevity**: Bold conclusion upfront, 5-second scan bullets, zero fluff.
    - **Execution Ratio**: 95% AI generation (plumbing, schemas, scaffolding) / 5% Human taste (typography, tone calibration, UX validation).
 
-2. **`lexicon.md`**: Eliminates generic AI filler and defines WellRoost's authoritative domain terminology.
+2. **`lexicon.md`**: WellRoost's authoritative domain terminology — the terms this front prefers
+   over generic filler. Enforcement is not here: `scripts/vibe/lexicon.json` (vendored from the
+   vibe-marketing spec) holds the banned list and `npm run copy:check` fails the build on a hit.
    - Replaces "lead magnet" with **Interactive Asset / Decision Engine**.
-   - Replaces "calculator" with **Net Yield / ROI Engine / Equity Recovery Ledger**.
+   - "Net Yield / ROI Engine / Equity Recovery Ledger" in positioning copy only — the search-facing
+     word stays **calculator**, and H1s, nav labels and slugs are never renamed.
    - Replaces "tips" with **Precision Mechanics / Empirical Framework**.
-   - Bans forbidden AI-isms (*delve, tapestry, harness, revolutionize, nest egg, dream home*).
 
 ---
 
@@ -43,7 +45,8 @@ Located at `src/components/VibeAssetCard.tsx`:
 ## Phase 3: The 95/5 Workflow Execution Checklist
 
 ### AI Plumbing (95%):
-- **Agent Protocol**: Agents ingest `skill.md` and `lexicon.md` to guarantee tone and vocabulary adherence.
+- **Agent Protocol**: Agents ingest `skill.md` and `lexicon.md` for tone and vocabulary, and the
+  vendored `scripts/vibe/lexicon.json` for the banned list that the build enforces.
 - **Supabase Telemetry Schema**: `supabase/migrations/20261019_vibe_telemetry.sql` tracks interaction events (`view`, `engage`, `deploy`, `input_change`, `complete`).
 - **Telemetry Pipeline**: `src/lib/telemetry.ts` safely sends client interaction payloads to Supabase REST and n8n webhooks.
 - **n8n Workflow File**: `n8n/vibe_telemetry_workflow.json` (generated) provides an importable n8n workflow for webhook handling, intent scoring, persona qualification, Supabase logging, and high-intent alerts.

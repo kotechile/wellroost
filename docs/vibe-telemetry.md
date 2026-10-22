@@ -1,6 +1,7 @@
 # Vibe marketing — operating the interactive assets
 
-The protocol itself lives in `skill.md` (voice, structure, 95/5 split) and `lexicon.md` (terms).
+The protocol itself lives in `skill.md` (voice, structure, 95/5 split) and `lexicon.md` (brand
+vocabulary). The banned list those files assume is enforced by `npm run copy:check`.
 This file covers the machinery those files assume, because the assets are worthless as an
 acquisition channel if nothing records what a visitor did with them.
 
@@ -196,4 +197,4 @@ the two surfaces disagree on the slug, which is the failure `src/lib/vibeAssets.
    paths (`friction.zipCode`). A nested updater that skips it silently deletes those inputs from the
    funnel. Call `onComplete({ action })` from every export action (copy, print, email).
 4. Never send input values — names only.
-5. `npm run check:lexicon` (also runs in the image build).
+5. `npm run copy:check` (also runs in the image build, through `prebuild`).

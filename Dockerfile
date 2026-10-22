@@ -42,11 +42,9 @@ ARG CACHEBUST=1
 RUN echo "Checking connection to $PUBLIC_WORDPRESS_API_BASE..." && \
     curl -v -I "$PUBLIC_WORDPRESS_API_BASE/wp-json/wp/v2/posts" || echo "Connection check failed, but proceeding with build..."
 
-# The lexicon gate runs in the image build, not just locally: lexicon.md is a brand contract, and a
-# contract that only runs when someone remembers to type the command is advisory. A violation stops
-# the deploy. Deliberate quotes opt out inline with `lexicon-allow`.
-RUN npm run check:lexicon
-
+# The copy gate runs in the image build, not just locally: the lexicon is a brand contract, and a
+# contract that only runs when someone remembers to type the command is advisory. `prebuild` runs
+# `copy:check` before `npm run build`, so a violation stops the deploy.
 RUN npm run build
 
 # Production stage

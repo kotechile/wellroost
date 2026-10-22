@@ -23,8 +23,9 @@ Two further files are BINDING — read them before writing copy or scaffolding a
 
 * `skill.md` — the operational protocol: audience, tone, Smart Brevity structure, the 95/5
   generation/human-taste split, and the output rules for code and copy.
-* `lexicon.md` — preferred domain terminology and the prohibited-terms list. `npm run check:lexicon`
-  enforces it against `src/`; copy that violates it fails the check rather than shipping.
+* `lexicon.md` — preferred domain terminology for this front. The prohibited list is not in it:
+  `npm run copy:check` enforces `scripts/vibe/lexicon.json` against `src/` at build time, and a
+  violation fails the build rather than shipping.
 
 ## Vibe marketing contract
 

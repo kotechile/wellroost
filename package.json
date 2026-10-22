@@ -11,7 +11,6 @@
     "preview": "astro preview",
     "check": "astro check",
     "check:crawl": "node scripts/check-crawl-artifacts.mjs",
-    "check:lexicon": "node scripts/check-lexicon.mjs",
     "indexnow": "node scripts/indexnow.mjs",
     "astro": "astro",
     "copy:check": "node scripts/vibe/verify-vendor.mjs && node scripts/vibe/vibe-lint.mjs --root src --baseline scripts/vibe/baseline.json",
