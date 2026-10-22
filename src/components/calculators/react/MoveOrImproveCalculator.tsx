@@ -1,6 +1,8 @@
 import { useId, useState, useMemo } from 'react';
 import { useVibeTelemetry } from '../../../lib/useVibeTelemetry';
 import { vibeAssets } from '../../../lib/vibeAssets';
+import { copyText } from '../../../lib/clipboard';
+import { formatScenarioPacket } from '../../../lib/scenarioPacket';
 import { usePersistedInputs } from '../../../lib/usePersistedInputs';
 import PersistenceNotice from '../../../components/PersistenceNotice';
 import { runCapExMatrixCalculator, PROJECT_ROI_DATABASE } from '../../../lib/calculators/moveOrImprove';
@@ -68,7 +70,8 @@ export default function MoveOrImproveCalculator() {
   const [sensitivityPreset, setSensitivityPreset] = useState<'low' | 'base' | 'high' | 'custom'>('base');
   const [showLogic, setShowLogic] = useState(false);
   const fieldId = useId();
-  const { onInputChange } = useVibeTelemetry(vibeAssets.relocationFriction);
+  const { onInputChange, onComplete } = useVibeTelemetry(vibeAssets.relocationFriction);
+  const [copyState, setCopyState] = useState<'idle' | 'copied' | 'blocked'>('idle');
 
   // Run calculation engine
   const result = useMemo(() => {
@@ -130,6 +133,75 @@ export default function MoveOrImproveCalculator() {
   const moveEquityYear5 = result.movePathway[5].netEquity;
   const variance = Math.abs(result.variance.year5EquityVariance);
   const improveIsBetter = result.variance.year5EquityVariance >= 0;
+
+  const projectLabel =
+    PROJECT_TYPE_OPTIONS.find((option) => option.value === inputs.renovation.projectType)?.label ??
+    inputs.renovation.projectType;
+
+  /**
+   * The export action this engine did not have.
+   *
+   * The four-field proxy could only ever say "they moved some inputs". A visitor who copies the ledger
+   * has the five-year answer outside the page, which is the conversion this asset exists to produce.
+   * The event fires whether or not the clipboard write is permitted, and records which happened.
+   */
+  const copyScenario = async () => {
+    const packet = formatScenarioPacket({
+      title: vibeAssets.relocationFriction.title,
+      sourcePath: '/calculators/move-or-improve/',
+      verdict: improveIsBetter
+        ? `Renovating builds ${formatCurrency(variance)} more net equity than moving after five years.`
+        : `Moving builds ${formatCurrency(variance)} more net equity than renovating after five years.`,
+      sections: [
+        {
+          heading: 'Five-year ledger',
+          rows: [
+            ['Equity if you renovate (year 5)', formatCurrency(improveEquityYear5)],
+            ['Equity if you move (year 5)', formatCurrency(moveEquityYear5)],
+            ['Difference', formatCurrency(variance)],
+            ['Cash out over 60 months, renovate', formatCurrency(result.variance.fiveYearTotalImprove)],
+            ['Cash out over 60 months, move', formatCurrency(result.variance.fiveYearTotalMove)]
+          ]
+        },
+        {
+          heading: 'Transaction costs modelled',
+          rows: [
+            ['State transfer tax', formatCurrency(result.taxDetails.transferTax)],
+            ['Recording fees', formatCurrency(result.taxDetails.recordationTax)],
+            [
+              'Local exemptions',
+              result.taxDetails.statutoryExemptionApplied ? 'Montgomery County exemption applied' : 'None applied'
+            ],
+            ['ZIP used', inputs.friction.zipCode]
+          ]
+        },
+        {
+          heading: 'Your assumptions',
+          rows: [
+            ['Current home value', formatCurrency(inputs.currentValue)],
+            ['Remaining mortgage balance', formatCurrency(inputs.legacyDebt.principalBalance)],
+            ['Current mortgage rate', formatPercent(Number((inputs.legacyDebt.interestRate * 100).toFixed(2)))],
+            ['Months left on current loan', String(inputs.legacyDebt.remainingTermMonths)],
+            ['Annual home price growth', formatPercent(Number((inputs.annualAppreciation * 100).toFixed(2)))],
+            ['New property price', formatCurrency(inputs.newPropertyPrice)],
+            ['New mortgage rate', formatPercent(Number((inputs.newMortgageRate * 100).toFixed(2)))],
+            ['Renovation project', projectLabel],
+            ['Contractor quote', formatCurrency(inputs.renovation.quoteAmount)],
+            ['Budget buffer for overruns', formatPercent(Number((inputs.renovation.overrunRate * 100).toFixed(2)))],
+            ['Broker commissions', formatPercent(Number((inputs.friction.brokerCommissionRate * 100).toFixed(2)))],
+            ['Buyer closing costs', formatPercent(Number((inputs.friction.buyerClosingCostRate * 100).toFixed(2)))],
+            ['Moving expenses', formatCurrency(inputs.friction.movingExpenses)],
+            ['First-time buyer exemption', inputs.friction.isFirstTimeBuyer ? 'Yes' : 'No']
+          ]
+        }
+      ]
+    });
+
+    const copied = await copyText(packet);
+    setCopyState(copied ? 'copied' : 'blocked');
+    onComplete({ action: 'copy_scenario', clipboard: copied });
+    window.setTimeout(() => setCopyState('idle'), 2400);
+  };
 
   return (
     <div className="grid gap-8">
@@ -209,6 +281,22 @@ export default function MoveOrImproveCalculator() {
                   {formatCurrency(moveEquityYear5)}
                 </p>
               </div>
+            </div>
+
+            <div className="mt-5">
+              <button
+                type="button"
+                onClick={copyScenario}
+                className="w-full rounded-full border border-emerald-700 bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 cursor-pointer"
+              >
+                {copyState === 'copied' ? 'Ledger copied' : copyState === 'blocked' ? 'Copy blocked' : 'Copy this ledger'}
+              </button>
+              {copyState === 'blocked' && (
+                <p aria-live="polite" className="mt-2 text-xs leading-5 font-medium text-amber-800">
+                  Your browser blocked the clipboard. The numbers above are unchanged — select them to copy
+                  manually.
+                </p>
+              )}
             </div>
           </div>
         </div>

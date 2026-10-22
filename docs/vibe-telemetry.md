@@ -14,13 +14,16 @@ engine view. Do not type a slug anywhere else.
 | Surface | Island | `asset_slug` | Events |
 | --- | --- | --- | --- |
 | `/calculators/` asset cards | `client:visible` | per card | `view`, `engage` |
-| `/calculators/remodeling-roi/` | `client:load` | `equity-arv-recovery-engine` | `view`, `input_change`, `complete` |
-| `/calculators/move-or-improve/` | `client:load` | `relocation-friction-ledger` | `view`, `input_change`, `complete` |
-| `/calculators/remodelytics/` | `client:load` | `remodelytics-underwriter` | `view`, `input_change`, `complete` (export) |
+| `/calculators/remodeling-roi/` | `client:load` | `equity-arv-recovery-engine` | `view`, `input_change`, `complete` (copy) |
+| `/calculators/move-or-improve/` | `client:load` | `relocation-friction-ledger` | `view`, `input_change`, `complete` (copy) |
+| `/calculators/remodelytics/` | `client:load` | `remodelytics-underwriter` | `view`, `input_change`, `complete` (copy/print/email) |
 
-`complete` on the two engines without an export action is the field-count proxy only
-(`trigger: field_threshold`). Remodelytics has real exports — copy, print, email — and records
-`trigger: export` with the action that fired.
+All three engines now have a real export action, so `complete{trigger:'export'}` is available everywhere:
+"Copy scenario" on the two lighter engines (`copy_scenario`), and copy / print / email on Remodelytics
+(`export_packet`, `print_packet`, `email_scenario`). The copy is a plain-text packet
+(`src/lib/scenarioPacket.ts`) for the two homeowner-facing engines and JSON for the underwriting one.
+The field-count threshold still fires for anyone who models without exporting — it is the fallback
+proxy, never the conversion.
 
 Event semantics:
 

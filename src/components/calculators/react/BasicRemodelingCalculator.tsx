@@ -1,6 +1,8 @@
 import { useId, useState } from 'react';
 import { useVibeTelemetry } from '../../../lib/useVibeTelemetry';
 import { vibeAssets } from '../../../lib/vibeAssets';
+import { copyText } from '../../../lib/clipboard';
+import { formatScenarioPacket } from '../../../lib/scenarioPacket';
 
 import { calculateBasicRemodeling } from '../../../lib/calculators/basicRemodeling';
 import { formatCurrency, formatPercent } from '../../../lib/calculators/format';
@@ -114,7 +116,8 @@ function getRecommendationSupport(recommendation: ReturnType<typeof calculateBas
 export default function BasicRemodelingCalculator() {
 	const [inputs, setInputs] = useState(INITIAL_INPUTS);
 	const fieldId = useId();
-	const { onInputChange } = useVibeTelemetry(vibeAssets.equityArv);
+	const { onInputChange, onComplete } = useVibeTelemetry(vibeAssets.equityArv);
+	const [copyState, setCopyState] = useState<'idle' | 'copied' | 'blocked'>('idle');
 	const breakdown = calculateBasicRemodeling(inputs);
 	const selectedEnjoyment =
 		ENJOYMENT_OPTIONS.find((option) => option.value === inputs.enjoymentLevel) ?? ENJOYMENT_OPTIONS[2];
@@ -125,6 +128,53 @@ export default function BasicRemodelingCalculator() {
 	) => {
 		setInputs((current) => ({ ...current, [key]: value }));
 		onInputChange(String(key));
+	};
+
+	const projectLabel = PROJECT_OPTIONS.find((option) => option.value === inputs.projectType)?.label ?? inputs.projectType;
+
+	/**
+	 * The export action this engine did not have.
+	 *
+	 * Without it the only completion this asset could report was the four-field proxy — "they touched
+	 * something" — which is not the same claim as "they walked away with the answer". The copy is
+	 * completion whether or not the browser permits the clipboard write, so the event fires either way
+	 * and records which happened in `clipboard`.
+	 */
+	const copyScenario = async () => {
+		const packet = formatScenarioPacket({
+			title: vibeAssets.equityArv.title,
+			sourcePath: '/calculators/remodeling-roi/',
+			verdict: `${getRecommendationLabel(breakdown.recommendation)} — ${formatCurrency(breakdown.netValue)} of value during a ${inputs.yearsStaying}-year stay, on a ${formatCurrency(inputs.projectCost)} project.`,
+			sections: [
+				{
+					heading: 'Result',
+					rows: [
+						['Recommendation', getRecommendationLabel(breakdown.recommendation)],
+						['Decision score', `${Math.round(breakdown.decisionScore)}/100`],
+						['Value during stay', formatCurrency(breakdown.netValue)],
+						['Total realised value', formatCurrency(breakdown.totalRealizedValue)],
+						['Resale recovery', formatRatioAsPercent(breakdown.resaleRecovery)],
+						['Simple payback', breakdown.paybackYears ? `${breakdown.paybackYears.toFixed(1)} years` : 'No clear payback']
+					]
+				},
+				{
+					heading: 'Your assumptions',
+					rows: [
+						['Project', projectLabel],
+						['Project cost', formatCurrency(inputs.projectCost)],
+						['Estimated resale lift', formatCurrency(inputs.estimatedResaleLift)],
+						['Years staying', String(inputs.yearsStaying)],
+						['Enjoyment value', selectedEnjoyment.label],
+						['Annual maintenance savings', formatCurrency(inputs.maintenanceSavingsAnnual)]
+					]
+				}
+			]
+		});
+
+		const copied = await copyText(packet);
+		setCopyState(copied ? 'copied' : 'blocked');
+		onComplete({ action: 'copy_scenario', clipboard: copied });
+		window.setTimeout(() => setCopyState('idle'), 2400);
 	};
 
 	return (
@@ -337,9 +387,24 @@ export default function BasicRemodelingCalculator() {
 				</div>
 
 				<div className="rounded-2xl border border-gray-200 bg-gradient-to-br from-blue-50/40 via-white to-gray-50/30 p-6 shadow-sm">
-					<p className="font-mono text-xs uppercase tracking-[0.28em] font-semibold text-blue-700">
-						Quick read
-					</p>
+					<div className="flex flex-wrap items-center justify-between gap-3">
+						<p className="font-mono text-xs uppercase tracking-[0.28em] font-semibold text-blue-700">
+							Quick read
+						</p>
+						<button
+							type="button"
+							onClick={copyScenario}
+							className="rounded-full border border-blue-600 bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 cursor-pointer"
+						>
+							{copyState === 'copied' ? 'Copied' : copyState === 'blocked' ? 'Copy blocked' : 'Copy scenario'}
+						</button>
+					</div>
+					{copyState === 'blocked' && (
+						<p aria-live="polite" className="mt-3 text-xs leading-5 font-medium text-amber-800">
+							Your browser blocked the clipboard. The numbers above are unchanged — select them to copy
+							manually.
+						</p>
+					)}
 					<div className="mt-5 grid gap-4 xl:grid-cols-3">
 						<div className="rounded-xl border border-gray-200 bg-white p-5 shadow-xs">
 							<p className="font-mono text-[0.68rem] uppercase tracking-[0.24em] font-medium text-gray-500">
