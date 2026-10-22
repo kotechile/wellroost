@@ -248,6 +248,9 @@ export default function RemodelyticsPlatform() {
 	const packet = useMemo(
 		() => ({
 			tool: 'Remodelytics underwriting packet',
+			// Carried so the lead row can record what the asset is about, not only which property it
+			// came from. The email path reads it from here rather than threading a second prop.
+			category: 'CAPEX UNDERWRITING',
 			property: {
 				address: INITIAL_ADDRESS,
 				zipCode: inputs.zipCode,
