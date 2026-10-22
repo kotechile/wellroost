@@ -431,6 +431,19 @@ The work is complete when:
 * Do not add heavy dependencies without a clear reason.
 * Do not leave broken imports, unused components, or failing builds.
 
+## Copy contract (enforced at build)
+
+Every reader-facing string on this site is gated. `npm run copy:check` runs before every build
+(wired as `prebuild`), and a hard violation fails the build, so it cannot deploy.
+
+* The rules live in `scripts/vibe/lexicon.json`, the gate in `scripts/vibe/vibe-lint.mjs`; the tone
+  and structure contract is `skill.md` in the vibe-marketing spec. Read both before writing copy.
+* `error` = fix the copy. Never edit `scripts/vibe/baseline.json` to go green — that is a gate bypass.
+* `warning` = reported (marketing adjectives, sentence length); clear it on any page you touch.
+* Search-facing names stay put: `calculator`, `/calculators/…`, H1s, nav labels and slugs are never
+  renamed to "net yield engine". Preferred terms apply to positioning copy only.
+* These vendored files are copies, not forks: edit the spec in `/root/vibe-marketing`, then re-vendor.
+
 ## Preferred final response from Codex
 
 When finished, report:
