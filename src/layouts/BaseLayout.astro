@@ -25,6 +25,30 @@ const {
 
 const site = Astro.site ?? new URL(Astro.url.origin);
 
+/**
+ * Analytics, which this layout did not have at all.
+ *
+ * "No traffic" was reported for this property while nothing on it was counting — the two are
+ * indistinguishable from the outside, and every fix that followed was unverifiable. One Umami
+ * website id per property, scoped to its own host: a shared id scoped to a sibling's domain drops
+ * the events without raising an error.
+ *
+ * The id is a BUILD-time variable (Astro inlines `import.meta.env`), so it must be set where
+ * `astro build` runs — not on the container. When it is missing the site ships unmeasured, which is
+ * why this warns loudly instead of failing silently, and why `scripts/verify.mjs` asserts the tag is
+ * present on the live origin.
+ */
+const analyticsSrc = import.meta.env.PUBLIC_ANALYTICS_SRC || 'https://cloud.umami.is/script.js';
+const analyticsWebsiteId = import.meta.env.PUBLIC_ANALYTICS_WEBSITE_ID || '';
+const analyticsDomains = import.meta.env.PUBLIC_ANALYTICS_DOMAINS || 'wellroost.com,www.wellroost.com';
+
+if (!analyticsWebsiteId) {
+	console.warn(
+		'\n[analytics] PUBLIC_ANALYTICS_WEBSITE_ID is not set — wellroost.com will ship UNMEASURED.\n' +
+			'            Add the Umami Cloud website id for this property to the build environment.\n'
+	);
+}
+
 // Canonical is derived from the route, never hand-written per page: a page cannot ship without
 // one, and it cannot disagree with the URL the sitemap advertises. Astro builds directory-style
 // routes, so the canonical always carries the trailing slash the sitemap emits.
@@ -32,8 +56,11 @@ const pathname = Astro.url.pathname;
 const canonicalPath = pathname === '/' || pathname.endsWith('/') ? pathname : `${pathname}/`;
 const canonical = new URL(canonicalPath, site).toString();
 
-// og:image must be absolute for every consumer (Slack, X, Facebook, Bing).
-const ogImage = image ? new URL(image, site).toString() : new URL('/favicon.svg', site).toString();
+// og:image must be absolute for every consumer (Slack, X, Facebook, Bing), and it must be a raster
+// card. This defaulted to /favicon.svg, which is not a valid og:image for any major consumer: every
+// LinkedIn, Reddit and Slack share rendered as an empty box, so the distribution work had no
+// clickable preview to do its job with. 1200x630, per-page `image` still overrides.
+const ogImage = image ? new URL(image, site).toString() : new URL('/og-share.png', site).toString();
 const ogImageIsRaster = /\.(png|jpe?g|webp|avif|gif)$/i.test(new URL(ogImage).pathname);
 ---
 
@@ -62,12 +89,18 @@ const ogImageIsRaster = /\.(png|jpe?g|webp|avif|gif)$/i.test(new URL(ogImage).pa
 		<meta property="og:description" content={description} />
 		<meta property="og:url" content={canonical} />
 		<meta property="og:image" content={ogImage} />
+		{ogImageIsRaster && <meta property="og:image:width" content="1200" />}
+		{ogImageIsRaster && <meta property="og:image:height" content="630" />}
 		{ogImageIsRaster && <meta property="og:image:alt" content={title} />}
 
 		<meta name="twitter:card" content={ogImageIsRaster ? 'summary_large_image' : 'summary'} />
 		<meta name="twitter:title" content={title} />
 		<meta name="twitter:description" content={description} />
 		<meta name="twitter:image" content={ogImage} />
+
+		{analyticsWebsiteId ? (
+			<script defer src={analyticsSrc} data-website-id={analyticsWebsiteId} data-domains={analyticsDomains}></script>
+		) : null}
 
 		<slot name="head" />
 	</head>

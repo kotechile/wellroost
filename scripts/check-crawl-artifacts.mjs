@@ -190,12 +190,40 @@ async function checkCanonical() {
 	else fail('canonical host', `${HOST} (this property)`, canonical);
 }
 
+/**
+ * A property with no analytics cannot report "no traffic" — it reports no data, and every fix after
+ * that is unverifiable. This checks the served HTML, not the repo, because the tag is gated on a
+ * BUILD-time variable: the source can be perfect while the deployed bundle records nothing.
+ *
+ * Same for og:image: `content="…/favicon.svg"` is not a valid preview for any consumer, so every
+ * share renders as an empty box and the distribution step has nothing to work with.
+ */
+async function checkInstrumentation() {
+	console.log('\nmeasurement and share card');
+	const home = await probe('/');
+
+	const id = home.body.match(/data-website-id="([^"]*)"/)?.[1];
+	if (!id) fail('analytics tag on /', 'a script with data-website-id', 'none in the served HTML — this property is unmeasured');
+	else ok('analytics tag on /', id);
+
+	const domains = home.body.match(/data-domains="([^"]*)"/)?.[1] || '';
+	if (!id) return;
+	if (domains.split(',').map((d) => d.trim()).includes(HOST)) ok('analytics scoped to this host', domains);
+	else fail('analytics data-domains', `a list including ${HOST}`, domains || '(none)');
+
+	const ogImage = home.body.match(/property="og:image" content="([^"]+)"/)?.[1] || '';
+	if (!ogImage) fail('og:image on /', 'an absolute image URL', 'not found');
+	else if (/\.(png|jpe?g|webp|avif)$/i.test(ogImage)) ok('og:image is a raster card', ogImage);
+	else fail('og:image format', 'png/jpg/webp — consumers cannot render an svg card', ogImage);
+}
+
 console.log(`\nChecking crawl artifacts at ${ORIGIN}`);
 await checkRobots();
 await checkSitemap();
 await checkSitemapTargets();
 await check404();
 await checkCanonical();
+await checkInstrumentation();
 
 console.log(`\n${'-'.repeat(58)}`);
 if (failures.length === 0) {
