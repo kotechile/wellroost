@@ -245,9 +245,42 @@ export function getConfiguredWordPressApiBase() {
 	return getWordPressApiBase();
 }
 
+/**
+ * The taxonomy term that makes a post belong to THIS property.
+ *
+ * One WordPress install publishes several sites; a post's `vertical` term is what routes it. Without
+ * this filter the WellRoost homepage listed another property's articles ("Your Route's 5x Stop Gap",
+ * "Your $125 Exam Costs 122 Hours") because `posts` with no `vertical` returns the whole install.
+ * Empty means the front end shows nothing rather than someone else's work, which is the honest
+ * failure. Override with PUBLIC_WORDPRESS_VERTICAL if the term slug changes.
+ */
+export function getConfiguredVertical(): string {
+	const configured = import.meta.env.PUBLIC_WORDPRESS_VERTICAL ?? import.meta.env.WORDPRESS_VERTICAL;
+	return (configured || 'resilient_home_assets').trim();
+}
+
+/** Category ids — and how many of this property's published posts — use them, counted in this vertical. */
+export async function fetchVerticalCategoryCounts(limit = 100): Promise<Map<number, number>> {
+	const vertical = getConfiguredVertical();
+	const rows = (await fetchWordPress('posts', {
+		vertical,
+		per_page: limit,
+		_fields: 'id,categories'
+	})) as unknown as Array<{ id: number; categories?: number[] }>;
+
+	const counts = new Map<number, number>();
+	for (const row of rows) {
+		for (const id of row.categories ?? []) {
+			counts.set(id, (counts.get(id) ?? 0) + 1);
+		}
+	}
+	return counts;
+}
+
 export async function fetchLatestPosts(limit = 6) {
 	const posts = await fetchWordPress('posts', {
 		_embed: 1,
+		vertical: getConfiguredVertical(),
 		per_page: limit
 	});
 	return posts.map(normalizePost);
@@ -256,6 +289,7 @@ export async function fetchLatestPosts(limit = 6) {
 export async function fetchPostsByCategory(categoryId: number, limit = 12) {
 	const posts = await fetchWordPress('posts', {
 		_embed: 1,
+		vertical: getConfiguredVertical(),
 		categories: categoryId,
 		per_page: limit
 	});
@@ -270,6 +304,7 @@ export async function searchPosts(query: string, limit = 8) {
 
 	const posts = await fetchWordPress('posts', {
 		_embed: 1,
+		vertical: getConfiguredVertical(),
 		search: trimmedQuery,
 		per_page: limit
 	});
@@ -296,6 +331,7 @@ export async function fetchAllPosts(limit = 100) {
 	while (collected.length < limit) {
 		const batch = await fetchWordPress('posts', {
 			_embed: 1,
+			vertical: getConfiguredVertical(),
 			per_page: Math.min(perPage, limit - collected.length),
 			page: Math.floor(collected.length / perPage) + 1
 		});

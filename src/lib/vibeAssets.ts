@@ -39,6 +39,22 @@ export const vibeAssets = {
 		metricsPreview: 'Comp ARV = Base Appraised Value + (CapEx × Recovery Rate) - Carry Depreciation',
 		href: '/calculators/remodeling-roi/'
 	},
+	/**
+	 * The homepage quote check — a three-input cut of the ROI engine.
+	 *
+	 * It reports under its own slug rather than borrowing the engine's: the hero is visited by an
+	 * order of magnitude more people than the engine page, and merging the two would make the
+	 * engine's view→complete funnel look like a 2% conversion when it is the hero doing the viewing.
+	 */
+	quoteCheck: {
+		slug: 'hero-quote-check',
+		category: 'CAPEX UNDERWRITING',
+		title: 'Quote Check',
+		description:
+			'Three inputs — project cost, resale lift, annual savings — return the gap you carry and how long savings take to close it.',
+		metricsPreview: 'Gap = Project Cost - Resale Lift',
+		href: '/calculators/remodeling-roi/'
+	},
 	/** Multivariable 5-year ledger — `/calculators/move-or-improve/`. */
 	relocationFriction: {
 		slug: 'relocation-friction-ledger',

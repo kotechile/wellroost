@@ -1,0 +1,35 @@
+---
+import { Image } from 'astro:assets';
+import { plates, type PlateName } from '../../lib/plates';
+
+interface Props {
+	plate: PlateName;
+	/** Tailwind height utility for the image frame. */
+	height?: string;
+	/** Extra line of context printed beside the credit. */
+	note?: string;
+	priority?: boolean;
+}
+
+const { plate, height = 'h-[46vh] min-h-[20rem] sm:h-[58vh] lg:h-[62vh]', note, priority = false } = Astro.props;
+const media = plates[plate];
+---
+
+<figure class="bleed mt-[clamp(2rem,4vw,3.5rem)]">
+	<div class:list={['drift-frame w-full overflow-hidden bg-paper-3', height]} data-reveal>
+		<div class="drift h-full w-full">
+			<Image
+				src={media.src}
+				alt={media.alt}
+				widths={[720, 1080, 1600, 2200]}
+				sizes="100vw"
+				loading={priority ? 'eager' : 'lazy'}
+				class="plate plate-warm h-full w-full object-cover"
+			/>
+		</div>
+	</div>
+	<figcaption class="wrap mt-3 flex flex-wrap items-start justify-between gap-x-8 gap-y-1">
+		<span class="caption">{media.credit}</span>
+		{note && <span class="caption text-ink-2">{note}</span>}
+	</figcaption>
+</figure>

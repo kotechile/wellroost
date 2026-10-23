@@ -1,4 +1,4 @@
-import { fetchAllCategories } from './wordpress';
+import { fetchAllCategories, fetchVerticalCategoryCounts, getConfiguredVertical } from './wordpress';
 
 export interface CategoryRecord {
 	id: string;
@@ -69,25 +69,36 @@ let categoryCache: Promise<CategoryRecord[]> | undefined;
 async function loadCategories(): Promise<CategoryRecord[]> {
 	try {
 		const liveCategories = await fetchAllCategories(100);
-		if (liveCategories.length > 0) {
-			const filtered = liveCategories
-				.filter((category) => !category.parent && category.slug !== 'uncategorized')
-				.map((category) => ({
-					id: String(category.id),
-					name: category.name,
-					slug: category.slug,
-					description: category.description,
-					level: 1,
-					parentCategoryId: null,
-					wordpressCategoryId: category.id,
-					wordpressSiteDomain: 'wellroost.com',
-					postCount: category.count,
-					children: []
-				}));
-			
-			if (filtered.length > 0) {
-				return filtered;
-			}
+
+		// A category belongs to this property only when one of its posts does. The install's
+		// category list is shared across every site it publishes, so the unfiltered list put
+		// "AI Stack & Tool TCO" and "Supply Chain & Operations" in WellRoost's navigation. Counts
+		// come from the same vertical-filtered query, so a pillar never advertises another
+		// property's articles.
+		const counts = await fetchVerticalCategoryCounts(200);
+		const owned = liveCategories
+			.filter((category) => !category.parent && category.slug !== 'uncategorized' && counts.has(category.id))
+			.map((category) => ({
+				id: String(category.id),
+				name: category.name,
+				slug: category.slug,
+				description: category.description,
+				level: 1,
+				parentCategoryId: null,
+				wordpressCategoryId: category.id,
+				wordpressSiteDomain: 'wellroost.com',
+				postCount: counts.get(category.id) ?? 0,
+				children: []
+			}));
+
+		if (owned.length > 0) {
+			return owned;
+		}
+
+		if (counts.size === 0) {
+			console.info(
+				`[categories] no published posts carry the "${getConfiguredVertical()}" vertical — showing the property's own pillars and empty category pages.`
+			);
 		}
 	} catch (error) {
 		console.error('Failed to fetch live categories from WordPress:', error);

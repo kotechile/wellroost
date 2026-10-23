@@ -1,0 +1,65 @@
+---
+import { Image } from 'astro:assets';
+import { fetchLatestPosts } from '../../lib/wordpress';
+import { plates } from '../../lib/plates';
+import PostCard from '../PostCard.astro';
+
+const posts = (await fetchLatestPosts(3)).slice(0, 3);
+---
+
+<section class="section wrap" aria-labelledby="recent">
+	{
+		posts.length > 0 ? (
+			<>
+				<div class="flex flex-wrap items-end justify-between gap-6">
+					<h2 id="recent" class="h2 max-w-[20ch] text-ink" data-reveal>
+						Recent work.
+					</h2>
+					<a href="/categories/" class="btn-ghost pb-2" data-reveal>
+						All guides
+						<span class="arrow" aria-hidden="true">&rarr;</span>
+					</a>
+				</div>
+
+				<div class="mt-[clamp(2rem,4vw,3rem)] grid gap-10 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+					{posts.map((post, index) => (
+						<div data-reveal style={`--reveal-delay:${index * 80}ms`}>
+							<PostCard post={post} feature={index === 0} />
+						</div>
+					))}
+				</div>
+			</>
+		) : (
+			<div class="grid items-center gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1fr)] lg:gap-16">
+				<figure class="max-w-[26rem]" data-reveal>
+					<div class="overflow-hidden bg-paper-3">
+						<Image
+							src={plates.mantel.src}
+							alt={plates.mantel.alt}
+							widths={[480, 720, 960]}
+							sizes="(min-width: 1024px) 26rem, 90vw"
+							loading="lazy"
+							class="plate plate-warm aspect-[7/6] w-full object-cover"
+						/>
+					</div>
+					<figcaption class="caption mt-3">{plates.mantel.credit}</figcaption>
+				</figure>
+
+				<div>
+					<h2 id="recent" class="h2 max-w-[20ch] text-ink" data-reveal>
+						No guide ships unchecked.
+					</h2>
+					<p class="body mt-6 max-w-[38ch]" data-reveal style="--reveal-delay:70ms">
+						The archive is empty while the first batch is written and checked. The three
+						calculators are finished, and they are the part of this site that answers a question
+						today.
+					</p>
+					<a href="/calculators/" class="btn mt-8" data-reveal style="--reveal-delay:120ms">
+						Run a number
+						<span aria-hidden="true">&rarr;</span>
+					</a>
+				</div>
+			</div>
+		)
+	}
+</section>

@@ -1,111 +1,137 @@
 ---
 const navLinks = [
-	{ href: '/', label: 'Home' },
 	{ href: '/calculators/', label: 'Calculators' },
-	{ href: '/categories/', label: 'Categories' },
+	{ href: '/categories/', label: 'Pillars' },
 	{ href: '/about/', label: 'About' }
 ];
 
 const pathname = Astro.url.pathname;
+
+function isActive(href: string) {
+	return pathname === href || (href !== '/' && pathname.startsWith(href));
+}
 ---
 
-<header class="fixed inset-x-0 top-0 z-50 flex justify-center bg-white/85 backdrop-blur-md border-b border-gray-200">
-	<div class="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-		<div class="flex h-16 items-center justify-between">
-			<!-- Logo -->
+<header
+	data-site-header
+	class="fixed inset-x-0 top-0 z-50 bg-paper transition-colors duration-300 data-[scrolled=true]:bg-paper-2 data-[hidden=true]:-translate-y-full"
+>
+	<div class="wrap">
+		<div class="flex h-[4.5rem] items-center justify-between gap-6">
 			<a
 				href="/"
-				class="inline-flex items-center gap-2.5 font-bold tracking-tight text-gray-1000 transition hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+				class="font-display text-[1.6rem] leading-none tracking-[-0.03em] text-ink"
+				aria-label="WellRoost, home"
 			>
-				<span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gray-1000 text-white text-sm font-black">
-					W
-				</span>
-				<span class="text-lg">WellRoost</span>
+				WellRoost
 			</a>
 
-			<!-- Desktop Nav -->
-			<nav class="hidden items-center gap-6 md:flex" aria-label="Primary navigation">
-				{
-					navLinks.map((link) => {
-						const isActive =
-							pathname === link.href ||
-							(link.href !== '/' && pathname.startsWith(`${link.href}/`));
-						return (
+			<div class="flex items-center gap-8">
+				<nav class="hidden items-center gap-7 md:flex" aria-label="Primary">
+					{
+						navLinks.map((link) => (
 							<a
 								href={link.href}
 								class:list={[
-									'text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-									isActive
-										? 'text-gray-1000 font-semibold'
-										: 'text-gray-600 hover:text-gray-1000'
+									'label transition-colors duration-150',
+									isActive(link.href) ? 'text-ink' : 'text-ink-2 hover:text-ink'
 								]}
-								aria-current={isActive ? 'page' : undefined}
+								aria-current={isActive(link.href) ? 'page' : undefined}
 							>
 								{link.label}
 							</a>
-						);
-					})
-				}
-			</nav>
+						))
+					}
+				</nav>
 
-			<!-- Mobile Actions / Search -->
-			<div class="flex items-center gap-2 md:gap-4">
-				<button
-					type="button"
-					data-search-open
-					aria-label="Open site search"
-					class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-600 transition hover:bg-gray-100 hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary border border-transparent hover:border-gray-200"
-				>
-					<svg viewBox="0 0 24 24" fill="none" class="h-5 w-5" aria-hidden="true">
-						<path
-							d="M21 21l-4.35-4.35m1.35-5.15a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"
-							stroke="currentColor"
-							stroke-width="1.8"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						/>
-					</svg>
-				</button>
-
-				<details class="group relative md:hidden">
-					<summary
-						class="inline-flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-lg text-gray-600 transition hover:bg-gray-100 hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary border border-transparent hover:border-gray-200"
-						aria-label="Open navigation menu"
+				<div class="flex items-center gap-1.5">
+					<button
+						type="button"
+						data-search-open
+						aria-label="Search WellRoost"
+						class="-mr-2 inline-flex h-10 w-10 items-center justify-center text-ink transition-opacity duration-150 hover:opacity-60"
 					>
-						<svg viewBox="0 0 24 24" fill="none" class="h-5 w-5" aria-hidden="true">
+						<svg viewBox="0 0 24 24" fill="none" class="h-[1.15rem] w-[1.15rem]" aria-hidden="true">
 							<path
-								d="M4 7h16M4 12h16M4 17h16"
+								d="M20.5 20.5 16.2 16.2M18 10.75a7.25 7.25 0 1 1-14.5 0 7.25 7.25 0 0 1 14.5 0Z"
 								stroke="currentColor"
-								stroke-width="1.8"
+								stroke-width="1.6"
 								stroke-linecap="round"
 							/>
 						</svg>
-					</summary>
-					<div class="absolute right-0 top-[calc(100%+0.5rem)] w-56 rounded-xl border border-gray-200 bg-white p-2 shadow-xl">
-						<nav class="grid gap-1" aria-label="Mobile navigation">
-							{
-								navLinks.map((link) => {
-									const isActive =
-										pathname === link.href ||
-										(link.href !== '/' && pathname.startsWith(`${link.href}/`));
-									return (
+					</button>
+
+					<span class="ml-2 hidden sm:block">
+						<a href="/calculators/" class="btn h-11 px-5 text-sm">
+							Run a number
+						</a>
+					</span>
+
+					<details class="group relative md:hidden">
+						<summary
+							class="ml-1 inline-flex h-10 w-10 cursor-pointer list-none items-center justify-center text-ink transition-opacity duration-150 hover:opacity-60 [&::-webkit-details-marker]:hidden"
+							aria-label="Open menu"
+						>
+							<svg viewBox="0 0 24 24" fill="none" class="h-[1.15rem] w-[1.15rem]" aria-hidden="true">
+								<path
+									d="M3.5 7h17M3.5 12h17M3.5 17h17"
+									stroke="currentColor"
+									stroke-width="1.6"
+									stroke-linecap="round"
+								/>
+							</svg>
+						</summary>
+						<div class="absolute right-0 top-[calc(100%+1.15rem)] w-[15rem] bg-paper-2 p-2">
+							<nav class="grid" aria-label="Mobile">
+								{
+									navLinks.map((link) => (
 										<a
 											href={link.href}
 											class:list={[
-												'rounded-lg px-3 py-2 text-sm transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-												isActive ? 'bg-gray-100 text-black font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-black'
+												'px-3 py-3 text-[0.95rem] transition-colors',
+												isActive(link.href) ? 'text-ink' : 'text-ink-2 hover:text-ink'
 											]}
-											aria-current={isActive ? 'page' : undefined}
+											aria-current={isActive(link.href) ? 'page' : undefined}
 										>
 											{link.label}
 										</a>
-									);
-								})
-							}
-						</nav>
-					</div>
-				</details>
+									))
+								}
+								<a href="/calculators/" class="btn mt-2 w-full justify-between px-3">
+									Run a number
+									<span aria-hidden="true">&rarr;</span>
+								</a>
+							</nav>
+						</div>
+					</details>
+				</div>
 			</div>
 		</div>
 	</div>
 </header>
+
+<script is:inline>
+	(() => {
+		const header = document.querySelector('[data-site-header]');
+		if (!header) return;
+		let frame = 0;
+		let lastY = window.scrollY;
+		const sync = () => {
+			frame = 0;
+			const y = window.scrollY;
+			header.dataset.scrolled = y > 24 ? 'true' : 'false';
+			// Hide while reading downward, reveal on any upward scroll. Keeps a fixed bar from
+			// covering the line a visitor is mid-way through.
+			header.dataset.hidden = y > 140 && y > lastY + 4 ? 'true' : 'false';
+			lastY = y;
+		};
+		addEventListener(
+			'scroll',
+			() => {
+				if (!frame) frame = requestAnimationFrame(sync);
+			},
+			{ passive: true }
+		);
+		sync();
+	})();
+</script>

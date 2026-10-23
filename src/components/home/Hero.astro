@@ -1,0 +1,32 @@
+---
+import QuoteCheck from './QuoteCheck.tsx';
+---
+
+<section class="wrap pt-[clamp(1.75rem,4vw,3.25rem)]">
+	<div class="grid items-end gap-x-14 gap-y-8 lg:grid-cols-[minmax(0,1.24fr)_minmax(0,1fr)]">
+		<h1 class="display text-ink" data-reveal>
+			Run the number before you sign.
+		</h1>
+
+		<div class="pb-1 lg:pb-2" data-reveal style="--reveal-delay:90ms">
+			<p class="lede">
+				A quote is a price, not a return. WellRoost turns your cost, your resale lift and your
+				savings into the one figure that decides whether the project is an investment or a cost.
+			</p>
+			<div class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+				<a href="/calculators/" class="btn">
+					Run a number
+					<span aria-hidden="true">&rarr;</span>
+				</a>
+				<a href="#method" class="btn-ghost">
+					See the formulas
+					<span class="arrow" aria-hidden="true">&darr;</span>
+				</a>
+			</div>
+		</div>
+	</div>
+</section>
+
+<div class="wrap mt-[clamp(1.75rem,3.5vw,2.75rem)]" data-reveal style="--reveal-delay:150ms">
+	<QuoteCheck client:load />
+</div>

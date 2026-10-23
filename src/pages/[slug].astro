@@ -2,301 +2,183 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import JsonLd from '../components/JsonLd.astro';
 import { fetchAllPosts } from '../lib/wordpress';
+import { calculatorTools } from '../lib/calculators/metadata';
 
 export async function getStaticPaths() {
-  const posts = await fetchAllPosts(100);
-  return posts.map((post) => ({
-    params: { slug: post.slug },
-    props: { post },
-  }));
+	const posts = await fetchAllPosts(100);
+	return posts.map((post) => ({
+		params: { slug: post.slug },
+		props: { post }
+	}));
 }
 
 const { post } = Astro.props;
 
 if (!post) {
-  return Astro.redirect('/404');
+	return Astro.redirect('/404');
 }
 
-const formattedDate = post.date ? new Date(post.date).toLocaleDateString('en-US', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric'
-}) : '';
-
-// Determine metrics based on category slug or fallback
-const categorySlug = post.categorySlug || '';
-let estRoi = 'High';
-let estRoiWidth = '80%';
-let implementationEffort = 'Medium';
-let implementationWidth = '50%';
-let strategicValue = 'High';
-let strategicWidth = '85%';
-
-if (categorySlug.includes('renov') || categorySlug.includes('remodel')) {
-  estRoi = 'High';
-  estRoiWidth = '85%';
-  implementationEffort = 'High';
-  implementationWidth = '75%';
-  strategicValue = 'Max';
-  strategicWidth = '90%';
-} else if (categorySlug.includes('energy') || categorySlug.includes('system')) {
-  estRoi = 'High';
-  estRoiWidth = '80%';
-  implementationEffort = 'Medium';
-  implementationWidth = '50%';
-  strategicValue = 'High';
-  strategicWidth = '85%';
-} else if (categorySlug.includes('finance') || categorySlug.includes('budget')) {
-  estRoi = 'Max';
-  estRoiWidth = '95%';
-  implementationEffort = 'Low';
-  implementationWidth = '30%';
-  strategicValue = 'Max';
-  strategicWidth = '95%';
-}
+const formattedDate = post.date
+	? new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+	: '';
 
 const siteUrl = Astro.site?.toString() || 'https://wellroost.com/';
 const postUrl = new URL(`/${post.slug}/`, siteUrl).toString();
 const categoryUrl = post.categorySlug ? new URL(`/categories/${post.categorySlug}/`, siteUrl).toString() : null;
 
 const articleSchema = {
-	"@context": "https://schema.org",
-	"@type": "Article",
-	"headline": post.title,
-	"description": post.excerpt,
-	"image": post.featuredImage || new URL('/favicon.svg', siteUrl).toString(),
-	"datePublished": post.date,
-	"dateModified": post.modified || post.date,
-	"author": {
-		"@type": "Organization",
-		"name": "WellRoost Editorial Team",
-		"url": siteUrl
+	'@context': 'https://schema.org',
+	'@type': 'Article',
+	'headline': post.title,
+	'description': post.excerpt,
+	'image': post.featuredImage || new URL('/og-share.png', siteUrl).toString(),
+	'datePublished': post.date,
+	'dateModified': post.modified || post.date,
+	'author': { '@type': 'Organization', 'name': 'WellRoost Editorial Team', 'url': siteUrl },
+	'publisher': {
+		'@type': 'Organization',
+		'name': 'WellRoost',
+		'logo': { '@type': 'ImageObject', 'url': new URL('/og-share.png', siteUrl).toString() }
 	},
-	"publisher": {
-		"@type": "Organization",
-		"name": "WellRoost",
-		"logo": {
-			"@type": "ImageObject",
-			"url": new URL('/favicon.svg', siteUrl).toString()
-		}
-	},
-	"mainEntityOfPage": {
-		"@type": "WebPage",
-		"@id": postUrl
-	}
+	'mainEntityOfPage': { '@type': 'WebPage', '@id': postUrl }
 };
 
-const breadcrumbElements = [
-	{
-		"@type": "ListItem",
-		"position": 1,
-		"name": "Home",
-		"item": siteUrl
-	}
+const breadcrumbElements: Array<Record<string, unknown>> = [
+	{ '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': siteUrl }
 ];
 
 if (post.categoryLabel && post.categorySlug && categoryUrl) {
 	breadcrumbElements.push({
-		"@type": "ListItem",
-		"position": 2,
-		"name": post.categoryLabel,
-		"item": categoryUrl
+		'@type': 'ListItem',
+		'position': 2,
+		'name': post.categoryLabel,
+		'item': categoryUrl
 	});
 }
 
 breadcrumbElements.push({
-	"@type": "ListItem",
-	"position": breadcrumbElements.length + 1,
-	"name": post.title,
-	"item": postUrl
+	'@type': 'ListItem',
+	'position': breadcrumbElements.length + 1,
+	'name': post.title,
+	'item': postUrl
 });
 
 const breadcrumbSchema = {
-	"@context": "https://schema.org",
-	"@type": "BreadcrumbList",
-	"itemListElement": breadcrumbElements
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	'itemListElement': breadcrumbElements
 };
 ---
 
-<BaseLayout 
-  title={`${post.title} | WellRoost`}
-  description={post.excerpt || `A WellRoost guide to ${post.title}.`}
-  image={post.featuredImage}
-  type="article"
+<BaseLayout
+	title={`${post.title} | WellRoost`}
+	description={post.excerpt || `A WellRoost guide to ${post.title}.`}
+	image={post.featuredImage}
+	type="article"
 >
-  <!-- Social/canonical head is owned by BaseLayout; only article-specific meta lives here. -->
-  <meta slot="head" property="article:published_time" content={post.date ?? undefined} />
-  <meta slot="head" property="article:modified_time" content={post.modified ?? post.date ?? undefined} />
-  {post.categoryLabel && <meta slot="head" property="article:section" content={post.categoryLabel} />}
-  {post.featuredImage && <meta slot="head" property="og:image:alt" content={post.featuredImageAlt || post.title} />}
+	<meta slot="head" property="article:published_time" content={post.date ?? undefined} />
+	<meta slot="head" property="article:modified_time" content={post.modified ?? post.date ?? undefined} />
+	{post.categoryLabel && <meta slot="head" property="article:section" content={post.categoryLabel} />}
 
-  <JsonLd slot="head" data={articleSchema} />
-  <JsonLd slot="head" data={breadcrumbSchema} />
+	<JsonLd slot="head" data={articleSchema} />
+	<JsonLd slot="head" data={breadcrumbSchema} />
 
-  <!-- KaTeX for LaTeX Math Rendering -->
-  <link slot="head" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" />
-  <script slot="head" is:inline defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
-  <script slot="head" is:inline defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+	<link slot="head" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" />
+	<script slot="head" is:inline defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+	<script slot="head" is:inline defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
 
-  <div class="max-w-[1300px] mx-auto px-4 py-12 md:py-16">
-    <!-- Header Area -->
-    <div class="max-w-4xl mb-10 space-y-5">
-      <div class="flex flex-wrap items-center gap-3 text-xs font-mono tracking-wider text-gray-500 uppercase">
-        <span class="px-2.5 py-1 bg-gray-100 border border-gray-200 rounded-md font-semibold text-gray-700">Guide_ID: {post.id}</span>
-        {post.categoryLabel && (
-          <a href={categoryUrl ?? '#'} class="px-2.5 py-1 bg-blue-50 border border-blue-200 rounded-md text-primary font-bold hover:bg-blue-100 transition">
-            Pillar: {post.categoryLabel}
-          </a>
-        )}
-        <span class="text-gray-400">|</span>
-        <span>Published: {formattedDate}</span>
-      </div>
-      
-      <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-gray-1000 leading-[1.15]">
-        {post.title}
-      </h1>
-    </div>
+	<article>
+		<header class="wrap pt-[clamp(2rem,4.5vw,3.5rem)]">
+			<div class="flex flex-wrap items-baseline gap-x-5 gap-y-1 text-[0.8125rem] text-ink-2">
+				{
+					post.categoryLabel && (
+						<a href={categoryUrl ?? '/categories/'} class="text-pine transition-opacity hover:opacity-70">
+							{post.categoryLabel}
+						</a>
+					)
+				}
+				{formattedDate && <span class="num">{formattedDate}</span>}
+			</div>
 
-    <!-- Main Grid -->
-    <div class="flex flex-col lg:flex-row gap-10 xl:gap-16">
-      
-      <!-- Content Column -->
-      <main class="flex-1 min-w-0">
-        <!-- Featured Image -->
-        {post.featuredImage && (
-          <div class="relative group mb-10">
-            <div class="relative aspect-video lg:aspect-[21/9] rounded-2xl overflow-hidden border border-gray-200 shadow-sm bg-gray-50">
-              <img 
-                src={post.featuredImage} 
-                alt={post.featuredImageAlt}
-                class="w-full h-full object-cover scale-[1.01]"
-              />
-            </div>
-          </div>
-        )}
+			<h1 class="display-sm mt-5 max-w-[24ch] text-ink">{post.title}</h1>
 
-        <div class="relative">
-          <div class="prose lg:prose-lg max-w-none">
-            <!-- Summary Box -->
-            {post.excerpt && (
-              <div class="text-sm md:text-base mb-10 p-6 md:p-8 rounded-2xl bg-gray-50 border border-gray-200 text-gray-700 leading-relaxed relative overflow-hidden">
-                 <div class="absolute top-0 left-0 w-1.5 h-full bg-primary"></div>
-                 <span class="text-primary font-bold block mb-2 uppercase tracking-wider text-xs font-mono">Executive Summary //</span>
-                 {post.excerpt}
-              </div>
-            )}
+			{post.excerpt && (
+				<p class="lede mt-7 max-w-[46ch] text-ink-2">{post.excerpt}</p>
+			)}
+		</header>
 
-            <!-- Main Content -->
-            <div class="article-body space-y-6 max-w-3xl leading-relaxed text-gray-800" set:html={post.content} />
-            
-            <!-- Author / Editorial Bio Card -->
-            <div class="mt-14 p-6 md:p-8 rounded-2xl border border-gray-200 bg-white flex flex-col md:flex-row gap-6 items-center shadow-sm">
-              <div class="w-16 h-16 rounded-2xl bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-1000 font-black text-xl shrink-0">
-                WR
-              </div>
-              <div class="text-center md:text-left space-y-1.5">
-                <div class="flex flex-col md:flex-row md:items-center gap-2">
-                  <h4 class="text-base font-bold text-gray-1000">WellRoost Editorial & Research</h4>
-                  <span class="hidden md:inline text-gray-300">•</span>
-                  <p class="text-xs font-mono text-primary uppercase tracking-wider font-semibold">Home Analytics Team</p>
-                </div>
-                <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                  WellRoost builds interactive decision engines and analytical frameworks to help homeowners evaluate remodeling ROI, optimize energy upgrades, and make objective property choices.
-                </p>
-                <div class="pt-1">
-                  <a href="/calculators/" class="text-xs font-semibold text-primary hover:underline">
-                    Browse interactive calculators &rarr;
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
+		{post.featuredImage && (
+			<div class="bleed mt-[clamp(2rem,3.5vw,3rem)]">
+				<div class="h-[38vh] min-h-[15rem] overflow-hidden bg-paper-3 sm:h-[46vh]">
+					<img
+						src={post.featuredImage}
+						alt={post.featuredImageAlt || post.title}
+						class="plate h-full w-full object-cover"
+					/>
+				</div>
+			</div>
+		)}
 
-      <!-- Sidebar Column -->
-      <aside class="w-full lg:w-72 xl:w-80 shrink-0">
-        <div class="sticky top-24 space-y-6">
-          <!-- Decision Metrics Card -->
-          <div class="p-6 rounded-2xl bg-white border border-gray-200 shadow-sm">
-            <h3 class="font-mono text-xs uppercase tracking-wider text-gray-500 font-semibold mb-6 flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-primary"></span>
-              Decision Metrics
-            </h3>
-            
-            <div class="space-y-6">
-              <div>
-                <div class="flex justify-between text-xs font-mono text-gray-600 mb-2 tracking-wider">
-                  <span>EST_ROI</span>
-                  <span class="text-gray-1000 font-bold">{estRoi}</span>
-                </div>
-                <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div class="h-full bg-primary" style={`width: ${estRoiWidth}`}></div>
-                </div>
-              </div>
+		<div class="wrap mt-[clamp(2.5rem,4vw,4rem)] grid gap-12 lg:grid-cols-[minmax(0,36rem)_minmax(0,1fr)] lg:gap-20">
+			<div>
+				<div class="article-body" set:html={post.content} />
 
-              <div>
-                <div class="flex justify-between text-xs font-mono text-gray-600 mb-2 tracking-wider">
-                  <span>IMPLEMENTATION_EFFORT</span>
-                  <span class="text-gray-1000 font-bold">{implementationEffort}</span>
-                </div>
-                <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div class="h-full bg-amber-500" style={`width: ${implementationWidth}`}></div>
-                </div>
-              </div>
+				<div class="mt-14 bg-paper-2 p-6 sm:p-8">
+					<p class="font-display text-[1.35rem] leading-tight text-ink">WellRoost Editorial</p>
+					<p class="mt-3 max-w-[42ch] text-[1rem] leading-relaxed text-ink-2">
+						Guides are written against the published formulas and link to the calculator they
+						describe. If a number in this piece does not reproduce, that is a defect, and we want it.
+					</p>
+				</div>
+			</div>
 
-              <div>
-                <div class="flex justify-between text-xs font-mono text-gray-600 mb-2 tracking-wider">
-                  <span>STRATEGIC_VALUE</span>
-                  <span class="text-gray-1000 font-bold">{strategicValue}</span>
-                </div>
-                <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div class="h-full bg-emerald-600" style={`width: ${strategicWidth}`}></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="mt-8 pt-6 border-t border-gray-100">
-              <a href="/calculators/" class="block w-full py-3 px-4 rounded-xl bg-gray-1000 text-white font-semibold text-xs text-center hover:bg-gray-900 transition active:scale-95 shadow-sm">
-                Open Calculator Hub
-              </a>
-            </div>
-          </div>
-
-          <!-- Quick Navigation -->
-          <div class="p-6 rounded-2xl border border-gray-200 bg-gray-50/50">
-            <p class="text-xs font-mono text-gray-500 uppercase tracking-wider font-semibold mb-3">Explore Categories</p>
-            <div class="space-y-2 text-xs text-gray-600">
-              <a href="/categories/" class="block text-primary hover:underline font-medium">
-                View all decision pillars &rarr;
-              </a>
-            </div>
-          </div>
-        </div>
-      </aside>
-    </div>
-  </div>
+			<aside class="lg:sticky lg:top-28 lg:self-start">
+				<p class="text-[0.8125rem] text-ink-2">Run the math on your own numbers</p>
+				<ul class="mt-4 grid">
+					{
+						calculatorTools.map((tool) => (
+							<li>
+								<a
+									href={tool.href}
+									class="group flex items-baseline justify-between gap-4 py-3.5 text-ink transition-colors hover:text-pine"
+								>
+									<span class="font-display text-[1.15rem] leading-tight">{tool.title}</span>
+									<span aria-hidden="true" class="text-[0.875rem] transition-transform duration-200 group-hover:translate-x-1">
+										&rarr;
+									</span>
+								</a>
+							</li>
+						))
+					}
+				</ul>
+				<a href="/categories/" class="btn-ghost mt-6">
+					All pillars
+					<span class="arrow" aria-hidden="true">&rarr;</span>
+				</a>
+			</aside>
+		</div>
+	</article>
 </BaseLayout>
 
 <script>
-  const initKaTeX = () => {
-    // @ts-ignore - renderMathInElement is loaded globally via CDN
-    if (typeof renderMathInElement !== 'undefined') {
-      const articleBody = document.querySelector('.article-body');
-      if (articleBody) {
-        // @ts-ignore
-        renderMathInElement(articleBody, {
-          delimiters: [
-            {left: '$$', right: '$$', display: true},
-            {left: '\\[', right: '\\]', display: true},
-            {left: '\\(', right: '\\)', display: false}
-          ]
-        });
-      }
-    } else {
-      setTimeout(initKaTeX, 100);
-    }
-  };
+	const initKaTeX = () => {
+		// @ts-ignore - renderMathInElement is loaded globally via CDN
+		if (typeof renderMathInElement !== 'undefined') {
+			const articleBody = document.querySelector('.article-body');
+			if (articleBody) {
+				// @ts-ignore
+				renderMathInElement(articleBody, {
+					delimiters: [
+						{ left: '$$', right: '$$', display: true },
+						{ left: '\\[', right: '\\]', display: true },
+						{ left: '\\(', right: '\\)', display: false }
+					]
+				});
+			}
+		} else {
+			setTimeout(initKaTeX, 100);
+		}
+	};
 
-  document.addEventListener('DOMContentLoaded', initKaTeX);
+	document.addEventListener('DOMContentLoaded', initKaTeX);
 </script>

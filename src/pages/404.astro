@@ -3,16 +3,25 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout
-	title="Page Not Found | WellRoost"
-	description="That page is not on WellRoost. Browse the calculators or the category index to find what you were looking for."
+	title="Page not found | WellRoost"
+	description="That page is not on WellRoost. Start with the calculators or the pillar index."
 	noindex
 >
-	<div class="py-20 text-center">
-		<h1 class="text-4xl font-bold">404 - Page Not Found</h1>
-		<p class="mt-4 text-base text-gray-600">
-			<a class="font-semibold text-primary hover:underline" href="/calculators/">Browse calculators</a>
-			<span class="mx-2 text-gray-300">·</span>
-			<a class="font-semibold text-primary hover:underline" href="/categories/">Browse categories</a>
+	<section class="wrap py-[clamp(4rem,12vw,9rem)]">
+		<h1 class="display max-w-[12ch] text-ink">This page is not here.</h1>
+		<p class="lede mt-8 max-w-[38ch]">
+			Either it moved, or it never existed. The calculators are the part of this site that answers a
+			question today.
 		</p>
-	</div>
+		<div class="mt-10 flex flex-wrap items-center gap-x-8 gap-y-3">
+			<a href="/calculators/" class="btn">
+				Run a number
+				<span aria-hidden="true">&rarr;</span>
+			</a>
+			<a href="/categories/" class="btn-ghost">
+				Browse the pillars
+				<span class="arrow" aria-hidden="true">&rarr;</span>
+			</a>
+		</div>
+	</section>
 </BaseLayout>

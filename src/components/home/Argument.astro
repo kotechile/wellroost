@@ -1,0 +1,64 @@
+---
+import { Image } from 'astro:assets';
+import { plates } from '../../lib/plates';
+
+const points = [
+	{
+		term: 'Cost',
+		body: 'The contractor quote, the permits, the three change orders that arrive after the wall opens.'
+	},
+	{
+		term: 'Lift',
+		body: 'What an appraiser or a buyer will pay for the finished work. It is smaller than the quote more often than it is larger.'
+	},
+	{
+		term: 'The gap',
+		body: 'What you carry in cash and get back in daily use, or never get back at all. This is the number to argue about.'
+	}
+];
+---
+
+<section class="section wrap" aria-labelledby="argument">
+	<div class="grid gap-12 lg:grid-cols-[minmax(0,0.44fr)_minmax(0,1fr)] lg:gap-20">
+		<figure class="max-w-[24rem]" data-reveal>
+			<div class="overflow-hidden bg-paper-3">
+				<Image
+					src={plates.interior.src}
+					alt={plates.interior.alt}
+					widths={[480, 720, 960]}
+					sizes="(min-width: 1024px) 32rem, 90vw"
+					loading="lazy"
+					class="plate plate-warm aspect-[4/5] w-full object-cover"
+				/>
+			</div>
+			<figcaption class="caption mt-3">{plates.interior.credit}</figcaption>
+		</figure>
+
+		<div>
+			<h2 id="argument" class="h2 max-w-[22ch] text-ink" data-reveal>
+				Two prices, one decision.
+			</h2>
+			<p class="statement mt-8 text-ink" data-reveal style="--reveal-delay:70ms">
+				The gap between what a project costs and what it lifts the value by is the real price of it.
+			</p>
+
+			<dl class="mt-10 grid gap-6 border-0" data-reveal style="--reveal-delay:140ms">
+				{
+					points.map((point) => (
+						<div class="grid gap-1.5 sm:grid-cols-[7rem_minmax(0,1fr)] sm:gap-6">
+							<dt class="text-[0.9375rem] font-medium text-ink">{point.term}</dt>
+							<dd class="body max-w-[38ch]">{point.body}</dd>
+						</div>
+					))
+				}
+			</dl>
+
+			<div class="mt-10" data-reveal style="--reveal-delay:200ms">
+				<a href="/calculators/remodeling-roi/" class="btn-ghost">
+					Run your gap
+					<span class="arrow" aria-hidden="true">&rarr;</span>
+				</a>
+			</div>
+		</div>
+	</div>
+</section>

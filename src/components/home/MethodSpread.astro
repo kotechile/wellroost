@@ -1,0 +1,80 @@
+---
+import { Image } from 'astro:assets';
+import { plates } from '../../lib/plates';
+
+const formulas = [
+	{
+		expression: 'recovery = lift ÷ cost',
+		note: 'The share of the spend an appraisal hands back. At 80% or better the engine calls the recovery strong.'
+	},
+	{
+		expression: 'payback = cost ÷ savings a year',
+		note: 'How long running costs take to return the money. It counts upkeep and utility savings, never enjoyment.'
+	},
+	{
+		expression: 'value = lift + savings × years + enjoyment × 0.35',
+		note: 'The enjoyment credit is a share of cost, scaled by how much the upgrade matters and how long you stay. Only 35% of it is counted as value.'
+	},
+	{
+		expression: 'score = 45% recovery + 20% timeline + 15% savings + 20% enjoyment',
+		note: 'Seventy or above returns worth it. Below 45, or under 35% recovery with three years left, returns skip.'
+	}
+];
+---
+
+<section id="method" class="field-dark section mt-[var(--section-space)] scroll-mt-24" aria-labelledby="method-title">
+	<div class="wrap">
+		<div class="flex flex-wrap items-end justify-between gap-6">
+			<h2 id="method-title" class="h2 max-w-[20ch] text-paper" data-reveal>
+				The formulas, published.
+			</h2>
+			<p class="max-w-[30ch] pb-2 text-[0.95rem] leading-relaxed text-paper/65" data-reveal style="--reveal-delay:80ms">
+				Four equations run every answer on this site. They are here so you can check the output
+				instead of trusting it.
+			</p>
+		</div>
+
+		<div class="mt-[clamp(2.5rem,4vw,4rem)] grid gap-12 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1fr)] lg:gap-16">
+			<figure data-reveal>
+				<div class="overflow-hidden">
+					<Image
+						src={plates.plan.src}
+						alt={plates.plan.alt}
+						widths={[640, 960, 1280]}
+						sizes="(min-width: 1024px) 40vw, 92vw"
+						loading="lazy"
+						class="w-full object-cover"
+					/>
+				</div>
+				<figcaption class="caption caption-invert mt-3">{plates.plan.credit}</figcaption>
+			</figure>
+
+			<ol class="grid gap-8">
+				{
+					formulas.map((formula, index) => (
+						<li
+							class="grid gap-2"
+							data-reveal
+							style={`--reveal-delay:${index * 70}ms`}
+						>
+							<p class="font-display text-[clamp(1.35rem,2.1vw,1.85rem)] leading-tight tracking-[-0.02em] text-paper">
+								{formula.expression}
+							</p>
+							<p class="max-w-[46ch] text-[1rem] leading-relaxed text-paper/60">{formula.note}</p>
+						</li>
+					))
+				}
+			</ol>
+		</div>
+
+		<div class="mt-12 flex flex-wrap items-center gap-x-8 gap-y-3" data-reveal>
+			<a href="/calculators/remodeling-roi/" class="btn btn-invert">
+				Test them on your project
+				<span aria-hidden="true">&rarr;</span>
+			</a>
+			<p class="text-[0.8125rem] text-paper/55">
+				The full engine prints every assumption it used, next to the answer.
+			</p>
+		</div>
+	</div>
+</section>

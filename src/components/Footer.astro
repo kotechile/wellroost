@@ -2,73 +2,98 @@
 import { getTopLevelCategories } from '../lib/categories';
 
 const topCategories = await getTopLevelCategories();
+
+const columns = [
+	{
+		title: 'Engines',
+		links: [
+			{ href: '/calculators/move-or-improve/', label: 'Move or improve' },
+			{ href: '/calculators/remodeling-roi/', label: 'Remodeling ROI' },
+			{ href: '/calculators/remodelytics/', label: 'Remodelytics' }
+		]
+	},
+	{
+		title: 'Pillars',
+		links: topCategories.slice(0, 4).map((category) => ({
+			href: `/categories/${category.slug}/`,
+			label: category.name
+		}))
+	},
+	{
+		title: 'Site',
+		links: [
+			{ href: '/calculators/', label: 'All calculators' },
+			{ href: '/categories/', label: 'All pillars' },
+			{ href: '/about/', label: 'About' },
+			{ href: '/privacy/', label: 'Privacy' }
+		]
+	}
+];
 ---
 
-<footer class="mt-24 border-t border-gray-200 bg-white py-16">
-	<div class="mx-auto grid max-w-6xl gap-12 px-4 lg:grid-cols-[1fr_auto] lg:px-8">
-		<div class="grid gap-12 md:grid-cols-2">
-			<div>
-				<div class="flex items-center gap-2 mb-3">
-					<span class="inline-flex h-6 w-6 items-center justify-center rounded-md bg-gray-1000 text-white text-xs font-black">
-						W
-					</span>
-					<span class="font-bold text-gray-1000">WellRoost</span>
-				</div>
-				<h2 class="text-xl font-bold tracking-tight text-gray-1000">
-					The Decision Engine for Your Home.
-				</h2>
-				<p class="mt-3 text-sm leading-6 text-gray-600">
-					Objective, high-ROI choices for your property, budget, and lifestyle.
+<footer class="field-dark mt-[var(--section-space)] pt-[clamp(3rem,6vw,5rem)]">
+	<div class="wrap">
+		<div class="grid gap-12 border-0 pb-16 md:grid-cols-[1.2fr_repeat(3,minmax(0,0.7fr))] md:gap-8">
+			<div class="max-w-[22rem]">
+				<p class="font-display text-[1.35rem] leading-none tracking-[-0.02em]">WellRoost</p>
+				<p class="mt-4 text-[0.95rem] leading-relaxed text-paper/70">
+					The decision engine for your home. Three calculators, the same math we publish, no
+					account and no sales call.
 				</p>
+				<a href="/calculators/" class="btn btn-invert mt-7">
+					Run a number
+					<span aria-hidden="true">&rarr;</span>
+				</a>
 			</div>
-			
-			<!-- Core Focus Section -->
-			<div class="rounded-xl border border-gray-200 bg-gray-50 p-6">
-				<div class="flex items-center gap-2 mb-2">
-					<svg class="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-					<p class="font-mono text-xs uppercase tracking-wider text-gray-500 font-semibold">Stop Guessing</p>
-				</div>
-				<h3 class="font-bold text-gray-1000">Start Calculating</h3>
-				<p class="mt-2 text-sm text-gray-600 leading-relaxed">
-					We don't just give you opinions; we give you the tools to analyze the data. Welcome to smarter homeownership.
-				</p>
-			</div>
+
+			{
+				columns.map((column) => (
+					<div>
+						<p class="text-[0.8125rem] text-paper/55">{column.title}</p>
+						<ul class="mt-4 grid gap-2.5">
+							{column.links.map((link) => (
+								<li>
+									<a
+										href={link.href}
+										class="text-[0.95rem] text-paper/90 transition-colors duration-150 hover:text-paper"
+									>
+										{link.label}
+									</a>
+								</li>
+							))}
+						</ul>
+					</div>
+				))
+			}
 		</div>
 
-		<div class="grid gap-8 sm:grid-cols-2 lg:ml-12">
-			<div>
-				<p class="font-mono text-xs uppercase tracking-wider text-gray-400 font-semibold">System Map</p>
-				<div class="mt-4 grid gap-2.5 text-sm text-gray-600">
-					<a href="/" class="transition hover:text-primary">Home</a>
-					<a href="/calculators/" class="transition hover:text-primary">Calculators</a>
-					<a href="/categories/" class="transition hover:text-primary">Categories</a>
-					<a href="/about/" class="transition hover:text-primary">About</a>
-					<a href="/privacy/" class="transition hover:text-primary">Privacy</a>
-				</div>
-			</div>
-			<div>
-				<p class="font-mono text-xs uppercase tracking-wider text-gray-400 font-semibold">Pillars</p>
-				<div class="mt-4 grid gap-2.5 text-sm text-gray-600">
-					{topCategories.slice(0, 4).map((category) => (
-						<a href={`/categories/${category.slug}/`} class="transition hover:text-primary">
-							{category.name}
-						</a>
-					))}
-				</div>
-			</div>
+		<div class="pt-10">
+			<p
+				class="font-display leading-[0.78] tracking-[-0.045em] text-paper/95"
+				style="font-size: clamp(3.4rem, 13.2vw, 12.5rem);"
+				aria-hidden="true"
+			>
+				WellRoost
+			</p>
 		</div>
-	</div>
-	
-	<div class="mx-auto max-w-6xl px-4 lg:px-8 mt-12 pt-8 border-t border-gray-100 flex flex-col gap-4">
-		<p class="text-xs leading-6 text-gray-500">
-			<strong class="font-semibold text-gray-700">Analytics &amp; Telemetry:</strong> We record anonymous
-			interaction events and model parameters to evaluate calculator accuracy and refine our decision engines. We
-			do not sell personal data or run cross-site tracking scripts. See our
-			<a href="/privacy/" class="underline underline-offset-2 transition hover:text-gray-700">Privacy Policy</a>.
-		</p>
-		<div class="flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-gray-500">
-			<p>&copy; {new Date().getFullYear()} WellRoost. All rights reserved.</p>
-			<p class="font-mono">Decisions backed by data.</p>
+
+		<div class="mt-12 grid gap-6 pb-10 text-[0.8125rem] leading-relaxed text-paper/65 md:grid-cols-[1fr_auto]">
+			<div class="grid max-w-[62ch] gap-3">
+				<p>
+					<strong class="font-medium text-paper/80">Analytics.</strong> We record anonymous
+					interaction events and model parameters to check calculator accuracy and refine the engines.
+					Field values are never sent. We do not sell data or run cross-site trackers. See the
+					<a href="/privacy/" class="text-link">Privacy Policy</a>.
+				</p>
+				<p>
+					<strong class="font-medium text-paper/80">Photography.</strong> Archival plates are public
+					domain, from the Historic American Buildings Survey via Wikimedia Commons: Eleazer Arnold
+					House (1937), Sherman Phelps House (1966), Isaac Bell House porch bracket (1969), Jacob
+					Vanderbeck House (1938); Pratt residence first floor plan by McKim, Mead &amp; White. They
+					show the era's housing stock, not properties we have modelled.
+				</p>
+			</div>
+			<p class="md:text-right">&copy; {new Date().getFullYear()} WellRoost</p>
 		</div>
 	</div>
 </footer>

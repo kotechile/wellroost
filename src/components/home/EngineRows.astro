@@ -1,0 +1,63 @@
+---
+const engines = [
+	{
+		figure: '5 yr',
+		title: 'Move or improve',
+		utility: 'Sell and relocate, or stay and expand',
+		body: 'Selling takes 8–10% of the price in commissions and fees before you own anything new. This models that friction against the cost of expanding in place, across five years of ownership.',
+		href: '/calculators/move-or-improve/'
+	},
+	{
+		figure: '6',
+		title: 'Remodeling ROI',
+		utility: 'Decide whether one project is worth it',
+		body: 'Cost, resale lift, stay horizon and savings return value during your stay, the recovery rate, a payback figure and a verdict: worth it, maybe, skip.',
+		href: '/calculators/remodeling-roi/'
+	},
+	{
+		figure: '70%',
+		title: 'Remodelytics',
+		utility: 'Underwrite a whole property',
+		body: 'After-repair value, ADU income, combined loan-to-value and the 70% maximum allowable offer on one sheet, for buyers and landlords moving faster than a spreadsheet.',
+		href: '/calculators/remodelytics/'
+	}
+];
+---
+
+<section class="section wrap" aria-labelledby="engines">
+	<div class="flex flex-wrap items-end justify-between gap-6">
+		<h2 id="engines" class="h2 max-w-[24ch] text-ink" data-reveal>
+			Three questions that cost the most to get wrong.
+		</h2>
+		<p class="body max-w-[26ch] pb-2" data-reveal style="--reveal-delay:80ms">
+			Each one answers in a single number you can quote back to a contractor, an agent or a lender.
+		</p>
+	</div>
+
+	<div class="mt-[clamp(2.5rem,4vw,4rem)]">
+		{
+			engines.map((engine, index) => (
+				<a
+					href={engine.href}
+					class="group grid items-start gap-4 py-8 text-ink transition-colors duration-200 hover:bg-paper-2/70 sm:gap-6 md:grid-cols-[7rem_minmax(0,0.9fr)_minmax(0,1.1fr)] md:py-10 md:px-4 md:-mx-4"
+					data-reveal
+					style={`--reveal-delay:${index * 80}ms`}
+				>
+					<span class="figure text-[clamp(1.8rem,2.6vw,2.6rem)] leading-none text-pine">
+						{engine.figure}
+					</span>
+					<span>
+						<span class="h3 block text-ink">{engine.title}</span>
+						<span class="label mt-2 block text-ink-2">{engine.utility}</span>
+					</span>
+					<span class="flex flex-col justify-between gap-4 md:flex-row md:items-start md:gap-8">
+						<span class="body max-w-[42ch]">{engine.body}</span>
+						<span class="mb-1 shrink-0 text-[0.9375rem] text-pine transition-transform duration-200 group-hover:translate-x-1">
+							Open <span aria-hidden="true">&rarr;</span>
+						</span>
+					</span>
+				</a>
+			))
+		}
+	</div>
+</section>

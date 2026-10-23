@@ -14,6 +14,8 @@ interface Props {
 	type?: 'website' | 'article';
 	/** Emitted as noindex,follow. Set on the 404 page so it cannot be indexed as content. */
 	noindex?: boolean;
+	/** Suppresses the top padding the nav reserves; used by pages that open on a full-bleed plate. */
+	flushTop?: boolean;
 }
 
 const {
@@ -21,7 +23,8 @@ const {
 	description = 'WellRoost—The Decision Engine for Your Home. Built around a core ecosystem of interactive calculators and data-driven insights.',
 	image = null,
 	type = 'website',
-	noindex = false
+	noindex = false,
+	flushTop = false
 } = Astro.props;
 
 const site = Astro.site ?? new URL(Astro.url.origin);
@@ -60,7 +63,7 @@ const ogImageIsRaster = /\.(png|jpe?g|webp|avif|gif)$/i.test(new URL(ogImage).pa
 ---
 
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -68,6 +71,7 @@ const ogImageIsRaster = /\.(png|jpe?g|webp|avif|gif)$/i.test(new URL(ogImage).pa
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content={description} />
+		<meta name="theme-color" content="#f2eee4" />
 		<title>{title}</title>
 
 		<!-- Crawl contract: one canonical, one robots directive, one set of social cards. -->
@@ -99,17 +103,46 @@ const ogImageIsRaster = /\.(png|jpe?g|webp|avif|gif)$/i.test(new URL(ogImage).pa
 
 		<slot name="head" />
 	</head>
-	<body class="min-h-screen text-gray-900 antialiased selection:bg-black selection:text-white">
-		<div class="site-background"></div>
+	<body>
+		<a
+			href="#main"
+			class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:bg-ink focus:px-4 focus:py-2 focus:text-sm focus:text-paper"
+		>
+			Skip to content
+		</a>
 		<SiteNav />
 		<SearchOverlay />
-		<main class="relative z-10">
-			<div class="mx-auto max-w-7xl px-4 pb-10 pt-6 sm:px-6 lg:px-8">
-				<slot />
-			</div>
+		<main id="main" class={flushTop ? '' : 'pt-[4.5rem]'}>
+			<slot />
 		</main>
-		<div class="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-			<Footer />
-		</div>
+		<Footer />
+
+		{/*
+			Entrance motion. Progressive: the `js` flag is set here, so with no script every
+			revealed block is simply visible. One observer for the page, unobserved after firing.
+		*/}
+		<script is:inline>
+			(() => {
+				const root = document.documentElement;
+				root.classList.add('js');
+				const items = Array.from(document.querySelectorAll('[data-reveal]'));
+				const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+				if (reduce || !('IntersectionObserver' in window)) {
+					items.forEach((el) => el.classList.add('is-in'));
+					return;
+				}
+				const io = new IntersectionObserver(
+					(entries) => {
+						for (const entry of entries) {
+							if (!entry.isIntersecting) continue;
+							entry.target.classList.add('is-in');
+							io.unobserve(entry.target);
+						}
+					},
+					{ rootMargin: '0px 0px -12% 0px', threshold: 0.08 }
+				);
+				items.forEach((el) => io.observe(el));
+			})();
+		</script>
 	</body>
 </html>

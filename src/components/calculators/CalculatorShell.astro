@@ -11,18 +11,20 @@ const { eyebrow, title, description, variant = 'light' } = Astro.props;
 const isDark = variant === 'dark';
 ---
 
-<section class="pt-24 sm:pt-32">
-	<div class="max-w-3xl">
-		<p class:list={["text-sm font-semibold tracking-wide uppercase", isDark ? "text-emerald-400/80" : "text-gray-500"]}>{eyebrow}</p>
-		<h1 class:list={["mt-4 text-5xl font-bold tracking-tight sm:text-6xl", isDark ? "text-white" : "text-gray-1000"]}>{title}</h1>
-		<p class:list={["mt-6 text-lg leading-8", isDark ? "text-slate-300" : "text-gray-600"]}>{description}</p>
+<section class="wrap pt-[clamp(2rem,4.5vw,3.5rem)]">
+	<div class="grid items-end gap-x-14 gap-y-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
+		<div>
+			<p class:list={['text-[0.8125rem]', isDark ? 'text-paper/70' : 'text-ink-2']}>{eyebrow}</p>
+			<h1 class:list={['display mt-3', isDark ? 'text-paper' : 'text-ink']}>{title}</h1>
+		</div>
+		<p class:list={['lede max-w-[42ch] pb-2', isDark ? 'text-paper/85' : 'text-ink']}>{description}</p>
 	</div>
 
-	<div class="mt-16 grid gap-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(24rem,1fr)]">
-		<div class:list={["rounded-2xl p-6 sm:p-8", isDark ? "bg-slate-950 border border-slate-800 shadow-xl" : "border border-gray-200 bg-white shadow-sm"]}>
+	<div class="mt-[clamp(2rem,4vw,3rem)] grid gap-8 lg:grid-cols-[minmax(0,1.55fr)_minmax(18rem,1fr)]">
+		<div class="bg-card p-5 sm:p-7">
 			<slot name="calculator" />
 		</div>
-		<div class="grid gap-6">
+		<div class="grid content-start gap-8">
 			<slot name="aside" />
 		</div>
 	</div>

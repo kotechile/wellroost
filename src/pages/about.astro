@@ -1,291 +1,186 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import JsonLd from '../components/JsonLd.astro';
+import { plates } from '../lib/plates';
 
 const siteUrl = Astro.site?.toString() || 'https://wellroost.com/';
 const pageUrl = new URL('/about/', siteUrl).toString();
 
 const aboutSchema = {
-	"@context": "https://schema.org",
-	"@type": "AboutPage",
-	"name": "About WellRoost | The Decision Engine for Your Home",
-	"description": "Learn the mission, data frameworks, and decision thesis behind WellRoost.",
-	"url": pageUrl,
-	"mainEntity": {
-		"@type": "Organization",
-		"name": "WellRoost",
-		"url": siteUrl,
-		"logo": new URL('/favicon.svg', siteUrl).toString(),
-		"description": "Objective, data-driven calculators and editorial guides for high-stakes homeownership and remodeling decisions."
+	'@context': 'https://schema.org',
+	'@type': 'AboutPage',
+	'name': 'About WellRoost',
+	'description': 'The mission, the math and the limits behind WellRoost.',
+	'url': pageUrl,
+	'mainEntity': {
+		'@type': 'Organization',
+		'name': 'WellRoost',
+		'url': siteUrl,
+		'logo': new URL('/favicon.svg', siteUrl).toString(),
+		'description':
+			'Calculators and editorial guides for high-stakes homeownership and remodeling decisions.'
 	}
 };
 
 const breadcrumbSchema = {
-	"@context": "https://schema.org",
-	"@type": "BreadcrumbList",
-	"itemListElement": [
-		{
-			"@type": "ListItem",
-			"position": 1,
-			"name": "Home",
-			"item": siteUrl
-		},
-		{
-			"@type": "ListItem",
-			"position": 2,
-			"name": "About",
-			"item": pageUrl
-		}
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	'itemListElement': [
+		{ '@type': 'ListItem', 'position': 1, name: 'Home', item: siteUrl },
+		{ '@type': 'ListItem', 'position': 2, name: 'About', item: pageUrl }
 	]
 };
 
-const audiencePersonas = [
+const audience = [
 	{
-		badge: 'Renovation Strategy',
-		title: 'High-Stakes Renovators',
-		description: 'Homeowners evaluating $20k–$150k+ remodels who need to quantify real equity recovery, comp ARV lift, and prevent over-improvement pitfalls before signing contractor bids.'
+		title: 'The renovator',
+		body: 'Weighing a $20,000 to $150,000 project against after-repair value, and trying not to overbuild the street.'
 	},
 	{
-		badge: 'Housing Friction',
-		title: 'Move vs. Improve Evaluators',
-		description: 'Families weighing the true 5-year financial ledger of selling and relocating (broker fees, transfer taxes, reset mortgage rates) against expanding their existing footprint.'
+		title: 'The move-or-improve household',
+		body: 'Comparing the five-year ledger of selling and buying again against adding the space where you already live.'
 	},
 	{
-		badge: 'System & Utility Math',
-		title: 'Energy & System Optimizers',
-		description: 'Property owners upgrading heat pumps, solar, insulation, and electrification while maximizing IRA, Section 25C, HEAR, and HOMES rebate programs.'
+		title: 'The systems owner',
+		body: 'Financing a heat pump, solar or insulation, and needing the payback horizon before the installer leaves.'
 	},
 	{
-		badge: 'Underwriting & Yield',
-		title: 'Real Estate & Equity Builders',
-		description: 'Investors and landlords modeling 70% rule Maximum Allowable Offers (MAO), combined LTV leverage, and ADU rental cash flow with defensible baseline math.'
+		title: 'The investor',
+		body: 'Underwriting a purchase with the 70% rule, combined loan-to-value and rental income that has to survive the mortgage.'
 	}
 ];
 
-const corePrinciples = [
+const principles = [
 	{
-		number: '01',
-		title: 'Zero Black-Box Calculations',
-		text: 'Every calculation is fully transparent. We expose all formulas, assumptions, cost multipliers, and sensitivity variables so you can stress-test any scenario.'
+		title: 'Every formula is on the page',
+		body: 'Recovery, payback, the enjoyment credit and the weights behind the score are printed next to the answer. If the output looks wrong, you can check it without asking us.'
 	},
 	{
-		number: '02',
-		title: 'Objective & Unbiased',
-		text: 'We do not sell contractor leads or inflate ROI metrics. Our tools model conservative, real-world payback periods and resale recoveries based on empirical data.'
+		title: 'No lead selling, no inflated lift',
+		body: 'The calculators do not route you to a contractor, an agent or a lender, and no resale figure is tuned to make a decision look better.'
 	},
 	{
-		number: '03',
-		title: 'Total Cost of Ownership',
-		text: 'We factor in transaction friction, financing carry costs, energy offsets, property tax reassessments, and holding periods—not just surface-level sticker prices.'
+		title: 'Total cost, not sticker price',
+		body: 'Commissions, financing carry, utility offsets and the years you plan to stay all enter the model, because they are what separate a project from an investment.'
 	}
 ];
 ---
 
 <BaseLayout
-	title="About WellRoost | The Decision Engine for Your Home"
-	description="Learn the mission, data frameworks, and decision thesis behind WellRoost."
+	title="About WellRoost | The decision engine for your home"
+	description="Why WellRoost exists, what the four equations do, and where the calculators stop being reliable."
 >
 	<JsonLd slot="head" data={aboutSchema} />
 	<JsonLd slot="head" data={breadcrumbSchema} />
 
-	<!-- Hero Header Section -->
-	<section class="pt-20 sm:pt-28">
-		<div class="max-w-4xl">
-			<p class="section-eyebrow">About WellRoost</p>
-			<h1 class="mt-3 text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-gray-1000 leading-[1.12]">
-				The Decision Engine for Your Home.
-			</h1>
-			<p class="mt-6 text-lg sm:text-xl leading-relaxed text-gray-600 max-w-3xl">
-				WellRoost was built on a simple premise: high-stakes homeownership decisions shouldn't rely on guesswork, contractor sales pitches, or emotional impulse. We provide the analytical frameworks, calculators, and objective models to help you make high-ROI choices for your property.
+	<section class="wrap pt-[clamp(2rem,5vw,4rem)]">
+		<h1 class="display max-w-[16ch] text-ink" data-reveal>The decision engine for your home.</h1>
+		<div class="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-20">
+			<p class="statement text-ink" data-reveal style="--reveal-delay:80ms">
+				A house is a series of expensive decisions in sequence, and most of them get made on a
+				feeling.
 			</p>
-		</div>
-
-		<!-- Key Stat Badges -->
-		<div class="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
-			<div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-				<p class="font-mono text-xs uppercase tracking-wider text-primary font-bold">100% Transparent</p>
-				<p class="mt-2 text-2xl font-bold text-gray-1000">Open Math</p>
-				<p class="mt-1 text-xs text-gray-500">Every formula & variable exposed</p>
-			</div>
-			<div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-				<p class="font-mono text-xs uppercase tracking-wider text-emerald-600 font-bold">Multi-Engine</p>
-				<p class="mt-2 text-2xl font-bold text-gray-1000">3 Core Tools</p>
-				<p class="mt-1 text-xs text-gray-500">Remodeling, Moving & Analytics</p>
-			</div>
-			<div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-				<p class="font-mono text-xs uppercase tracking-wider text-blue-600 font-bold">Editorial Rigor</p>
-				<p class="mt-2 text-2xl font-bold text-gray-1000">4 Pillars</p>
-				<p class="mt-1 text-xs text-gray-500">Energy, Costs, Smart Home, Tools</p>
-			</div>
-			<div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-				<p class="font-mono text-xs uppercase tracking-wider text-purple-600 font-bold">Unbiased</p>
-				<p class="mt-2 text-2xl font-bold text-gray-1000">Zero Hype</p>
-				<p class="mt-1 text-xs text-gray-500">Conservative, empirical models</p>
+			<div class="grid gap-4" data-reveal style="--reveal-delay:140ms">
+				<p class="body max-w-[44ch]">
+					WellRoost exists to put a number in front of the ones that cost the most. Not a score out
+					of ten, and not a lead form: the cost, the resale lift, the gap you carry, and the years it
+					takes to close.
+				</p>
+				<p class="body max-w-[44ch]">
+					Three calculators do that today. Editorial guides are being written into four pillars, and
+					none of them ships until the arithmetic it describes is the arithmetic that runs.
+				</p>
 			</div>
 		</div>
 	</section>
 
-	<!-- Mission & Philosophy Bento Grid -->
-	<section class="mt-16">
-		<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-			
-			<!-- Spotlight Large Bento Card -->
-			<div class="flex flex-col justify-between rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-50/90 via-white to-indigo-50/50 p-8 shadow-sm lg:col-span-2">
+	<figure class="bleed mt-[clamp(3rem,6vw,5rem)]">
+		<div class="h-[38vh] min-h-[16rem] overflow-hidden bg-paper-3 sm:h-[46vh]" data-reveal>
+			<Image
+				src={plates.mantel.src}
+				alt={plates.mantel.alt}
+				widths={[1080, 1600, 2200]}
+				sizes="100vw"
+				loading="lazy"
+				class="plate plate-warm h-full w-full object-cover"
+			/>
+		</div>
+		<figcaption class="wrap mt-3 caption">{plates.mantel.credit}</figcaption>
+	</figure>
+
+	<section class="section wrap" aria-labelledby="name">
+		<div class="grid gap-12 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] lg:gap-20">
+			<h2 id="name" class="h2 max-w-[14ch] text-ink" data-reveal>Two words, one thesis.</h2>
+			<div class="grid gap-10 sm:grid-cols-2" data-reveal style="--reveal-delay:80ms">
 				<div>
-					<div class="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white px-3 py-1 text-xs font-mono font-bold text-primary">
-						<span>ORIGIN & THESIS</span>
-					</div>
-					<h2 class="mt-4 text-2xl sm:text-3xl font-bold text-gray-1000 tracking-tight">
-						From Confusion & Guesswork to Analytical Clarity
-					</h2>
-					<p class="mt-4 text-base leading-relaxed text-gray-700">
-						The path to smart property management is often fragmented. Renovation guides emphasize aesthetics while ignoring equity recovery and financing leverage; personal finance sites skip the physical realities of building systems and ongoing maintenance costs. The result is costly decision paralysis and budget blowouts.
-					</p>
-					<p class="mt-3 text-base leading-relaxed text-gray-700">
-						WellRoost was built as the resource we wished we had: one place where renovation, energy and financing models run on the same numbers. A homeowner can see what a decision returns before committing to it.
+					<p class="figure text-[clamp(2rem,3.2vw,2.8rem)] text-pine">Well</p>
+					<p class="body mt-3">
+						Low running costs, working systems, and a household that is not paying for energy it
+						does not use.
 					</p>
 				</div>
-				<div class="mt-8 pt-6 border-t border-blue-100 flex flex-wrap items-center gap-4 text-xs font-semibold text-primary">
-					<span>✓ Local Cost Scalers</span>
-					<span>✓ Comp ARV Valuations</span>
-					<span>✓ Energy Rebate Tax Rules</span>
-					<span>✓ 5-Year Equity Ledger</span>
-				</div>
-			</div>
-
-			<!-- What WellRoost Means Card -->
-			<div class="flex flex-col justify-between rounded-3xl border border-gray-200 bg-white p-8 shadow-sm">
 				<div>
-					<p class="font-mono text-xs uppercase tracking-wider text-gray-500 font-semibold">The Brand Name</p>
-					<h2 class="mt-2 text-2xl font-bold text-gray-1000">What "WellRoost" Means</h2>
-					<div class="mt-6 space-y-4">
-						<div class="rounded-xl border border-gray-100 bg-gray-50/70 p-4">
-							<p class="font-bold text-primary text-sm uppercase tracking-wider">Well</p>
-							<p class="mt-1 text-xs sm:text-sm text-gray-600 leading-relaxed">
-								Well-being, energy efficiency, optimized operations, and sound, healthy financial decision-making.
-							</p>
-						</div>
-						<div class="rounded-xl border border-gray-100 bg-gray-50/70 p-4">
-							<p class="font-bold text-emerald-700 text-sm uppercase tracking-wider">Roost</p>
-							<p class="mt-1 text-xs sm:text-sm text-gray-600 leading-relaxed">
-								Your sanctuary, your household anchor, and the foundational equity asset of your family's future.
-							</p>
-						</div>
-					</div>
+					<p class="figure text-[clamp(2rem,3.2vw,2.8rem)] text-pine">Roost</p>
+					<p class="body mt-3">
+						The equity you are sitting on, and the reason a bad decision here costs more than a bad
+						decision anywhere else.
+					</p>
 				</div>
-				<p class="mt-6 text-xs text-gray-400 font-mono">
-					Technology & strategy built for modern property owners.
-				</p>
 			</div>
-
-			<!-- Philosophy: Numbers Before Hammers -->
-			<div class="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm">
-				<div class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-primary mb-4">
-					<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-					</svg>
-				</div>
-				<p class="text-xs font-mono font-bold uppercase tracking-wider text-primary">Our Core Philosophy</p>
-				<h3 class="mt-2 text-xl font-bold text-gray-1000">Numbers Before Hammers</h3>
-				<p class="mt-3 text-sm sm:text-base leading-relaxed text-gray-600">
-					Whether you are evaluating a $60,000 kitchen renovation, buying down mortgage points, or deciding whether to move or improve, our calculators quantify the actual payback, resale lift, and total cost of ownership before you spend a dime.
-				</p>
-			</div>
-
-			<!-- Integrated Strategy: Tools + Insights -->
-			<div class="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm">
-				<div class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 mb-4">
-					<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 4a2 2 0 00-2-2m-2-3V3m8 8h-6M21 12H9m0 0v-4" />
-					</svg>
-				</div>
-				<p class="text-xs font-mono font-bold uppercase tracking-wider text-emerald-600">Unified Architecture</p>
-				<h3 class="mt-2 text-xl font-bold text-gray-1000">Tools + Editorial Insights</h3>
-				<p class="mt-3 text-sm sm:text-base leading-relaxed text-gray-600">
-					We connect dynamic, interactive calculators with live intelligence articles synced from our central knowledge base, giving you both the high-level strategy and the granular math.
-				</p>
-			</div>
-
-			<!-- Guardrails & Safeguards -->
-			<div class="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm">
-				<div class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-purple-50 text-purple-600 mb-4">
-					<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-					</svg>
-				</div>
-				<p class="text-xs font-mono font-bold uppercase tracking-wider text-purple-600">Built-in Guardrails</p>
-				<h3 class="mt-2 text-xl font-bold text-gray-1000">Over-Improvement Protection</h3>
-				<p class="mt-3 text-sm sm:text-base leading-relaxed text-gray-600">
-					Our models automatically flag budget-to-value ratios exceeding neighborhood norms, debt-to-income stress, and excessive financing leverage so you never overcapitalize.
-				</p>
-			</div>
-
 		</div>
 	</section>
 
-	<!-- Who We Serve -->
-	<section class="mt-20">
-		<div class="max-w-3xl">
-			<p class="section-eyebrow">Target Audience</p>
-			<h2 class="mt-2 text-3xl sm:text-4xl font-bold tracking-tight text-gray-1000">
-				Built for Property Owners Who Value Data
-			</h2>
-			<p class="mt-3 text-base sm:text-lg text-gray-600 leading-relaxed">
-				Whether managing a single-family residence, evaluating a move, or optimizing an investment portfolio, WellRoost serves distinct property decision profiles.
+	<section class="wrap" aria-labelledby="audience">
+		<div class="grid gap-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] lg:gap-20">
+			<h2 id="audience" class="h2 max-w-[16ch] text-ink" data-reveal>Who the math is for.</h2>
+			<ul class="grid">
+				{
+					audience.map((item, index) => (
+						<li
+							class="grid gap-1 py-5 sm:grid-cols-[12rem_minmax(0,1fr)] sm:gap-8"
+							data-reveal
+							style={`--reveal-delay:${index * 60}ms`}
+						>
+							<p class="font-display text-[1.3rem] leading-tight text-ink">{item.title}</p>
+							<p class="body max-w-[44ch]">{item.body}</p>
+						</li>
+					))
+				}
+			</ul>
+		</div>
+	</section>
+
+	<section class="field-dark section mt-[var(--section-space)]" aria-labelledby="principles">
+		<div class="wrap">
+			<h2 id="principles" class="h2 max-w-[18ch] text-paper" data-reveal>The rules we hold to.</h2>
+			<ul class="mt-12 grid gap-10 lg:grid-cols-3 lg:gap-12">
+				{
+					principles.map((item, index) => (
+						<li data-reveal style={`--reveal-delay:${index * 70}ms`}>
+							<h3 class="font-display text-[1.5rem] leading-tight text-paper">{item.title}</h3>
+							<p class="mt-3 max-w-[38ch] text-[1rem] leading-relaxed text-paper/70">
+								{item.body}
+							</p>
+						</li>
+					))
+				}
+			</ul>
+			<p class="mt-12 max-w-[52ch] text-[1rem] leading-relaxed text-paper/60" data-reveal>
+				Where the calculators stop: no live comparables, no contractor pricing by ZIP, no loan
+				program rules. Those gaps are named on each engine page rather than hidden behind a
+				disclaimer at the bottom.
 			</p>
 		</div>
-
-		<div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-			{audiencePersonas.map((persona) => (
-				<article class="flex flex-col justify-between rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-gray-300 hover:shadow-md">
-					<div>
-						<span class="inline-block rounded-md bg-gray-100 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-gray-700">
-							{persona.badge}
-						</span>
-						<h3 class="mt-4 text-lg font-bold text-gray-1000">{persona.title}</h3>
-						<p class="mt-2 text-xs sm:text-sm leading-relaxed text-gray-600">
-							{persona.description}
-						</p>
-					</div>
-				</article>
-			))}
-		</div>
 	</section>
 
-	<!-- Core Principles -->
-	<section class="mt-20 rounded-3xl border border-gray-200 bg-white p-8 sm:p-12 shadow-sm">
-		<div class="max-w-3xl">
-			<p class="section-eyebrow">Our Standards</p>
-			<h2 class="mt-2 text-3xl font-bold tracking-tight text-gray-1000">
-				The Principles Guiding Our Decision Engines
-			</h2>
-		</div>
-
-		<div class="mt-10 grid gap-8 md:grid-cols-3">
-			{corePrinciples.map((item) => (
-				<div class="flex flex-col">
-					<span class="font-mono text-3xl font-black text-gray-200">{item.number}</span>
-					<h3 class="mt-2 text-lg font-bold text-gray-1000">{item.title}</h3>
-					<p class="mt-2 text-sm leading-relaxed text-gray-600">{item.text}</p>
-				</div>
-			))}
-		</div>
-	</section>
-
-	<!-- Final CTA -->
-	<section class="mt-20 mb-12 rounded-3xl bg-gray-1000 p-10 sm:p-14 text-center text-white shadow-xl">
-		<h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Ready to model your next home move?</h2>
-		<p class="mx-auto mt-4 max-w-xl text-base text-gray-300 leading-relaxed">
-			Use our free interactive calculators to evaluate remodeling returns, compare moving vs. improving, and stress-test your financing.
-		</p>
-		<div class="mt-8 flex flex-wrap justify-center gap-4">
-			<a href="/calculators/" class="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-bold text-gray-1000 transition hover:bg-gray-100 shadow-sm">
-				Open Calculator Hub
-			</a>
-			<a href="/categories/" class="inline-flex items-center justify-center rounded-xl border border-gray-700 bg-gray-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-gray-800">
-				Explore Decision Pillars &rarr;
+	<section class="paper-2 mt-[var(--section-space)] py-[clamp(3.5rem,8vw,7rem)]">
+		<div class="wrap flex flex-wrap items-end justify-between gap-x-16 gap-y-8">
+			<h2 class="display-sm max-w-[18ch] text-ink" data-reveal>Start with your own quote.</h2>
+			<a href="/calculators/" class="btn" data-reveal style="--reveal-delay:80ms">
+				Open the calculators
+				<span aria-hidden="true">&rarr;</span>
 			</a>
 		</div>
 	</section>
 </BaseLayout>
-
