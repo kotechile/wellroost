@@ -14,6 +14,8 @@
  * answers 200 for meta-refresh redirect pages and for any unknown path, which produces false
  * results in both directions.
  */
+import { ANALYTICS } from '../src/data/analytics.mjs';
+
 const INPUT = process.argv[2];
 if (!INPUT) {
 	console.error('usage: node check-crawl-artifacts.mjs <origin>');
@@ -203,11 +205,20 @@ async function checkInstrumentation() {
 	const home = await probe('/');
 
 	const id = home.body.match(/data-website-id="([^"]*)"/)?.[1];
-	if (!id) fail('analytics tag on /', 'a script with data-website-id', 'none in the served HTML — this property is unmeasured');
-	else ok('analytics tag on /', id);
+	if (!id) {
+		fail('analytics tag on /', 'a script with data-website-id', 'none in the served HTML — this property is unmeasured');
+		return;
+	}
+	// The exact id, not merely an id: a copy-pasted sibling's id records visits against the wrong
+	// property and looks completely healthy from here.
+	if (id === ANALYTICS.websiteId) ok('analytics tag on /', id);
+	else fail('analytics website id', `${ANALYTICS.websiteId} (wellroost.com)`, `${id} — wrong property or a stale build`);
+
+	const src = home.body.match(/src="([^"]*)"[^>]*data-website-id/)?.[1] || '';
+	if (src && new URL(src).host === new URL(ANALYTICS.src).host) ok('tracker is the self-hosted Umami', src);
+	else fail('tracker host', new URL(ANALYTICS.src).host, src || '(not detected)');
 
 	const domains = home.body.match(/data-domains="([^"]*)"/)?.[1] || '';
-	if (!id) return;
 	if (domains.split(',').map((d) => d.trim()).includes(HOST)) ok('analytics scoped to this host', domains);
 	else fail('analytics data-domains', `a list including ${HOST}`, domains || '(none)');
 

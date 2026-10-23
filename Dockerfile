@@ -28,6 +28,17 @@ ENV PUBLIC_N8N_WEBHOOK_URL=${PUBLIC_N8N_WEBHOOK_URL:-}
 ARG PUBLIC_TELEMETRY_WEBHOOK_URL=
 ENV PUBLIC_TELEMETRY_WEBHOOK_URL=${PUBLIC_TELEMETRY_WEBHOOK_URL:-}
 
+# Analytics. The id is committed in src/data/analytics.mjs, so a normal build needs no arguments —
+# these only exist so a staging build or a re-hosted Umami instance can override them. They MUST be
+# declared: Docker silently drops a build arg the Dockerfile never names, and Astro inlines
+# import.meta.env at build time, so the value would look set in Coolify and never reach the bundle.
+ARG PUBLIC_ANALYTICS_SRC=
+ENV PUBLIC_ANALYTICS_SRC=${PUBLIC_ANALYTICS_SRC:-}
+ARG PUBLIC_ANALYTICS_WEBSITE_ID=
+ENV PUBLIC_ANALYTICS_WEBSITE_ID=${PUBLIC_ANALYTICS_WEBSITE_ID:-}
+ARG PUBLIC_ANALYTICS_DOMAINS=
+ENV PUBLIC_ANALYTICS_DOMAINS=${PUBLIC_ANALYTICS_DOMAINS:-}
+
 # This helps if the server has trouble with its own SSL certificate during build
 ENV NODE_TLS_REJECT_UNAUTHORIZED=0
 

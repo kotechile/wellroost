@@ -2,6 +2,7 @@
 import Footer from '../components/Footer.astro';
 import SearchOverlay from '../components/SearchOverlay.astro';
 import SiteNav from '../components/SiteNav.astro';
+import { ANALYTICS } from '../data/analytics.mjs';
 import '../styles/global.css';
 
 interface Props {
@@ -26,26 +27,20 @@ const {
 const site = Astro.site ?? new URL(Astro.url.origin);
 
 /**
- * Analytics, which this layout did not have at all.
+ * Analytics. Values live in `src/data/analytics.mjs` (committed), environment wins when set.
  *
- * "No traffic" was reported for this property while nothing on it was counting — the two are
- * indistinguishable from the outside, and every fix that followed was unverifiable. One Umami
- * website id per property, scoped to its own host: a shared id scoped to a sibling's domain drops
- * the events without raising an error.
- *
- * The id is a BUILD-time variable (Astro inlines `import.meta.env`), so it must be set where
- * `astro build` runs — not on the container. When it is missing the site ships unmeasured, which is
- * why this warns loudly instead of failing silently, and why `scripts/verify.mjs` asserts the tag is
- * present on the live origin.
+ * This layout had none at all, so "no traffic" on this property was really "no data". The id is
+ * committed rather than left to a build argument the Dockerfile has to remember to declare; empty is
+ * a build failure, not a silent no-op.
  */
-const analyticsSrc = import.meta.env.PUBLIC_ANALYTICS_SRC || 'https://cloud.umami.is/script.js';
-const analyticsWebsiteId = import.meta.env.PUBLIC_ANALYTICS_WEBSITE_ID || '';
-const analyticsDomains = import.meta.env.PUBLIC_ANALYTICS_DOMAINS || 'wellroost.com,www.wellroost.com';
+const analyticsSrc = import.meta.env.PUBLIC_ANALYTICS_SRC || ANALYTICS.src;
+const analyticsWebsiteId = import.meta.env.PUBLIC_ANALYTICS_WEBSITE_ID || ANALYTICS.websiteId;
+const analyticsDomains = import.meta.env.PUBLIC_ANALYTICS_DOMAINS || ANALYTICS.domains;
 
-if (!analyticsWebsiteId) {
-	console.warn(
-		'\n[analytics] PUBLIC_ANALYTICS_WEBSITE_ID is not set — wellroost.com will ship UNMEASURED.\n' +
-			'            Add the Umami Cloud website id for this property to the build environment.\n'
+if (!analyticsWebsiteId || !analyticsSrc) {
+	throw new Error(
+		'[analytics] no website id or tracker configured — refusing to build an unmeasured site. ' +
+			'Set it in src/data/analytics.mjs or PUBLIC_ANALYTICS_WEBSITE_ID.'
 	);
 }
 
