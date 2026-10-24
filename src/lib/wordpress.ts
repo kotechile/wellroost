@@ -5,6 +5,26 @@ interface WordPressRenderedField {
 interface WordPressMedia {
 	source_url?: string;
 	alt_text?: string;
+	media_details?: {
+		width?: number;
+		height?: number;
+		sizes?: Record<string, { source_url?: string; width?: number; height?: number }>;
+	};
+}
+
+/**
+ * WordPress publishes every upload at several renditions. Taking `source_url` means shipping the
+ * largest (here: 2,560px, 342 KB on average) inside a card that renders at 340px. Prefer `large`,
+ * fall back to `medium_large`, and only then the original.
+ */
+function pickMediaUrl(media?: WordPressMedia): string | null {
+	if (!media) return null;
+	const sizes = media.media_details?.sizes ?? {};
+	for (const key of ['large', 'medium_large', 'medium']) {
+		const url = sizes[key]?.source_url;
+		if (url) return url;
+	}
+	return media.source_url ?? null;
 }
 
 interface WordPressTerm {
@@ -113,7 +133,7 @@ function normalizePost(post: WordPressPostResponse): WordPressPost {
 	const category = terms.find((term) => term?.slug && term?.name);
 	const featuredMedia = post._embedded?.['wp:featuredmedia']?.[0];
 	
-	let featuredImage = featuredMedia?.source_url ?? null;
+	let featuredImage = pickMediaUrl(featuredMedia);
 	const apiBase = getWordPressApiBase();
 
 	// Ensure featured image URL is absolute if it starts with /
