@@ -35,7 +35,7 @@ const VERTICALS = (
 
 const TARGET_ASPECT = 16 / 9;
 const ASPECT_TOLERANCE = 0.03;
-const MIN_WIDTH = 1600;
+const MIN_WIDTH = 1344; // 1K 16:9 — the render size the generator produces
 const MAX_BYTES = 400 * 1024;
 const ALT_MIN = 40;
 const ALT_MAX = 140;

@@ -36,7 +36,7 @@ featured image, so §1 and §2 are the whole contract for it.
 | --- | --- | --- | --- |
 | 1 | Featured image set | required | A post without one falls back to a placeholder and breaks the card grid. |
 | 2 | Aspect ratio | **16:9**, tolerance ±3% | The site renders two crops: a 7:4 card and a 16:9 masthead. From a 16:9 master the card crop removes 1.6% of the width and the masthead removes nothing. Any other master loses content in one of the two. |
-| 3 | Width | **≥ 1600 px** (upload 2400 × 1350) | The front end requests WordPress's `large` rendition (1024 px) for cards and the full file for a masthead on a 1440 pt screen. Under 1600 px the masthead is soft. |
+| 3 | Width | **≥ 1344 px** — a 1K 16:9 render is 1344 × 768, which is the target, not the floor | Cards render at ≤ 30 vw (≈ 430 CSS px) and the masthead at ≤ 72 rem (1152 CSS px). 1344 covers the masthead at 1.17×, enough for photography. Asking for more made the build upscale a 1K original, which costs bytes and adds nothing. A 2K render is a deliberate upgrade for a hero image, never a requirement. |
 | 4 | File weight | **≤ 400 KB** at upload size | Cards are 340 px wide. 342 KB average was the old library's normal; a 16:9 JPEG at q84 lands near 150 KB. |
 | 5 | Format | **JPEG, sRGB, progressive** | PNG photographs are 4–8× heavier. No CMYK. WebP only if WordPress's media library is configured to accept it. |
 | 6 | WordPress renditions | `large` must exist | `src/lib/wordpress.ts` asks for `large`, then `medium_large`, then `medium`, then the original. A missing rendition means the front end silently ships a 2560 px file. |
@@ -90,6 +90,24 @@ measure, so the rules differ from the featured image:
 | Markup | theme chrome is stripped for you | `src/lib/wordpress.ts` → `cleanArticleHtml()` rewrites every `<img>`: drops the theme's classes and inline `float`/`width`, adds `loading="lazy"`, `decoding="async"`, and dimensions when WordPress supplies them. `border-border` in a body otherwise resolves to currentColor and draws a near-black hairline on a paper ground. |
 | No text, no charts | same as rules 11 and 12 | A screenshot of a table is not an illustration; it is unreadable on a phone and unsearchable everywhere. |
 | Aspect | **any**, including portrait (3:4 – 4:5) | The body slot is the one place a tall picture works. It is height-capped at 34rem and centred (`max-height: 34rem; width: auto`), so a 3:4 portrait arrives at ~408 × 544 px instead of a 768 px wall. Wide images never reach the cap, so their treatment is unchanged. |
+
+### About 1K
+
+The generator renders 16:9 at **1344 × 768**. That is the size this site is built for, and it is
+also the cheapest render the models offer — the difference between 1K and 2K is roughly a doubling
+of cost per image for detail that a 340 px card cannot show and a 1152 px masthead barely can.
+
+What 1344 buys, precisely:
+
+| Slot | Displayed at | Source ratio | Verdict |
+| --- | --- | --- | --- |
+| Card | ≈ 430 CSS px (30 vw at 1440) | 3.1× | plenty, even on a 2× screen |
+| Masthead | ≤ 1152 CSS px (72 rem) | 1.17× | acceptable for photography; soft if zoomed |
+| `og:image` | 1200 × 630 crop | 1.1× | fine |
+
+So: **render at 1K, always.** Go to 2K only for a piece whose masthead is the whole point — a hero
+spread — and never because a checklist said so. The build no longer upscales: the masthead asks for
+720, 1080 and 1344, and stops at the source.
 
 ### Why the featured image cannot be portrait
 

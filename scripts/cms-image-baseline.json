@@ -3,65 +3,31 @@
   "note": "Grandfathered featured images, published before docs/cms-image-spec.md. Reported, not fatal. New posts must pass.",
   "posts": {
     "20-percent-of-your-ac-never-arrives": [
-      "1376px wide, needs ≥1600",
       "1479KB, needs ≤400KB"
     ],
-    "3-percent-cap-never-covers-your-addition": [
-      "1344px wide, needs ≥1600"
-    ],
-    "backup-battery-sizing-critical-loads": [
-      "1344px wide, needs ≥1600"
-    ],
-    "battery-payback-five-state-gap": [
-      "1344px wide, needs ≥1600"
-    ],
     "borrow-at-8-to-remodel-or-let-your-battery-earn-on-the-grid": [
-      "1200px wide, needs ≥1600"
+      "1200px wide, needs ≥1344"
     ],
     "california-fair-plan-premiums-jump-291-oct-15-your-exit-strategy": [
-      "1200px wide, needs ≥1600",
+      "1200px wide, needs ≥1344",
       "alt 20 chars, needs ≥40"
     ],
     "california-legalizes-plug-in-home-solar-panels": [
-      "1200px wide, needs ≥1600"
-    ],
-    "cheapest-fuel-priciest-pipe": [
-      "1344px wide, needs ≥1600"
+      "1200px wide, needs ≥1344"
     ],
     "cloud-update-bricked-the-fridge-local-first": [
-      "1376px wide, needs ≥1600",
       "1181KB, needs ≤400KB"
     ],
     "heat-pumps-cheaper-to-run-pricier-to-buy": [
-      "1376px wide, needs ≥1600",
       "978KB, needs ≤400KB"
     ],
     "heat-pumps-just-got-cheaper-to-run-and-pricier-to-buy": [
       "aspect 1.83:1, needs 16:9",
-      "1200px wide, needs ≥1600",
+      "1200px wide, needs ≥1344",
       "alt 29 chars, needs ≥40"
     ],
-    "hold-back-capped-at-5-percent": [
-      "1344px wide, needs ≥1600"
-    ],
     "kill-your-deposit-in-3-days": [
-      "1344px wide, needs ≥1600",
       "alt 156 chars, needs ≤140"
-    ],
-    "local-api-isnt-in-the-contract": [
-      "1344px wide, needs ≥1600"
-    ],
-    "local-first-smart-home-cost-squeeze": [
-      "1344px wide, needs ≥1600"
-    ],
-    "mechanics-lien-clock-payment-release": [
-      "1344px wide, needs ≥1600"
-    ],
-    "monitor-77-percent-guess-where-it-fails": [
-      "1344px wide, needs ≥1600"
-    ],
-    "panel-upgrade-80-percent-test": [
-      "1344px wide, needs ≥1600"
     ],
     "roof-claim-hidden-second-check-12-months": [
       "522KB, needs ≤400KB"
@@ -74,41 +40,10 @@
       "filename not lowercase"
     ],
     "the-remodel-that-pays-you-back-isnt-the-one-you-want": [
-      "1200px wide, needs ≥1600"
-    ],
-    "water-leak-monitor-rate-threshold": [
-      "1344px wide, needs ≥1600"
+      "1200px wide, needs ≥1344"
     ],
     "windows-13-percent-best-case": [
-      "1376px wide, needs ≥1600",
       "1291KB, needs ≤400KB"
-    ],
-    "your-49-discount-isnt-all-roof": [
-      "1344px wide, needs ≥1600"
-    ],
-    "your-5-deductible-risks-your-claim": [
-      "1344px wide, needs ≥1600"
-    ],
-    "your-75000-btu-tank-venting-trap": [
-      "1344px wide, needs ≥1600"
-    ],
-    "your-batterys-745-mw-cliff": [
-      "1344px wide, needs ≥1600"
-    ],
-    "your-blocks-30b-hardening-bill": [
-      "1344px wide, needs ≥1600"
-    ],
-    "your-ev-is-now-a-home-battery-behind-a-paywall": [
-      "1344px wide, needs ≥1600"
-    ],
-    "your-nonrenewal-isnt-final-count-120-days": [
-      "1344px wide, needs ≥1600"
-    ],
-    "your-remodel-loses-to-149-growth": [
-      "1344px wide, needs ≥1600"
-    ],
-    "your-upgrades-9-silent-reset": [
-      "1344px wide, needs ≥1600"
     ]
   }
 }
