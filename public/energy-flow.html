@@ -9,23 +9,40 @@
 				margin: 0;
 				padding: 0;
 				overflow: hidden;
-				/* transparent, and no color-scheme hint: the UA must not paint an opaque canvas behind
-				   the document, or the tint below composites over black instead of over the page. */
-				background: transparent;
+				background: #122a20;
 			}
 			body {
 				margin: 0;
 				padding: 0;
 				overflow: hidden;
 				/*
-				 * A tint, not a slab: pine-deep at 80%, so the paper behind the frame comes through and
-				 * the plate reads as glass over the page. The canvas stays transparent and fades by
-				 * erasing, so nothing re-opaques it.
+				 * A slab, not a tint: solid pine-deep. Composed at 80% over the paper band the plate
+				 * measured #3b4e45 — a slate green that read as a washed panel rather than a dark
+				 * one. Solid #122a20 is the same pine, 13 points darker, and the strokes sit on it
+				 * at their designed contrast. The canvas stays transparent and fades by erasing, so
+				 * this is the only ground the drawing has.
 				 */
-				background: rgba(18, 42, 32, 0.8);
+				background: #122a20;
 			}
 			canvas {
 				display: block;
+			}
+			/*
+			 * Ambient contrast vignette, as in the sketch this came from: the plate falls away
+			 * toward its edges so the house and the car hold the centre. Pointer-events off, or it
+			 * would eat the clicks that send a pulse down the cable.
+			 */
+			body::after {
+				content: "";
+				position: fixed;
+				inset: 0;
+				pointer-events: none;
+				background: radial-gradient(
+					125% 95% at 50% 46%,
+					rgba(18, 42, 32, 0) 34%,
+					rgba(12, 30, 23, 0.5) 74%,
+					rgba(6, 16, 12, 0.86) 100%
+				);
 			}
 		</style>
 		<script src="/vendor/p5.min.js"></script>
@@ -41,10 +58,12 @@
 			 *
 			 * Four changes from the sketch as handed over, all of them about *this* page:
 			 *
-			 * 1. The ground is a CSS tint over the paper rather than an opaque slate, and the trail
-			 *    fade runs on the raw 2D context as destination-out. Two consequences: the canvas stays
-			 *    transparent, and because the tint is translucent it brightens the palette slightly —
-			 *    so the window glass is solved for hover, not painted at full amber.
+			 * 1. The ground is a solid pine-deep plate, not the paper showing through. Composed at 80%
+			 *    over the paper band it measured #3b4e45 — a slate green that read as a washed panel,
+			 *    not a dark one. The canvas stays transparent and erases instead of repainting, so the
+			 *    plate is the only ground; a CSS vignette then falls away toward the edges. Without the
+			 *    paper behind the glass the palette no longer brightens, so the window glass is solved
+			 *    for hover, not painted at full amber.
 			 * 2. Every value drawn each frame accumulates to a/(f+a) of its alpha. The sketch repaints
 			 *    at ~11% per frame; this erases at 5.5%, so identical alphas would settle nearly twice
 			 *    as dense. The underlay alphas below are the sketch's divided by ~2.1 to hold the same
@@ -736,11 +755,17 @@
 						line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
 					} else if (this.role === 'SMOKE') {
 						let progress = this.life / this.maxLife;
+						// Cool vapour, not soot. The sketch's amber plume was drawn for a navy plate;
+						// over pine-deep it composites to olive — a brown stain on the chimney rather
+						// than chimney vapour. Pale grey-green into teal keeps it in the drawing's own
+						// family. It also dies out before the frame's top edge, or the plate cuts the
+						// plume with a hard horizontal line.
+						let edgeFade = constrain(map(this.pos.y, 0, 70, 0, 1), 0, 1);
 						stroke(
-							lerp(240, 170, progress) + houseHoverAmt * 20,
-							lerp(180, 195, progress),
-							lerp(120, 220, progress),
-							sin(progress * PI) * (70 + houseHoverAmt * 24)
+							lerp(214, 168, progress),
+							lerp(226, 206, progress),
+							lerp(222, 210, progress),
+							sin(progress * PI) * (58 + houseHoverAmt * 20) * edgeFade
 						);
 						strokeWeight(lerp(1.2, 2.8, progress));
 						line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
