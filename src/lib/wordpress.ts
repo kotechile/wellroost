@@ -316,11 +316,12 @@ const DEFAULT_VERTICAL_SLUGS = [
 	'property_loss_insurance_mitigation',
 	// Routed to wellroost.com by public.vertical_sites but missing from this list, so their posts
 	// were filtered out of every build and 404'd on the reader front. yard_robotics added with its
-	// first article (2026-10-24); outdoor_power_equipment added with its first article (2026-10-24).
-	// home_diagnostics_tech is still absent and has no published posts yet — see the report, this
-	// list should be derived from vertical_sites, not hand-kept.
+	// first article (2026-10-24); outdoor_power_equipment added with its first article (2026-10-24);
+	// home_diagnostics_tech added with its first article (2026-10-24). This list should be derived
+	// from vertical_sites, not hand-kept — see the open report item.
 	'yard_robotics',
-	'outdoor_power_equipment'
+	'outdoor_power_equipment',
+	'home_diagnostics_tech'
 ];
 
 export function getConfiguredVerticalSlugs(): string[] {
