@@ -1,14 +1,14 @@
 ---
+import { Image } from 'astro:assets';
 import type { CategoryRecord } from '../../lib/categories';
+import { getSubjectImage } from '../../lib/subjectImages';
 
 interface Props {
 	categories: CategoryRecord[];
 	postCount: number;
-	/** Newest article's picture per subject, keyed by slug. */
-	images?: Record<string, string | null>;
 }
 
-const { categories, postCount, images = {} } = Astro.props;
+const { categories, postCount } = Astro.props;
 ---
 
 <section class="section wrap" aria-labelledby="subjects">
@@ -31,19 +31,22 @@ const { categories, postCount, images = {} } = Astro.props;
 
 	<ul class="mt-[clamp(2rem,4vw,3rem)] grid">
 		{
-			categories.map((category, index) => (
+			categories.map((category, index) => {
+				const cover = getSubjectImage(category.slug);
+				return (
 				<li data-reveal style={`--reveal-delay:${index * 60}ms`}>
 					<a
 						href={`/categories/${category.slug}/`}
 						class="group grid items-center gap-4 bg-card p-4 text-ink transition-colors duration-200 hover:bg-paper-2 sm:gap-6 sm:p-5 md:grid-cols-[7.5rem_minmax(0,0.85fr)_minmax(0,1fr)_auto]"
 					>
-						{images[category.slug] ? (
+						{cover ? (
 							<span class="block aspect-[4/3] w-full overflow-hidden bg-paper-3 md:w-[7.5rem]">
-								<img
-									src={images[category.slug] as string}
-									alt=""
+								<Image
+									src={cover.src}
+									alt={cover.alt}
+									widths={[240, 360, 480]}
+									sizes="7.5rem"
 									loading="lazy"
-									decoding="async"
 									class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
 								/>
 							</span>
@@ -74,7 +77,8 @@ const { categories, postCount, images = {} } = Astro.props;
 						</span>
 					</a>
 				</li>
-			))
+				);
+			})
 		}
 	</ul>
 </section>
