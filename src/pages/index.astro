@@ -11,10 +11,21 @@ import PillarIndex from '../components/home/PillarIndex.astro';
 import LatestArticles from '../components/home/LatestArticles.astro';
 import CloseCta from '../components/home/CloseCta.astro';
 import { getTopLevelCategories } from '../lib/categories';
-import { fetchLatestPosts } from '../lib/wordpress';
+import { fetchLatestPosts, fetchPostsByCategory } from '../lib/wordpress';
 
 const topCategories = await getTopLevelCategories();
 const posts = await fetchLatestPosts(3);
+
+// A cover per subject, taken from its newest piece — the only picture the CMS carries per article.
+const categoryCovers = Object.fromEntries(
+	await Promise.all(
+		topCategories.map(async (category) => {
+			if (!category.wordpressCategoryId) return [category.slug, null] as const;
+			const [latest] = await fetchPostsByCategory(category.wordpressCategoryId, 1);
+			return [category.slug, latest?.featuredImage ?? null] as const;
+		})
+	)
+);
 
 const siteUrl = Astro.site?.toString() || 'https://wellroost.com/';
 
@@ -46,7 +57,11 @@ const websiteSchema = {
 	<EngineRows />
 	<CandyHome />
 	<MethodSpread />
-	<PillarIndex categories={topCategories} postCount={posts.length} />
+	<PillarIndex
+		categories={topCategories}
+		postCount={topCategories.reduce((sum, category) => sum + (category.postCount ?? 0), 0)}
+		images={categoryCovers}
+	/>
 	<LatestArticles />
 
 	<PlateBand
