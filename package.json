@@ -10,6 +10,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "check:crawl": "node scripts/check-crawl-artifacts.mjs",
     "indexnow": "node scripts/indexnow.mjs",
     "astro": "astro",
@@ -34,6 +36,7 @@
     "@astrojs/check": "0.9.9",
     "@types/node": "^25.6.0",
     "typescript": "5.9.3",
-    "vite": "7.3.2"
+    "vite": "7.3.2",
+    "vitest": "^5.0.5"
   }
 }
