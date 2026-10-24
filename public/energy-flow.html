@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Flow field: a house, its chimney, a wall charger and an electric car</title>
+		<title>Flow field: a modern house, its wall connector and an electric car</title>
 		<style>
 			html {
 				margin: 0;
@@ -18,11 +18,11 @@
 				padding: 0;
 				overflow: hidden;
 				/*
-				 * A tint, not a slab. Pine-deep at 58% lets the paper behind the frame come through, so
-				 * the plate reads as glass laid over the page rather than a black rectangle punched into
-				 * it. The canvas itself is transparent and fades by erasing, so nothing re-opaques it.
+				 * A tint, not a slab: pine-deep at 80%, so the paper behind the frame comes through and
+				 * the plate reads as glass over the page. The canvas stays transparent and fades by
+				 * erasing, so nothing re-opaques it.
 				 */
-				background: rgba(18, 42, 32, 0.80);
+				background: rgba(18, 42, 32, 0.8);
 			}
 			canvas {
 				display: block;
@@ -33,105 +33,121 @@
 	<body>
 		<script>
 			/**
-			 * WellRoost — generative flow field and vector harmonics.
+			 * WellRoost — meditative flow field and vector harmonics.
 			 *
-			 * Everything in the frame (clouds, chimney plume, house contour, wall charger, cable, car)
-			 * is drawn by the same three primitives: Perlin noise, trigonometric curl, and vector
-			 * steering. No sprites, no images, no third-party scene graph.
+			 * A cantilevered modern house, a wall connector, a draped charging cable and a fastback EV,
+			 * drawn entirely by Perlin noise, trigonometric curl and vector steering. No sprites, no
+			 * images, no scene graph.
 			 *
-			 * Three departures from the sketch as handed over, all of them about *this* page:
+			 * Four changes from the sketch as handed over, all of them about *this* page:
 			 *
-			 * 1. The plate is pine-deep (#122a20) at 58% rather than an opaque navy sky, so the paper
-			 *    behind the frame shows through and the drawing sits on the page's own ink instead of
-			 *    importing a second palette. One CSS line to change back.
-			 * 4. Motion is roughly half the sketch's speed with a much longer trail fade, so the field
-			 *    reads as flowing curves rather than dashes: noise drift 0.0025 -> 0.0011 per frame,
-			 *    accelerations and max speeds halved, lifespans lengthened, trail fade 8% -> 2.6%.
-			 * 2. Particle count and frame rate scale to the viewport, and pixelDensity is pinned to 1.
-			 *    2,200 hairlines at DPR 2 on a phone is a space heater; the trail effect is unchanged.
-			 * 3. prefers-reduced-motion draws ~140 frames and then stops, leaving the settled picture.
-			 *    The swirl is an enhancement, never the content.
+			 * 1. The ground is a CSS tint over the paper rather than an opaque slate, and the trail
+			 *    fade runs on the raw 2D context as destination-out. Two consequences: the canvas stays
+			 *    transparent, and because the tint is translucent it brightens the palette slightly —
+			 *    so the window glass is solved for hover, not painted at full amber.
+			 * 2. Every value drawn each frame accumulates to a/(f+a) of its alpha. The sketch repaints
+			 *    at ~11% per frame; this erases at 5.5%, so identical alphas would settle nearly twice
+			 *    as dense. The underlay alphas below are the sketch's divided by ~2.1 to hold the same
+			 *    final opacity — otherwise the house and windows go flat and the neon goes white.
+			 * 3. Speeds are ~20% under the sketch, per instruction: drift 0.0016 -> 0.0012, atmosphere
+			 *    1.0-1.8 -> 0.85-1.45, smoke, contour, cable wave and wheel rotation likewise. Nothing
+			 *    in this frame should read as fast.
+			 * 4. The HUD carries status words, not figures. It is decoration; "11.5 kW" and a kWh
+			 *    counter ticking up on its own would be invented telemetry on a site whose entire
+			 *    promise is that every number is published and checkable.
+			 *
+			 * Also: particle count and frame rate scale to the viewport, pixelDensity is pinned to 1,
+			 * the trail buffer is pre-warmed so the plate does not arrive blank, and
+			 * prefers-reduced-motion draws ~150 frames and then stops.
 			 */
 
-			// The ground is CSS, not canvas: rgba(18, 42, 32, 0.80) — pine-deep at 80% — so the paper
-			// behind the frame shows through. See the note in <style> above.
-
 			let particles = [];
-			let NUM_PARTICLES = 2200;
+			let NUM_PARTICLES = 1200;
 			let zOffset = 0;
 			let stillFrame = -1;
 
-			// Scene anchors and mathematical force zones
 			let scene = {};
 			let clouds = [];
+			let pulses = [];
+
+			let houseHoverAmt = 0;
+			let chargerHoverAmt = 0;
+			let lastPulse = 0;
 
 			function setup() {
 				createCanvas(windowWidth, windowHeight);
-				colorMode(HSB, 360, 100, 100, 100);
-				clear();
+				colorMode(RGB, 255);
+				textFont('ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif');
 				pixelDensity(1);
+				clear();
 
 				const narrow = windowWidth < 760;
-				NUM_PARTICLES = narrow ? 300 : windowWidth < 1200 ? 460 : 600;
+				NUM_PARTICLES = narrow ? 420 : windowWidth < 1200 ? 820 : 1200;
 				if (narrow) frameRate(45);
 
 				calculateSceneGeometry();
 				initClouds();
 
 				for (let i = 0; i < NUM_PARTICLES; i++) {
-					let role = 'ATMOS'; // Atmospheric wind and cloud flow field
-					if (i < NUM_PARTICLES * 0.22) {
-						role = 'ENERGY'; // Conduit: roof -> exterior wall box -> wire -> EV
-					} else if (i < NUM_PARTICLES * 0.38) {
-						role = 'SMOKE'; // Turbulent curl-noise thermal plume from the chimney
-					} else if (i < NUM_PARTICLES * 0.52) {
-						role = 'CONTOUR'; // Structural boundary particles tracing house and car
+					let role = 'ATMOS';
+					if (i < NUM_PARTICLES * 0.28) {
+						role = 'ENERGY'; // Conduit: roof -> wall connector -> cable -> car
+					} else if (i < NUM_PARTICLES * 0.44) {
+						role = 'SMOKE'; // Chimney vapour plume
+					} else if (i < NUM_PARTICLES * 0.6) {
+						role = 'CONTOUR'; // Outlines tracing the house and the car
 					}
 					particles.push(new FlowParticle(role));
 				}
 
-				// Warm the trail buffer with ~1.5 seconds of history so the plate does not arrive blank. This is
-				// not equilibrium — at a 3% fade that takes ~40s — it just means the first painted frame already
-				// has a field in it, and the rest settles while the reader is watching.
+				// Warm the trail buffer so the first painted frame already has a field in it; the rest
+				// settles while the reader is watching.
 				for (let i = 0; i < 90; i++) draw();
-				
+
 				if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) stillFrame = 150;
 			}
 
 			function calculateSceneGeometry() {
-				let u = min(width * 0.25, 310);
-				let totalW = u * 2.25;
+				let u = min(width * 0.3, height * 0.62, 380);
+				let totalW = u * 2.3;
 				let startX = width / 2 - totalW / 2;
 				let groundY = height * 0.68;
 
 				scene.u = u;
 				scene.groundY = groundY;
 
-				// 1. House geometry
-				let houseH = u * 0.72;
+				// 1. Modern architectural house: cantilevered upper box, shed roof, chimney
+				let houseW = u * 1.0;
+				let houseH = u * 0.7;
+				let houseX = startX;
 				let houseY = groundY - houseH;
 
 				scene.house = {
-					x: startX,
+					x: houseX,
 					y: houseY,
-					w: u,
+					w: houseW,
 					h: houseH,
-					peakX: startX + u * 0.5,
-					peakY: groundY - u * 1.18,
-					chimneyX: startX + u * 0.74,
-					chimneyY: groundY - u * 1.05,
-					chimneyW: u * 0.11,
-					// Wall box mounted squarely on the exterior right wall, ~55% down
-					chargerX: startX + u,
-					chargerY: houseY + houseH * 0.55,
-					chargerW: u * 0.05,
+					upperX: houseX - u * 0.05,
+					upperY: houseY,
+					upperW: houseW * 0.66,
+					upperH: houseH * 0.48,
+					roofPeakX: houseX + houseW * 0.52,
+					roofPeakY: houseY - u * 0.22,
+					roofRightX: houseX + houseW * 1.02,
+					roofRightY: houseY + houseH * 0.06,
+					chimneyX: houseX + houseW * 0.35,
+					chimneyY: houseY - u * 0.24,
+					chimneyW: u * 0.075,
+					chargerX: houseX + houseW,
+					chargerY: groundY - houseH * 0.45,
+					chargerW: u * 0.038,
 					chargerH: houseH * 0.16
 				};
 
-				// 2. Modern fastback EV geometry
-				let carW = u * 0.82;
-				let carH = carW * 0.35;
-				let carX = scene.house.x + scene.house.w + u * 0.42;
+				// 2. Fastback EV, facing left
+				let carW = u * 0.86;
+				let carH = carW * 0.34;
+				let carX = houseX + houseW + u * 0.35;
 				let carY = groundY - carH * 0.22;
 
 				scene.car = {
@@ -139,29 +155,28 @@
 					y: carY,
 					w: carW,
 					h: carH,
-					centerX: carX + carW * 0.5,
-					centerY: carY - carH * 0.45,
-					wheelR: carW * 0.16,
-					wheel1X: carX + carW * 0.21,
-					wheel2X: carX + carW * 0.79,
-					wheelY: groundY - carW * 0.08,
-					// Charge port on the driver-side front quarter panel
-					portX: carX + carW * 0.14,
-					portY: carY - carH * 0.48
+					centerX: carX + carW * 0.52,
+					centerY: carY - carH * 0.42,
+					wheelR: carW * 0.165,
+					wheel1X: carX + carW * 0.2,
+					wheel2X: carX + carW * 0.8,
+					wheelY: groundY - carW * 0.082,
+					// Charge port at the rear wheel arch, low enough that the cable meets the car's edge
+					portX: carX + carW * 0.86,
+					portY: carY - carH * 0.26
 				};
 
-				// 3. Natural catenary wire from the exterior wall to the car port
+				// 3. Draped charging cable: wall connector -> sag -> car port
 				let wStartX = scene.house.chargerX + scene.house.chargerW;
-				let wStartY = scene.house.chargerY + scene.house.chargerH * 0.65;
+				let wStartY = scene.house.chargerY + scene.house.chargerH * 0.75;
 
 				scene.wire = {
 					x1: wStartX,
 					y1: wStartY,
-					// Control points simulate a heavy cable's gravity sag near the driveway
 					cx1: wStartX + (scene.car.portX - wStartX) * 0.25,
-					cy1: groundY + u * 0.04,
-					cx2: wStartX + (scene.car.portX - wStartX) * 0.75,
-					cy2: groundY - u * 0.02,
+					cy1: groundY + u * 0.06,
+					cx2: wStartX + (scene.car.portX - wStartX) * 0.68,
+					cy2: groundY + u * 0.02,
 					x2: scene.car.portX,
 					y2: scene.car.portY
 				};
@@ -172,145 +187,348 @@
 				for (let i = 0; i < 4; i++) {
 					clouds.push({
 						x: random(width),
-						y: random(height * 0.08, height * 0.32),
-						rx: random(140, 260),
+						y: random(height * 0.06, height * 0.28),
+						rx: random(160, 280),
 						ry: random(35, 65),
-						speed: random(0.10, 0.24),
+						speed: random(0.12, 0.28),
 						seed: random(1000)
 					});
 				}
 			}
 
+			function mousePressed() {
+				triggerEnergyPulse();
+			}
+
+			function touchStarted() {
+				triggerEnergyPulse();
+			}
+
+			function triggerEnergyPulse() {
+				// Some devices fire both handlers for one gesture; one pulse per gesture is enough.
+				if (millis() - lastPulse < 150) return;
+				lastPulse = millis();
+				pulses.push({ t: -0.25, speed: 0.014 });
+			}
+
+			function updateInteractiveStates() {
+				let h = scene.house;
+				let isOverHouse =
+					mouseX >= h.upperX - 20 &&
+					mouseX <= h.x + h.w + 20 &&
+					mouseY >= h.roofPeakY - 20 &&
+					mouseY <= scene.groundY + 20;
+				houseHoverAmt = lerp(houseHoverAmt, isOverHouse ? 1.0 : 0.0, 0.06);
+
+				let badgeCenterX = h.chargerX + scene.u * 0.16;
+				let badgeCenterY = h.chargerY - scene.u * 0.22;
+				let isNearCharger = dist(mouseX, mouseY, badgeCenterX, badgeCenterY) < scene.u * 0.35;
+				chargerHoverAmt = lerp(chargerHoverAmt, isNearCharger ? 1.0 : 0.0, 0.08);
+			}
+
 			function draw() {
-				// Erase rather than repaint. A low-alpha destination-out leaves the canvas transparent
-				// where nothing is drawn — which is the only way the tint behind can stay visible — and
-				// the slower fade is what turns short dashes into long, smooth curves.
+				// Erase rather than repaint, so the paper behind the frame stays visible. The rate is the
+				// trail length: 5.5% per frame is roughly a third of a second of history.
 				const ctx = drawingContext;
 				ctx.save();
 				ctx.globalCompositeOperation = 'destination-out';
-				ctx.fillStyle = 'rgba(0, 0, 0, 0.030)';
+				ctx.fillStyle = 'rgba(0, 0, 0, 0.055)';
 				ctx.fillRect(0, 0, width, height);
 				ctx.restore();
 
-				// Advance drifting cloud vortex cells
+				updateInteractiveStates();
+
 				for (let c of clouds) {
 					c.x += c.speed;
 					if (c.x - c.rx > width) c.x = -c.rx;
 				}
 
-				drawEtherealUnderlay();
+				for (let i = pulses.length - 1; i >= 0; i--) {
+					pulses[i].t += pulses[i].speed;
+					if (pulses[i].t > 1.5) pulses.splice(i, 1);
+				}
+
+				drawModernUnderlay();
 
 				for (let p of particles) {
 					p.step();
 					p.render();
 				}
 
-				zOffset += 0.0008;
+				drawTOUBadge();
+
+				zOffset += 0.0012;
 
 				if (stillFrame > 0 && frameCount === stillFrame) noLoop();
 			}
 
-			function drawEtherealUnderlay() {
+			function drawModernUnderlay() {
 				push();
 				noFill();
 				let h = scene.house;
 				let c = scene.car;
 				let w = scene.wire;
-				let pulse = (sin(frameCount * 0.028) + 1) * 0.5;
+				let breath = (sin(frameCount * 0.04) + 1) * 0.5;
 
-				// Ground horizon
-				stroke(200, 40, 42, 4);
-				strokeWeight(1);
-				beginShape();
-				for (let x = 0; x <= width; x += 25) {
-					let yOff = sin(x * 0.01 + zOffset * 4) * 3;
-					vertex(x, scene.groundY + yOff);
-				}
-				endShape();
-
-				// House structure
-				stroke(196, 42, 86, 8);
-				strokeWeight(1.3);
-				rect(h.x, h.y, h.w, h.h, 2);
-				triangle(h.x - h.w * 0.04, h.y, h.x + h.w * 1.04, h.y, h.peakX, h.peakY);
-				rect(h.chimneyX, h.chimneyY, h.chimneyW, h.y - h.chimneyY - h.h * 0.15);
-
-				// Exterior wall smart EVSE charger unit
-				stroke(168, 48, 88, 8);
-				strokeWeight(1.2);
-				rect(h.chargerX, h.chargerY, h.chargerW, h.chargerH, 2);
-
-				// Conduit from the eaves down the wall into the charger
-				stroke(168, 45, 78, 5);
-				line(h.x + h.w, h.y, h.chargerX, h.chargerY);
-
-				// Window glow
-				noStroke();
-				for (const wx of [h.x + h.w * 0.22, h.x + h.w * 0.56]) {
-				const ww = h.w * 0.22;
-				const wh = h.h * 0.25;
-				const wy = h.y + h.h * 0.25;
-				fill(32, 68, 97, 1.7 + pulse * 0.6);
-				rect(wx, wy, ww, wh, 2);
-				// a glazing bar across each pane: a window, not a lamp
-				stroke(30, 55, 96, 1.5);
-				strokeWeight(1);
-				line(wx + ww / 2, wy, wx + ww / 2, wy + wh);
-				line(wx, wy + wh / 2, wx + ww, wy + wh / 2);
-				noStroke();
+				let carPulseBoost = 0;
+				for (let p of pulses) {
+					if (p.t > 0.85 && p.t < 1.45) {
+						carPulseBoost = max(carPulseBoost, sin(map(p.t, 0.85, 1.45, 0, PI)));
+					}
 				}
 
-				// Wire baseline glow
+				// --- ground horizon
+				stroke(40, 80, 130, 38);
+				strokeWeight(1.5);
+				line(0, scene.groundY, width, scene.groundY);
+
+				// --- house outline
+				stroke(60, 140, 210, 52 + houseHoverAmt * 38);
+				strokeWeight(1.8);
+				rect(h.x, h.y + h.h * 0.35, h.w, h.h * 0.65, 2);
+				rect(h.upperX, h.upperY, h.upperW, h.upperH, 2);
+				line(h.upperX - h.w * 0.03, h.upperY, h.upperX + h.upperW + h.w * 0.04, h.upperY);
+				quad(
+					h.roofPeakX, h.roofPeakY,
+					h.roofRightX, h.roofRightY,
+					h.x + h.w, h.y + h.h * 0.35,
+					h.roofPeakX, h.y + h.h * 0.35
+				);
+				rect(h.chimneyX, h.chimneyY, h.chimneyW, h.upperY - h.chimneyY);
+
+				// --- windows: cool glass at rest, warm and blooming on hover
+				let winX1 = h.upperX + h.upperW * 0.12;
+				let winY1 = h.upperY + h.upperH * 0.22;
+				let winW1 = h.upperW * 0.72;
+				let winH1 = h.upperH * 0.58;
+
+				let winX2 = h.x + h.w * 0.1;
+				let winY2 = h.y + h.h * 0.45;
+				let winW2 = h.w * 0.42;
+				let winH2 = h.h * 0.55;
+
+				let winX3 = h.x + h.w * 0.58;
+				let winY3 = h.y + h.h * 0.45;
+				let winW3 = h.w * 0.32;
+				let winH3 = h.h * 0.55;
+
+				noStroke();
+				if (houseHoverAmt > 0.02) {
+					fill(255, 175, 55, houseHoverAmt * 5);
+					rect(winX1 - 8, winY1 - 8, winW1 + 16, winH1 + 16, 6);
+					rect(winX2 - 8, winY2 - 8, winW2 + 16, winH2 + 16, 6);
+					rect(winX3 - 8, winY3 - 8, winW3 + 16, winH3 + 16, 6);
+
+					fill(255, 160, 40, houseHoverAmt * 2.6);
+					ellipse(h.x + h.w * 0.48, scene.groundY + 8, h.w * 0.9, scene.u * 0.12);
+				}
+
+				fill(
+				lerp(70, 255, houseHoverAmt),
+				lerp(120, 190, houseHoverAmt),
+				lerp(170, 90, houseHoverAmt),
+				8 + houseHoverAmt * 19 + breath * 2
+				);
+				rect(winX1, winY1, winW1, winH1, 2);
+				rect(winX2, winY2, winW2, winH2, 2);
+				rect(winX3, winY3, winW3, winH3, 2);
+				
+				// Frame, so each pane reads as an opening rather than a hole in the wall
 				noFill();
-				stroke(168, 60, 88, 5 + pulse * 4);
-				strokeWeight(1.4);
+				stroke(120, 190, 235, 14 + houseHoverAmt * 12);
+				strokeWeight(1.1);
+				rect(winX1, winY1, winW1, winH1, 2);
+				rect(winX2, winY2, winW2, winH2, 2);
+				rect(winX3, winY3, winW3, winH3, 2);
+				
+				// Mullions inside the glass
+				stroke(150, 200, 235, 9);
+				line(winX1 + winW1 * 0.35, winY1, winX1 + winW1 * 0.35, winY1 + winH1);
+				line(winX1 + winW1 * 0.7, winY1, winX1 + winW1 * 0.7, winY1 + winH1);
+				line(winX2 + winW2 * 0.5, winY2, winX2 + winW2 * 0.5, winY2 + winH2);
+				line(winX3 + winW3 * 0.5, winY3, winX3 + winW3 * 0.5, winY3 + winH3);
+				noStroke();
+
+				// Mullions
+				stroke(20, 35, 55, 75);
+				strokeWeight(1.5);
+				line(h.x + h.w * 0.31, h.y + h.h * 0.45, h.x + h.w * 0.31, scene.groundY);
+				line(h.x + h.w * 0.74, h.y + h.h * 0.45, h.x + h.w * 0.74, scene.groundY);
+
+				// --- wall connector
+				noFill();
+				stroke(0, 235, 175, 85);
+				strokeWeight(1.8);
+				rect(h.chargerX, h.chargerY, h.chargerW, h.chargerH, 3);
+				stroke(0, 255, 190, 94 + breath * 26);
+				strokeWeight(2.2);
+				line(
+					h.chargerX + h.chargerW * 0.5,
+					h.chargerY + h.chargerH * 0.2,
+					h.chargerX + h.chargerW * 0.5,
+					h.chargerY + h.chargerH * 0.8
+				);
+
+				// --- draped cable
+				stroke(0, 245, 180, 21 + breath * 14);
+				strokeWeight(6);
+				bezier(w.x1, w.y1, w.cx1, w.cy1, w.cx2, w.cy2, w.x2, w.y2);
+				stroke(0, 230, 180, 85);
+				strokeWeight(2.2);
 				bezier(w.x1, w.y1, w.cx1, w.cy1, w.cx2, w.cy2, w.x2, w.y2);
 
-				// EV silhouette
-				stroke(190, 44, 86, 7);
-				strokeWeight(1.3);
+				// Beacon travelling the cable on click
+				for (let p of pulses) {
+					if (p.t >= 0 && p.t <= 1.0) {
+						let px = bezierPoint(w.x1, w.cx1, w.cx2, w.x2, p.t);
+						let py = bezierPoint(w.y1, w.cy1, w.cy2, w.y2, p.t);
+						noStroke();
+						fill(0, 255, 190, 80);
+						circle(px, py, 22);
+						fill(255, 230, 100, 220);
+						circle(px, py, 8);
+					}
+				}
+
+				// --- fastback EV
+				noFill();
+				stroke(65, 175, 255, 75 + carPulseBoost * 38);
+				strokeWeight(2);
 				beginShape();
-				vertex(c.x + c.w * 0.04, c.y);
-				vertex(c.x, c.y - c.h * 0.32);
+				vertex(c.x + c.w * 0.03, c.y);
 				bezierVertex(
-					c.x + c.w * 0.04, c.y - c.h * 0.55,
-					c.x + c.w * 0.18, c.y - c.h * 0.58,
-					c.x + c.w * 0.26, c.y - c.h * 0.62
+					c.x - c.w * 0.01, c.y - c.h * 0.18,
+					c.x + c.w * 0.01, c.y - c.h * 0.42,
+					c.x + c.w * 0.08, c.y - c.h * 0.50
 				);
 				bezierVertex(
-					c.x + c.w * 0.38, c.y - c.h * 1.05,
-					c.x + c.w * 0.55, c.y - c.h * 1.08,
-					c.x + c.w * 0.72, c.y - c.h * 0.92
+					c.x + c.w * 0.15, c.y - c.h * 0.56,
+					c.x + c.w * 0.22, c.y - c.h * 0.58,
+					c.x + c.w * 0.27, c.y - c.h * 0.62
 				);
 				bezierVertex(
-					c.x + c.w * 0.86, c.y - c.h * 0.78,
-					c.x + c.w * 0.94, c.y - c.h * 0.60,
-					c.x + c.w, c.y - c.h * 0.30
+					c.x + c.w * 0.39, c.y - c.h * 1.04,
+					c.x + c.w * 0.58, c.y - c.h * 1.08,
+					c.x + c.w * 0.76, c.y - c.h * 0.90
 				);
-				vertex(c.x + c.w * 0.94, c.y);
+				bezierVertex(
+					c.x + c.w * 0.88, c.y - c.h * 0.78,
+					c.x + c.w * 0.95, c.y - c.h * 0.66,
+					c.x + c.w * 0.99, c.y - c.h * 0.60
+				);
+				bezierVertex(
+					c.x + c.w * 1.01, c.y - c.h * 0.40,
+					c.x + c.w * 0.99, c.y - c.h * 0.15,
+					c.x + c.w * 0.94, c.y
+				);
 				endShape(CLOSE);
 
-				// Aero rims
-				drawHarmonicWheel(c.wheel1X, c.wheelY, c.wheelR);
-				drawHarmonicWheel(c.wheel2X, c.wheelY, c.wheelR);
+				// Greenhouse glass
+				stroke(50, 140, 220, 56);
+				strokeWeight(1.4);
+				beginShape();
+				vertex(c.x + c.w * 0.3, c.y - c.h * 0.6);
+				bezierVertex(
+					c.x + c.w * 0.41, c.y - c.h * 0.95,
+					c.x + c.w * 0.58, c.y - c.h * 0.98,
+					c.x + c.w * 0.75, c.y - c.h * 0.82
+				);
+				vertex(c.x + c.w * 0.84, c.y - c.h * 0.62);
+				endShape(CLOSE);
 
-				// Wall plug and car port nodes
+				// Door handles
+				stroke(90, 180, 255, 80);
+				strokeWeight(1.8);
+				line(c.x + c.w * 0.48, c.y - c.h * 0.5, c.x + c.w * 0.52, c.y - c.h * 0.5);
+				line(c.x + c.w * 0.66, c.y - c.h * 0.52, c.x + c.w * 0.7, c.y - c.h * 0.52);
+
+				// Headlight and taillight
+				stroke(180, 240, 255, 103);
+				line(c.x + c.w * 0.04, c.y - c.h * 0.44, c.x + c.w * 0.12, c.y - c.h * 0.49);
+				stroke(255, 60, 90, 103);
+				line(c.x + c.w * 0.93, c.y - c.h * 0.56, c.x + c.w * 0.98, c.y - c.h * 0.52);
+
+				// Skateboard pack glow
 				noStroke();
-				fill(160, 55, 96, 8 + pulse * 6);
-				circle(w.x1, w.y1, 6 + pulse * 3);
-				circle(w.x2, w.y2, 7 + pulse * 3);
+				fill(0, 240, 180, 21 + breath * 16 + carPulseBoost * 38);
+				rect(c.x + c.w * 0.28, c.y - c.h * 0.08, c.w * 0.44, c.h * 0.06, 2);
+
+				drawFastbackWheel(c.wheel1X, c.wheelY, c.wheelR);
+				drawFastbackWheel(c.wheel2X, c.wheelY, c.wheelR);
+
+				// Charge-port lamp
+				fill(0, 255, 190, 85 + breath * 33);
+				circle(w.x2, w.y2, 7 + breath * 3 + carPulseBoost * 6);
 				pop();
 			}
 
-			function drawHarmonicWheel(wx, wy, r) {
-				stroke(184, 48, 84, 6);
-				strokeWeight(1.2);
+			function drawFastbackWheel(wx, wy, r) {
+				fill(18, 30, 26);
+				stroke(60, 160, 240, 85);
+				strokeWeight(2);
 				circle(wx, wy, r);
-				let rot = frameCount * 0.014;
-				for (let i = 0; i < 5; i++) {
-					let a = rot + (TWO_PI / 5) * i;
-					line(wx, wy, wx + cos(a) * (r * 0.45), wy + sin(a) * (r * 0.45));
+
+				noFill();
+				stroke(0, 230, 180, 56);
+				strokeWeight(1.2);
+				circle(wx, wy, r * 0.65);
+
+				let rot = frameCount * 0.012;
+				for (let i = 0; i < 7; i++) {
+					let a = rot + (TWO_PI / 7) * i;
+					line(wx, wy, wx + cos(a) * (r * 0.46), wy + sin(a) * (r * 0.46));
 				}
+			}
+
+			function drawTOUBadge() {
+			// Below this scale the panel's type falls under 7px and it covers the car. A HUD nobody can read
+			// is clutter: on a phone the scene plays on its own.
+			if (scene.u < 150) return;
+			
+			push();
+			let h = scene.house;
+				let breath = (sin(frameCount * 0.04) + 1) * 0.5;
+				let floatY = sin(frameCount * 0.025) * 3.5;
+
+				let badgeW = constrain(scene.u * 0.5, 96, 168);
+				let badgeH = constrain(scene.u * 0.12, 28, 42);
+				let k = badgeH / 42; // everything inside the panel scales with it
+				let bx = h.chargerX + scene.u * 0.04;
+				let by = h.chargerY - scene.u * 0.24 + floatY;
+
+				// Tether dots back to the connector
+				stroke(0, 230, 180, 60);
+				strokeWeight(1.5);
+				for (let i = 0; i <= 6; i++) {
+					let t = i / 6;
+					point(lerp(h.chargerX + h.chargerW * 0.5, bx + 18, t), lerp(h.chargerY, by + badgeH, t));
+				}
+
+				// Panel
+				fill(16, 26, 22, 130);
+				stroke(0, 230, 180, 70 + breath * 30);
+				strokeWeight(1.4);
+				rect(bx, by, badgeW, badgeH, 8);
+
+				// Status beacon
+				noStroke();
+				fill(0, 255, 180, 80 + breath * 100);
+				circle(bx + 14 * k, by + 15 * k, (10 + breath * 4) * k);
+				fill(0, 255, 180, 255);
+				circle(bx + 14 * k, by + 15 * k, 5 * k);
+
+				// Status words only. A kW figure and a kWh counter that ticks up by itself would be
+				// invented telemetry on a site whose claim is that every number is checkable.
+				textAlign(LEFT, CENTER);
+				textStyle(BOLD);
+				textSize(9.5 * k);
+				fill(236, 246, 242);
+				text('OFF-PEAK TOU', bx + 24 * k, by + 15 * k);
+				textStyle(NORMAL);
+				textSize(8.5 * k);
+				fill(140, 226, 200);
+				text(pulses.length > 0 ? 'SENDING A PULSE' : 'CHARGING', bx + 24 * k, by + 29 * k);
+				pop();
 			}
 
 			class FlowParticle {
@@ -319,43 +537,40 @@
 					this.pos = createVector(0, 0);
 					this.prevPos = createVector(0, 0);
 					this.vel = createVector(0, 0);
-					this.acc = createVector(0, 0);
 					this.seed = random(10000);
 					this.initRole(true);
 				}
 
 				initRole(firstSpawn = false) {
 					let h = scene.house;
-					let c = scene.car;
 
 					if (this.role === 'SMOKE') {
-						this.pos.set(h.chimneyX + random(h.chimneyW), h.chimneyY + random(-5, 10));
-						this.vel.set(random(-0.15, 0.15), random(-0.9, -0.42));
-						this.maxSpeed = random(0.6, 1.05);
-						this.life = firstSpawn ? random(20, 240) : 0;
-						this.maxLife = random(280, 470);
+						this.pos.set(h.chimneyX + random(h.chimneyW), h.chimneyY + random(-3, 6));
+						this.vel.set(random(-0.18, 0.18), random(-0.95, -0.52));
+						this.maxSpeed = random(0.68, 1.2);
+						this.life = firstSpawn ? random(10, 260) : 0;
+						this.maxLife = random(240, 400);
 					} else if (this.role === 'ENERGY') {
-						// t: -0.35 solar roof -> -0.1 down the wall conduit -> 0.0 wall box -> 1.0 car port -> 1.4 battery aura
-						this.t = firstSpawn ? random(-0.35, 1.35) : random(-0.35, 0.0);
-						this.tSpeed = random(0.0026, 0.0052);
-						this.waveAmp = random(3, 11);
-						this.waveFreq = random(4, 9);
+						this.t = firstSpawn ? random(-0.3, 1.35) : random(-0.3, 0.0);
+						this.baseTSpeed = random(0.0024, 0.0046);
+						this.waveAmp = random(3, 9);
+						this.waveFreq = random(3, 6);
 						this.phase = random(TWO_PI);
+						this.pulseProximity = 0;
 						this.updateEnergyPos();
 						this.prevPos.set(this.pos);
 					} else if (this.role === 'CONTOUR') {
 						this.spawnOnStructure();
 						this.vel.set(random(-0.25, 0.25), random(-0.25, 0.25));
-						this.maxSpeed = random(0.5, 0.9);
-						this.life = firstSpawn ? random(0, 90) : 0;
-						this.maxLife = random(85, 160);
+						this.maxSpeed = random(0.6, 1.1);
+						this.life = firstSpawn ? random(0, 100) : 0;
+						this.maxLife = random(80, 160);
 					} else {
-						// ATMOS
 						this.pos.set(random(width), random(height));
-						this.vel.set(random(0.25, 1.0), random(-0.25, 0.25));
-						this.maxSpeed = random(0.7, 1.3);
+						this.vel.set(random(0.3, 1.1), random(-0.18, 0.18));
+						this.maxSpeed = random(0.85, 1.45);
 						this.life = 0;
-						this.maxLife = random(330, 640);
+						this.maxLife = random(260, 480);
 					}
 
 					this.prevPos.set(this.pos);
@@ -364,21 +579,21 @@
 				spawnOnStructure() {
 					let h = scene.house;
 					let c = scene.car;
-					if (random(1) < 0.52) {
-						let t = random(1);
-						if (random(1) < 0.55) {
-							let isLeft = random(1) < 0.5;
-							this.pos.x = isLeft ? lerp(h.x, h.peakX, t) : lerp(h.peakX, h.x + h.w, t);
-							this.pos.y = isLeft ? lerp(h.y, h.peakY, t) : lerp(h.peakY, h.y, t);
+					if (random(1) < 0.5) {
+						let r = random(1);
+						if (r < 0.4) {
+							this.pos.set(lerp(h.upperX, h.upperX + h.upperW, random(1)), h.upperY);
+						} else if (r < 0.75) {
+							let t = random(1);
+							this.pos.set(lerp(h.roofPeakX, h.roofRightX, t), lerp(h.roofPeakY, h.roofRightY, t));
 						} else {
-							this.pos.x = random(1) < 0.5 ? h.x : h.x + h.w;
-							this.pos.y = random(h.y, h.y + h.h);
+							this.pos.set(h.x + h.w, random(h.y + h.h * 0.1, scene.groundY));
 						}
 					} else {
 						let t = random(1);
 						let x = lerp(c.x, c.x + c.w, t);
-						let arch = sin(t * PI) * c.h * 0.95;
-						this.pos.set(x, c.y - arch * random(0.6, 1.05));
+						let arch = sin(pow(t, 0.85) * PI) * c.h * 0.96;
+						this.pos.set(x, c.y - arch * random(0.65, 1.02));
 					}
 				}
 
@@ -391,28 +606,48 @@
 					}
 
 					this.life++;
+					let targetAngle = 0;
 
 					if (this.role === 'SMOKE') {
-						this.stepSmoke();
+						let progress = this.life / this.maxLife;
+						let n = noise(this.pos.x * 0.0045, this.pos.y * 0.0045, zOffset * 1.2);
+						let windDrift = map(progress, 0, 1, -HALF_PI, -PI * 0.14);
+						let curl = (n - 0.5) * TWO_PI * 1.3;
+						targetAngle = windDrift + curl * (0.25 + progress * 0.55);
 					} else if (this.role === 'CONTOUR') {
-						this.stepContour();
+						let n = noise(this.pos.x * 0.006, this.pos.y * 0.006, zOffset);
+						targetAngle = n * TWO_PI * 1.8;
 					} else {
-						this.stepAtmos();
+						let n = noise(this.pos.x * 0.0022, this.pos.y * 0.0022, zOffset);
+						targetAngle = (n - 0.5) * PI * 1.1 + sin(this.pos.x * 0.003 + zOffset * 2) * 0.2;
+
+						for (let cl of clouds) {
+							let dx = (this.pos.x - cl.x) / cl.rx;
+							let dy = (this.pos.y - cl.y) / cl.ry;
+							if (dx * dx + dy * dy < 1.0) {
+								let cloudCurl =
+									noise(this.pos.x * 0.008 + cl.seed, this.pos.y * 0.008, zOffset * 1.5) *
+									TWO_PI * 1.6;
+								targetAngle = lerp(targetAngle, cloudCurl, 0.65);
+								break;
+							}
+						}
 					}
 
-					// Interactive mouse swirl
+					let desiredVel = p5.Vector.fromAngle(targetAngle).mult(this.maxSpeed);
+
+					// Steering, not pushing: the swarm leans toward the cursor instead of being shoved.
 					let dMouse = dist(mouseX, mouseY, this.pos.x, this.pos.y);
-					if (dMouse < 210 && dMouse > 1) {
+					if (dMouse < 150 && dMouse > 1) {
 						let aMouse = atan2(this.pos.y - mouseY, this.pos.x - mouseX);
-						let swirlAngle = aMouse + HALF_PI * 0.7;
-						let strength = map(dMouse, 0, 210, 0.24, 0);
-						this.acc.add(p5.Vector.fromAngle(swirlAngle).mult(strength));
+						let swirl = p5.Vector.fromAngle(aMouse + HALF_PI * 0.65).mult(
+							map(dMouse, 0, 150, 0.55, 0)
+						);
+						desiredVel.add(swirl);
 					}
 
-					this.vel.add(this.acc);
-					this.vel.limit(this.maxSpeed);
+					this.vel.lerp(desiredVel, 0.05);
 					this.pos.add(this.vel);
-					this.acc.mult(0);
 
 					if (
 						this.life > this.maxLife ||
@@ -423,20 +658,15 @@
 					}
 				}
 
-				stepSmoke() {
-					let progress = this.life / this.maxLife;
-					let n = noise(this.pos.x * 0.006, this.pos.y * 0.006, zOffset * 1.4);
-					let windDrift = map(progress, 0, 1, -HALF_PI, -PI * 0.18);
-					let curl = (n - 0.5) * TWO_PI * 1.8;
-					let harmonicWave = sin(this.life * 0.08 + this.seed) * 0.35;
-
-					let angle = windDrift + curl * (0.35 + progress * 0.65) + harmonicWave;
-					this.acc.add(p5.Vector.fromAngle(angle).mult(0.10));
-				}
-
 				stepEnergy() {
-					this.t += this.tSpeed;
-					if (this.t > 1.42) {
+					this.pulseProximity = 0;
+					for (let p of pulses) {
+						let d = abs(this.t - p.t);
+						if (d < 0.18) this.pulseProximity = max(this.pulseProximity, map(d, 0, 0.18, 1, 0));
+					}
+
+					this.t += this.baseTSpeed * (1 + this.pulseProximity * 2.2);
+					if (this.t > 1.38) {
 						this.initRole(false);
 						return;
 					}
@@ -449,22 +679,22 @@
 					let c = scene.car;
 
 					if (this.t < 0) {
-						// Phase A: rooftop cascade down the exterior wall into the charger
-						let u = map(this.t, -0.35, 0, 0, 1);
+						// Rooftop cascade, then down the wall into the connector
+						let u = map(this.t, -0.3, 0, 0, 1);
 						let rx, ry;
-						if (u < 0.6) {
-							let subU = map(u, 0, 0.6, 0, 1);
-							rx = lerp(h.peakX, h.x + h.w, subU);
-							ry = lerp(h.peakY, h.y, subU);
+						if (u < 0.55) {
+							let subU = map(u, 0, 0.55, 0, 1);
+							rx = lerp(h.roofPeakX, h.x + h.w, subU);
+							ry = lerp(h.roofPeakY, h.roofRightY, subU);
 						} else {
-							let subU = map(u, 0.6, 1, 0, 1);
-							rx = h.x + h.w;
-							ry = lerp(h.y, w.y1, subU);
+							let subU = map(u, 0.55, 1, 0, 1);
+							rx = h.x + h.w + h.chargerW * 0.5;
+							ry = lerp(h.roofRightY, w.y1, subU);
 						}
-						let wave = sin(u * TWO_PI * 3 + frameCount * 0.075 + this.phase) * 3;
+						let wave = sin(u * TWO_PI * 2 + frameCount * 0.06 + this.phase) * 2.5;
 						this.pos.set(rx + wave, ry);
 					} else if (this.t <= 1.0) {
-						// Phase B: draped bezier wire from wall box to car port
+						// Along the draped cable
 						let bx = bezierPoint(w.x1, w.cx1, w.cx2, w.x2, this.t);
 						let by = bezierPoint(w.y1, w.cy1, w.cy2, w.y2, this.t);
 
@@ -473,113 +703,71 @@
 						let normAngle = atan2(ty, tx) + HALF_PI;
 
 						let envelope = sin(this.t * PI);
+						let amp = this.waveAmp * (1 + this.pulseProximity * 1.4);
 						let wave =
-							sin(this.t * TWO_PI * this.waveFreq - frameCount * 0.10 + this.phase) *
-							this.waveAmp * envelope;
+							sin(this.t * TWO_PI * this.waveFreq - frameCount * 0.08 + this.phase) * amp * envelope;
 
 						this.pos.set(bx + cos(normAngle) * wave, by + sin(normAngle) * wave);
 					} else {
-						// Phase C: dispersal vortex inside the car's battery and cabin
-						let u = map(this.t, 1.0, 1.42, 0, 1);
-						let spiralAngle = u * TWO_PI * 2.5 + this.phase - frameCount * 0.035;
-						let rx = lerp(4, c.w * 0.42, u);
-						let ry = lerp(4, c.h * 0.42, u);
+						// Into the pack
+						let u = map(this.t, 1.0, 1.38, 0, 1);
+						let spiralAngle = u * TWO_PI * 1.8 + this.phase - frameCount * 0.035;
+						let rx = lerp(3, c.w * 0.38, u);
+						let ry = lerp(3, c.h * 0.34, u);
 
 						let cx = lerp(w.x2, c.centerX, u);
-						let cy = lerp(w.y2, c.centerY, u);
+						let cy = lerp(w.y2, c.y - c.h * 0.25, u);
 
 						this.pos.set(cx + cos(spiralAngle) * rx, cy + sin(spiralAngle) * ry);
 					}
 				}
 
-				stepContour() {
-					let n = noise(this.pos.x * 0.008, this.pos.y * 0.008, zOffset);
-					let angle = n * TWO_PI * 2;
-					this.acc.add(p5.Vector.fromAngle(angle).mult(0.075));
-				}
-
-				stepAtmos() {
-					let nx = this.pos.x * 0.003;
-					let ny = this.pos.y * 0.003;
-					let n = noise(nx, ny, zOffset);
-
-					let baseAngle = (n - 0.5) * PI * 1.4 + sin(this.pos.x * 0.004 + zOffset * 3) * 0.25;
-
-					this.inCloud = false;
-					for (let cl of clouds) {
-						let dx = (this.pos.x - cl.x) / cl.rx;
-						let dy = (this.pos.y - cl.y) / cl.ry;
-						let d2 = dx * dx + dy * dy;
-						if (d2 < 1.0) {
-							this.inCloud = true;
-							let cloudCurl =
-								noise(this.pos.x * 0.012 + cl.seed, this.pos.y * 0.012, zOffset * 2) *
-								TWO_PI * 2;
-							baseAngle = lerp(baseAngle, cloudCurl, (1 - d2) * 0.75);
-							break;
-						}
-					}
-
-					let h = scene.house;
-					let hCenter = createVector(h.x + h.w * 0.5, h.y + h.h * 0.4);
-					if (p5.Vector.dist(this.pos, hCenter) < h.w * 0.75) {
-						let deflect = atan2(this.pos.y - hCenter.y, this.pos.x - hCenter.x);
-						baseAngle = lerp(baseAngle, deflect, 0.45);
-					}
-
-					let c = scene.car;
-					let cCenter = createVector(c.centerX, c.centerY);
-					if (p5.Vector.dist(this.pos, cCenter) < c.w * 0.6) {
-						let deflect = atan2(this.pos.y - cCenter.y, this.pos.x - cCenter.x);
-						baseAngle = lerp(baseAngle, deflect, 0.5);
-					}
-
-					this.acc.add(p5.Vector.fromAngle(baseAngle).mult(0.06));
-				}
-
 				render() {
-					if (p5.Vector.dist(this.pos, this.prevPos) > 35) return;
+					if (dist(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y) > 30) return;
 
 					if (this.role === 'ENERGY') {
-						let hue = map(sin(this.t * PI + frameCount * 0.03), -1, 1, 150, 186);
-						let alpha = 26;
-						if (this.t < 0) alpha = map(this.t, -0.35, 0, 0, 26);
-						if (this.t > 1.0) alpha = map(this.t, 1.0, 1.42, 56, 0);
-						stroke(hue, 62, 93, alpha);
-						strokeWeight(this.t >= 0 && this.t <= 1.0 ? 1.5 : 1.2);
+						let pulse = this.pulseProximity;
+						let a = 96 + pulse * 55;
+						if (this.t < 0) a *= map(this.t, -0.3, 0, 0, 1);
+						if (this.t > 1.0) a *= map(this.t, 1.0, 1.38, 1, 0);
+
+						stroke(lerp(120, 255, pulse), lerp(235, 240, pulse), lerp(180, 100, pulse), a);
+						strokeWeight((this.t >= 0 && this.t <= 1.0 ? 2.2 : 1.5) + pulse * 1.2);
 						line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
 					} else if (this.role === 'SMOKE') {
 						let progress = this.life / this.maxLife;
-						let hue = lerp(30, 200, constrain(progress * 1.4, 0, 1));
-						let sat = lerp(48, 16, progress);
-						let bri = lerp(92, 82, progress);
-						let alpha = sin(progress * PI) * 26;
-						stroke(hue, sat, bri, alpha);
-						strokeWeight(lerp(1.1, 2.2, progress));
+						stroke(
+							lerp(240, 170, progress) + houseHoverAmt * 20,
+							lerp(180, 195, progress),
+							lerp(120, 220, progress),
+							sin(progress * PI) * (70 + houseHoverAmt * 24)
+						);
+						strokeWeight(lerp(1.2, 2.8, progress));
 						line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
 					} else if (this.role === 'CONTOUR') {
 						let progress = this.life / this.maxLife;
-						let isCarSide = this.pos.x > scene.house.x + scene.house.w * 1.1;
-						let hue = isCarSide ? 178 : 192;
-						let alpha = sin(progress * PI) * 47;
-						stroke(hue, 52, 92, alpha);
-						strokeWeight(1.2);
+						let isCarSide = this.pos.x > scene.house.x + scene.house.w * 1.08;
+						stroke(
+							isCarSide ? 40 : lerp(60, 255, houseHoverAmt * 0.5),
+							isCarSide ? 210 : lerp(150, 200, houseHoverAmt * 0.5),
+							isCarSide ? 245 : 220,
+							sin(progress * PI) * 78
+						);
+						strokeWeight(1.4);
 						line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
 					} else {
 						let progress = this.life / this.maxLife;
 						let fade = sin(progress * PI);
 
-						if (this.inCloud) {
-							stroke(196, 16, 95, fade * 40);
+						if (this.pos.y < scene.groundY * 0.45) {
+							stroke(190, 235, 255, fade * 52);
 							strokeWeight(1.8);
 						} else if (this.pos.y > scene.groundY) {
-							let hue = map(noise(this.pos.x * 0.005, zOffset), 0, 1, 160, 205);
-							stroke(hue, 48, 60, fade * 36);
-							strokeWeight(1.1);
+							stroke(30, 90, 140, fade * 40);
+							strokeWeight(1.2);
 						} else {
-							let hue = map(sin(this.pos.x * 0.003 + zOffset * 5), -1, 1, 172, 214);
-							stroke(hue, 44, 78, fade * 34);
-							strokeWeight(1);
+							stroke(50, 120, 180, fade * 34);
+							strokeWeight(1.1);
 						}
 						line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
 					}

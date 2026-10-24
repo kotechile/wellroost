@@ -14,8 +14,8 @@
  * The frame is lazy: p5 loads when a visitor reaches it.
  */
 const paths = [
-	{ part: 'Roof', effect: 'The cascade runs down the wall into the charger.' },
-	{ part: 'Wall box', effect: 'The cable sags under its own weight to the car.' },
+	{ part: 'Windows', effect: 'Warm when the cursor crosses the house.' },
+	{ part: 'Connector', effect: 'A click sends a pulse down the cable.' },
 	{ part: 'Chimney', effect: 'The plume curls with the wind it is given.' }
 ];
 ---
@@ -36,9 +36,9 @@ const paths = [
 			<div data-reveal style="--reveal-delay:120ms">
 				<iframe
 					src="/energy-flow.html"
-					class="block h-[28rem] w-full border-0 sm:h-[34rem] lg:h-[42rem]"
+					class="block h-[26rem] w-full border-0 sm:h-[30rem] lg:h-[36rem]"
 					loading="lazy"
-					title="Generative illustration: a house, chimney plume, wall charger and electric car drawn with particles"
+					title="Generative illustration: a modern house, its wall connector and an electric car drawn with particles"
 					aria-describedby="model-caption"
 				></iframe>
 			</div>
@@ -46,9 +46,10 @@ const paths = [
 			<figcaption class="mt-4 grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-baseline">
 				<p id="model-caption" class="caption">
 					Generative illustration, drawn in the browser with p5. Hairlines follow a noise field
-					around the house; energy runs from the roof through the wall box and along the cable
-					into the car. Move the cursor across the frame and the field bends around it. It
-					reads nothing from your inputs.
+					around a house and its car; energy runs from the roof through the wall connector and
+					along the sagging cable into the pack. Move the cursor and the field leans toward it;
+					cross the house and the windows warm; click and a pulse travels the cable. It reads
+					nothing from your inputs.
 				</p>
 				<dl class="flex flex-wrap gap-x-6 gap-y-1 text-[0.8125rem] text-ink-2">
 					{
