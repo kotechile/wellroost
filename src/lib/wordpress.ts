@@ -184,7 +184,9 @@ function normalizePost(post: WordPressPostResponse): WordPressPost {
 		modified: post.modified ?? post.date ?? null,
 		featuredImage,
 		featuredImageAlt: featuredMedia?.alt_text || '',
-		categoryLabel: category?.name ?? null,
+		// The embedded term name is still HTML-encoded ("Energy &amp; Efficiency"), and it is
+		// printed as text on every card. Decode it here, once, where the post is normalized.
+		categoryLabel: category?.name ? decodeHtmlEntities(category.name) : null,
 		categorySlug: category?.slug ?? null
 	};
 }
@@ -197,9 +199,9 @@ async function fetchWordPress(endpoint: string, query: Record<string, string | n
 
 	const url = new URL(`${baseUrl}/wp-json/wp/v2/${endpoint}`);
 	for (const [key, value] of Object.entries(query)) {
-		if (value !== undefined && value !== '') {
-			url.searchParams.set(key, String(value));
-		}
+		if (value === undefined || value === '') continue;
+		// WordPress rejects per_page > 100 with a 400, which reads as "no content" downstream.
+		url.searchParams.set(key, key === 'per_page' ? String(Math.min(Number(value) || 1, 100)) : String(value));
 	}
 
 	// Add a cache-buster parameter to prevent CDN/Edge nodes from serving stale JSON
@@ -215,6 +217,12 @@ async function fetchWordPress(endpoint: string, query: Record<string, string | n
 			signal: AbortSignal.timeout(8000)
 		});
 		if (!response.ok) {
+			// A 400 from a malformed taxonomy param used to be indistinguishable from "no content":
+			// the build stayed green and the site shipped empty. Say what the API said.
+			const detail = await response.text().catch(() => '');
+			console.error(
+				`[wordpress] ${response.status} ${response.statusText} from ${url.pathname}${url.search} — ${detail.slice(0, 300)}`
+			);
 			return [];
 		}
 
@@ -246,29 +254,86 @@ export function getConfiguredWordPressApiBase() {
 }
 
 /**
- * The taxonomy term that makes a post belong to THIS property.
+ * The vertical terms that make a post belong to THIS property.
  *
- * One WordPress install publishes several sites; a post's `vertical` term is what routes it. Without
- * this filter the WellRoost homepage listed another property's articles ("Your Route's 5x Stop Gap",
- * "Your $125 Exam Costs 122 Hours") because `posts` with no `vertical` returns the whole install.
- * Empty means the front end shows nothing rather than someone else's work, which is the honest
- * failure. Override with PUBLIC_WORDPRESS_VERTICAL if the term slug changes.
+ * One WordPress install publishes one property here: cms.wellroost.com carries six home verticals
+ * (equity, infrastructure, operations, insurance, resilience, smart home) and nothing else. A post
+ * with none of them is held as a draft by the routing job, so anything published is ours — the list
+ * still exists because it is the contract, and because it keeps a stray cross-post out.
+ *
+ * Two things learned the hard way, both fixed here:
+ * - the `vertical` REST param on this install takes TERM IDS, not slugs. Sending slugs returns
+ *   HTTP 400, and a 400 used to look exactly like "no articles" (see the logging in fetchWordPress).
+ * - this property owns six verticals, not one. Filtering to a single slug hid 30 of the 38 articles.
+ *
+ * Override with PUBLIC_WORDPRESS_VERTICALS (comma-separated slugs) if the terms change.
  */
-export function getConfiguredVertical(): string {
-	const configured = import.meta.env.PUBLIC_WORDPRESS_VERTICAL ?? import.meta.env.WORDPRESS_VERTICAL;
-	return (configured || 'resilient_home_assets').trim();
+const DEFAULT_VERTICAL_SLUGS = [
+	'resilient_home_assets',
+	'home_equity_tco',
+	'home_infrastructure_lifecycle_tco',
+	'smart_home_telemetry',
+	'home_ops_execution',
+	'property_loss_insurance_mitigation'
+];
+
+export function getConfiguredVerticalSlugs(): string[] {
+	const raw = import.meta.env.PUBLIC_WORDPRESS_VERTICALS ?? import.meta.env.WORDPRESS_VERTICALS;
+	const configured = String(raw ?? '')
+		.split(',')
+		.map((slug) => slug.trim())
+		.filter(Boolean);
+	return configured.length > 0 ? configured : DEFAULT_VERTICAL_SLUGS;
 }
 
-/** Category ids — and how many of this property's published posts — use them, counted in this vertical. */
+let verticalIdsPromise: Promise<number[]> | undefined;
+
+/** Map this property's vertical slugs onto the term ids the REST API actually accepts. */
+async function resolveVerticalIds(): Promise<number[]> {
+	verticalIdsPromise ??= (async () => {
+		const slugs = new Set(getConfiguredVerticalSlugs());
+		const rows = (await fetchWordPress('vertical', {
+			per_page: 100,
+			_fields: 'id,slug'
+		})) as unknown as Array<{ id: number; slug: string }>;
+
+		if (!Array.isArray(rows)) {
+			return [];
+		}
+		return rows.filter((term) => slugs.has(term.slug)).map((term) => term.id);
+	})();
+
+	return verticalIdsPromise;
+}
+
+/**
+ * The `vertical` value to send, or undefined when it cannot be resolved.
+ *
+ * Undefined means "do not filter" rather than "filter to nothing": a taxonomy hiccup should leave
+ * the site readable, and an empty site is the failure this file exists to prevent.
+ */
+export async function getVerticalParam(): Promise<string | undefined> {
+	const ids = await resolveVerticalIds();
+	return ids.length > 0 ? ids.join(',') : undefined;
+}
+
+/** Query fragment carrying this property's vertical filter. */
+async function withVertical(query: Record<string, string | number | undefined>) {
+	const vertical = await getVerticalParam();
+	return vertical ? { ...query, vertical } : query;
+}
+
+/** Category ids — and how many of this property's published posts — use them. */
 export async function fetchVerticalCategoryCounts(limit = 100): Promise<Map<number, number>> {
-	const vertical = getConfiguredVertical();
-	const rows = (await fetchWordPress('posts', {
-		vertical,
-		per_page: limit,
-		_fields: 'id,categories'
-	})) as unknown as Array<{ id: number; categories?: number[] }>;
+	const rows = (await fetchWordPress(
+		'posts',
+		await withVertical({ per_page: limit, _fields: 'id,categories' })
+	)) as unknown as Array<{ id: number; categories?: number[] }>;
 
 	const counts = new Map<number, number>();
+	if (!Array.isArray(rows)) {
+		return counts;
+	}
 	for (const row of rows) {
 		for (const id of row.categories ?? []) {
 			counts.set(id, (counts.get(id) ?? 0) + 1);
@@ -278,21 +343,18 @@ export async function fetchVerticalCategoryCounts(limit = 100): Promise<Map<numb
 }
 
 export async function fetchLatestPosts(limit = 6) {
-	const posts = await fetchWordPress('posts', {
-		_embed: 1,
-		vertical: getConfiguredVertical(),
-		per_page: limit
-	});
+	const posts = await fetchWordPress(
+		'posts',
+		await withVertical({ _embed: 1, per_page: limit })
+	);
 	return posts.map(normalizePost);
 }
 
 export async function fetchPostsByCategory(categoryId: number, limit = 12) {
-	const posts = await fetchWordPress('posts', {
-		_embed: 1,
-		vertical: getConfiguredVertical(),
-		categories: categoryId,
-		per_page: limit
-	});
+	const posts = await fetchWordPress(
+		'posts',
+		await withVertical({ _embed: 1, categories: categoryId, per_page: limit })
+	);
 	return posts.map(normalizePost);
 }
 
@@ -302,12 +364,10 @@ export async function searchPosts(query: string, limit = 8) {
 		return [];
 	}
 
-	const posts = await fetchWordPress('posts', {
-		_embed: 1,
-		vertical: getConfiguredVertical(),
-		search: trimmedQuery,
-		per_page: limit
-	});
+	const posts = await fetchWordPress(
+		'posts',
+		await withVertical({ _embed: 1, search: trimmedQuery, per_page: limit })
+	);
 	return posts.map(normalizePost);
 }
 
@@ -329,12 +389,14 @@ export async function fetchAllPosts(limit = 100) {
 	const collected: WordPressPostResponse[] = [];
 
 	while (collected.length < limit) {
-		const batch = await fetchWordPress('posts', {
-			_embed: 1,
-			vertical: getConfiguredVertical(),
-			per_page: Math.min(perPage, limit - collected.length),
-			page: Math.floor(collected.length / perPage) + 1
-		});
+		const batch = await fetchWordPress(
+			'posts',
+			await withVertical({
+				_embed: 1,
+				per_page: Math.min(perPage, limit - collected.length),
+				page: Math.floor(collected.length / perPage) + 1
+			})
+		);
 
 		if (batch.length === 0) {
 			break;

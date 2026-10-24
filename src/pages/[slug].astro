@@ -107,18 +107,6 @@ const breadcrumbSchema = {
 			)}
 		</header>
 
-		{post.featuredImage && (
-			<div class="bleed mt-[clamp(2rem,3.5vw,3rem)]">
-				<div class="h-[38vh] min-h-[15rem] overflow-hidden bg-paper-3 sm:h-[46vh]">
-					<img
-						src={post.featuredImage}
-						alt={post.featuredImageAlt || post.title}
-						class="plate h-full w-full object-cover"
-					/>
-				</div>
-			</div>
-		)}
-
 		<div class="wrap mt-[clamp(2.5rem,4vw,4rem)] grid gap-12 lg:grid-cols-[minmax(0,36rem)_minmax(0,1fr)] lg:gap-20">
 			<div>
 				<div class="article-body" set:html={post.content} />

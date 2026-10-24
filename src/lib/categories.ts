@@ -1,4 +1,4 @@
-import { fetchAllCategories, fetchVerticalCategoryCounts, getConfiguredVertical } from './wordpress';
+import { fetchAllCategories, fetchVerticalCategoryCounts, getConfiguredVerticalSlugs } from './wordpress';
 
 export interface CategoryRecord {
 	id: string;
@@ -97,7 +97,7 @@ async function loadCategories(): Promise<CategoryRecord[]> {
 
 		if (counts.size === 0) {
 			console.info(
-				`[categories] no published posts carry the "${getConfiguredVertical()}" vertical — showing the property's own pillars and empty category pages.`
+				`[categories] no published posts carry this property's verticals (${getConfiguredVerticalSlugs().join(', ')}) — showing the committed pillars and empty category pages.`
 			);
 		}
 	} catch (error) {

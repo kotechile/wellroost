@@ -364,7 +364,8 @@
     const container = document.getElementById('canvas-container');
     const scene = new THREE.Scene();
     // Fog matched to the page's paper ground so the island recedes into the page, not into a haze.
-    const FOG_DAY = 0xebe9e3;
+    // Matches the paper-2 field the frame sits on, so the island recedes into its own ground.
+    const FOG_DAY = 0xe1dfd7;
     scene.fog = new THREE.FogExp2(FOG_DAY, 0.0062);
 
     const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 120);

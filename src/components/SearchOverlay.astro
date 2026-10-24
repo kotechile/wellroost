@@ -1,8 +1,8 @@
 ---
-import { getConfiguredWordPressApiBase, getConfiguredVertical } from '../lib/wordpress';
+import { getConfiguredWordPressApiBase, getVerticalParam } from '../lib/wordpress';
 
 const apiBase = getConfiguredWordPressApiBase();
-const vertical = getConfiguredVertical();
+const vertical = (await getVerticalParam()) ?? '';
 ---
 
 <div
