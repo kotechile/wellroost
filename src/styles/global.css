@@ -450,6 +450,26 @@ input[type="range"].range:focus-visible::-webkit-slider-thumb {
   max-width: 36rem;
 }
 
+/*
+ * In-body images arrive from WordPress carrying the theme's own chrome: `border-border` resolves to
+ * currentColor here (a near-black hairline on a paper ground), `shadow-sm` adds a shadow this design
+ * language does not use, and half-width floats collapse the measure on a phone. The markup is
+ * cleaned in src/lib/wordpress.ts; these are the guarantees that survive any content shape.
+ */
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border: 0;
+  box-shadow: none;
+  float: none !important;
+  margin: 2rem 0;
+}
+
+.prose img[width][height] {
+  /* dimensions are emitted where the CMS knows them, so the column does not jump on load */
+  aspect-ratio: attr(width) / attr(height);
+}
+
 /* ---------------------------------------------------------------- motion */
 
 @media (prefers-reduced-motion: no-preference) {

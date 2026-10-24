@@ -4,6 +4,7 @@ import JsonLd from '../components/JsonLd.astro';
 import { decodeHtmlEntities, fetchAllPosts, fetchPostsByCategory } from '../lib/wordpress';
 import { getCategoryBySlug } from '../lib/categories';
 import { getArticleImage } from '../lib/articleImages';
+import { cleanArticleHtml } from '../lib/wordpress';
 import { Image } from 'astro:assets';
 import PostCard from '../components/PostCard.astro';
 import { calculatorTools } from '../lib/calculators/metadata';
@@ -52,9 +53,9 @@ const openingParagraph = post.content.match(/<p[^>]*>([\s\S]*?)<\/p>/);
 const hookText = openingParagraph
 	? plainText(openingParagraph[1])
 	: plainText(post.excerpt ?? '');
-const bodyHtml = openingParagraph
-	? post.content.replace(openingParagraph[0], '').trim()
-	: post.content;
+const bodyHtml = cleanArticleHtml(
+	openingParagraph ? post.content.replace(openingParagraph[0], '').trim() : post.content
+);
 
 const cover = getArticleImage(post.slug);
 

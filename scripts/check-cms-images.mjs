@@ -88,6 +88,18 @@ function checkPost(post) {
 		if (file !== file.toLowerCase()) problems.push('filename not lowercase');
 	}
 
+	// In-body images arrive in the same CMS payload and render through set:html, so they are CMS
+	// images too — ungated until now.
+	const body = String(post.content?.rendered ?? '');
+	let bodyIndex = 0;
+	for (const [, attrs] of body.matchAll(/<img\b([^>]*)>/gi)) {
+		bodyIndex += 1;
+		const bodyAlt = /\balt="([^"]*)"/i.exec(attrs) ?? /\balt='([^']*)'/i.exec(attrs);
+		const bodySrc = /\bsrc="([^"]*)"/i.exec(attrs)?.[1] ?? '';
+		if (!bodyAlt || !bodyAlt[1].trim()) problems.push(`body image ${bodyIndex}: no alt text`);
+		if (bodySrc && !bodySrc.startsWith(API)) problems.push(`body image ${bodyIndex}: hosted off-site`);
+	}
+
 	if (!alt) problems.push('no alt text');
 	else {
 		if (alt.length < ALT_MIN) problems.push(`alt ${alt.length} chars, needs ≥${ALT_MIN}`);

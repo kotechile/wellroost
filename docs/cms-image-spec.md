@@ -11,6 +11,25 @@ tell a photograph from a chart.
 
 ---
 
+## 0. Which images this covers
+
+**All of them.** The *numbers* differ by slot, because each slot crops differently; the *content*
+rules (§2) are identical everywhere. Two of these five slots are CMS-managed.
+
+| Slot | Where it renders | Frame | Source | Machine-checked |
+| --- | --- | --- | --- | --- |
+| **Featured image** | article cards, article masthead, `og:image` | 7:4 card, 16:9 masthead, `object-cover` | CMS | yes, §1 |
+| **In-body image** | inside article body, via `set:html` | article column (36 rem), full width | CMS | partly, §6 |
+| Curated plate | cards + masthead for the 34 existing posts | 7:4, 16:9 | repo, `src/assets/articles/` | build-time |
+| Editorial plate | full-bleed bands, portrait argument | 46–62 vh band, 4:5 portrait | repo, `src/assets/photos/` | review |
+| Subject tile | subject rows on `/categories/` | 4:3 at 160 px | repo, `src/assets/subjects/` | review |
+
+**The generated-per-post plates are the exception, not the model.** They exist for the 34 posts
+published before this spec and are kept as a set. A new post gets no plate: it renders its CMS
+featured image, so §1 and §2 are the whole contract for it.
+
+---
+
 ## 1. Technical requirements (machine-checked)
 
 | # | Requirement | Value | Why |
@@ -57,7 +76,24 @@ So the rules above are not arbitrary, this is the actual path:
 5. Astro re-encodes local plates to WebP at build. CMS images are served from WordPress, so the
    upload itself carries the weight — rule 4 is the one that costs readers time.
 
-## 4. How a new post gets its image
+## 4. In-body images
+
+An article body can carry images, and four posts do. They render inside the reading column at full
+measure, so the rules differ from the featured image:
+
+| Requirement | Value | Why |
+| --- | --- | --- |
+| Alt text | required, never empty | Read aloud in the middle of the piece; the gate fails on an empty one. |
+| Host | this CMS only | Hotlinked images rot and hand a third party your page weight. |
+| Width | ≤ 1600 px | It renders at 36 rem (576 px) and never wider. |
+| Format / weight | JPEG sRGB, ≤ 300 KB | Same reasoning as rule 5. |
+| Markup | theme chrome is stripped for you | `src/lib/wordpress.ts` → `cleanArticleHtml()` rewrites every `<img>`: drops the theme's classes and inline `float`/`width`, adds `loading="lazy"`, `decoding="async"`, and dimensions when WordPress supplies them. `border-border` in a body otherwise resolves to currentColor and draws a near-black hairline on a paper ground. |
+| No text, no charts | same as rules 11 and 12 | A screenshot of a table is not an illustration; it is unreadable on a phone and unsearchable everywhere. |
+
+Put the image in the body only when the piece genuinely needs a second picture. The masthead already
+carries one.
+
+## 5. How a new post gets its image
 
 ```
 1. Commission the photograph against §2 (kie.ai nano-banana, FLUX, a shoot, or an archive plate).
@@ -70,7 +106,7 @@ So the rules above are not arbitrary, this is the actual path:
 Rules 11–20 cannot be automated. They are checked at approval against §2 and the image is either
 accepted or re-shot; the script prints them as a reminder for every new file.
 
-## 5. Grandfathered images
+## 6. Grandfathered images
 
 The 38 posts published before this spec carry images that break rules 2, 3, 4, 11 and 12 (nine
 aspect ratios, headline text baked in, three with invented figures). They are listed in

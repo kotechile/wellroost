@@ -265,6 +265,25 @@ function normalizeCategory(category: WordPressCategoryResponse): WordPressCatego
 	};
 }
 
+/**
+ * WordPress sends article bodies with the theme's own markup: Tailwind classes that mean something
+ * else here (`border-border` resolves to currentColor — a near-black hairline on a paper ground),
+ * inline float/width chrome, no `loading`, and often no dimensions. Normalise image tags in the
+ * shared utility so every page renders the same thing; leave the rest of the body alone, because
+ * tables and embeds should not be rewritten by guesswork.
+ */
+export function cleanArticleHtml(html: string): string {
+	return String(html ?? '').replace(/<img\b([^>]*)>/gi, (_tag, attrs: string) => {
+		const src = /\bsrc="([^"]*)"/i.exec(attrs)?.[1];
+		if (!src) return '';
+		const alt = /\balt="([^"]*)"/i.exec(attrs)?.[1] ?? '';
+		const width = /\bwidth="(\d+)"/i.exec(attrs)?.[1];
+		const height = /\bheight="(\d+)"/i.exec(attrs)?.[1];
+		const dims = width && height ? ` width="${width}" height="${height}"` : '';
+		return `<img src="${src}" alt="${alt}"${dims} loading="lazy" decoding="async" data-inline-image="true">`;
+	});
+}
+
 export function hasWordPressApiBase() {
 	return Boolean(getWordPressApiBase());
 }
