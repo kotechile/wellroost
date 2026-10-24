@@ -1,7 +1,9 @@
 # Gear verticals on WellRoost: taxonomy, boundaries, and three calculator specs
 
-Status: verticals are **live in the factory** (registry, CMS taxonomy, routing row, cron fleet).
-The calculators below are **specs, not builds** — nothing has been added to `src/` yet.
+Status: verticals are **live in the factory** (registry, CMS taxonomy, routing row, cron fleets).
+Each one now runs three schedules — news, evergreen and **review** — so the vertical publishes news
+*and* quick reviews/head-to-head comparisons. The calculators below are **specs, not builds** —
+nothing has been added to `src/` yet.
 
 Why these exist: the site already answers "what does this home decision cost over time". These three
 verticals apply the same math to the **objects** that decision buys — the segment where affiliate and
@@ -12,11 +14,16 @@ model that justifies it.
 
 ## 1. What shipped
 
-| Factory vertical id | WP category (cms.wellroost.com) | Slug / hub URL | News cron | Evergreen cron |
-|---|---|---|---|---|
-| `yard_robotics` | 22 — Yard Robots & Automation | `yard-robotics` → `/categories/yard-robotics/` | Sat 10:30 UTC | Sat 18:30 UTC |
-| `outdoor_power_equipment` | 24 — Outdoor Power & Snow Equipment | `outdoor-power-equipment` → `/categories/outdoor-power-equipment/` | Sat 11:00 UTC | Sat 19:00 UTC |
-| `home_diagnostics_tech` | 26 — Home Diagnostic Tools | `home-diagnostics-tools` → `/categories/home-diagnostics-tools/` | Sat 11:30 UTC | Sat 19:30 UTC |
+| Factory vertical id | WP category (cms.wellroost.com) | Slug / hub URL | News | Evergreen | Review |
+|---|---|---|---|---|---|
+| `yard_robotics` | 22 — Yard Robots & Automation | `yard-robotics` → `/categories/yard-robotics/` | Sat 10:30 | Sat 18:30 | Sun 14:00 |
+| `outdoor_power_equipment` | 24 — Outdoor Power & Snow Equipment | `outdoor-power-equipment` → `/categories/outdoor-power-equipment/` | Sat 11:00 | Sat 19:00 | Sun 14:30 |
+| `home_diagnostics_tech` | 26 — Home Diagnostic Tools | `home-diagnostics-tools` → `/categories/home-diagnostics-tools/` | Sat 11:30 | Sat 19:30 | Sun 15:00 |
+
+All times UTC. The review run is a third fleet, not a format flag on the news run: the news gate
+scores novelty inside 30 days and the evergreen gate rewards figures that stay true for a year, so
+neither can admit a price table. The review fleet has its own gate
+(`scripts/review_gate.py`) and its own skill (`skills/review_comparison.md`).
 
 - Editorial vertical ids are snake_case because the dashboard, `sync_crons.py` and `vertical-sync.mjs`
   join on them; the WordPress **category** slug is hyphenated and is what the reader sees. They are
@@ -104,6 +111,21 @@ lie · circuit analyzers and the bootleg ground · instrument accuracy vs price.
 
 **Commercial shape:** $50–$600 AOV, thinnest margin, **best conversion** — the reader is mid-problem,
 which is why the vertical earns its slot as a top-of-funnel feeder for the other two.
+
+## 2.4 What the review track produces
+
+Two formats, both gated before a word of prose is drafted:
+
+- **`quick_review`** — one product, ~700–900 words: verdict first, price table, what the spec sheet
+  hides, ownership cost, who should not buy it, and a mandatory "what we did not test" paragraph.
+- **`comparison`** — 2–4 products, ~900–1,200 words: the pick stated first, price table, the three
+  axes that actually change the decision, the trap the comparison hides, verdict by situation.
+
+The gate fetches every cited page and requires each listed price to *appear on it*, ≥3 verified
+figures across ≥2 hosts, a `Price as of` date inside 60 days, a verdict naming a product, and no
+hands-on claim — this pipeline has no hardware, so "we tested" is a failure, not a voice. No
+`Review`/`AggregateRating` schema either; a star rating for a unit nobody handled is a false
+machine-readable claim.
 
 ## 3. Monetization gap to close before this earns anything
 
