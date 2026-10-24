@@ -1,5 +1,7 @@
 ---
+import { Image } from 'astro:assets';
 import type { WordPressPost } from '../lib/wordpress';
+import { getArticleImage } from '../lib/articleImages';
 
 interface Props {
 	post: WordPressPost;
@@ -8,6 +10,9 @@ interface Props {
 }
 
 const { post, feature = false } = Astro.props;
+
+// A clean plate made for the piece if one exists, otherwise the CMS share card.
+const cover = getArticleImage(post.slug);
 
 const formattedDate = post.date
 	? new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
@@ -25,13 +30,19 @@ const formattedDate = post.date
 			the CMS carries per piece — so the card shows it rather than going bare.
 		*/}
 		{
-			post.featuredImage && (
-				<div
-					class:list={[
-						'w-full overflow-hidden bg-paper-3',
-						feature ? 'aspect-[7/4]' : 'aspect-[7/4]'
-					]}
-				>
+			cover ? (
+				<div class="aspect-[7/4] w-full overflow-hidden bg-paper-3">
+					<Image
+						src={cover.src}
+						alt={cover.alt}
+						widths={[420, 640, 900]}
+						sizes="(min-width: 1024px) 30vw, 90vw"
+						loading="lazy"
+						class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+					/>
+				</div>
+			) : post.featuredImage ? (
+				<div class="aspect-[7/4] w-full overflow-hidden bg-paper-3">
 					<img
 						src={post.featuredImage}
 						alt={post.featuredImageAlt || ''}
@@ -40,7 +51,7 @@ const formattedDate = post.date
 						class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
 					/>
 				</div>
-			)
+			) : null
 		}
 
 		<div class="flex flex-1 flex-col justify-between p-5">

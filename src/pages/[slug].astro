@@ -3,6 +3,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import JsonLd from '../components/JsonLd.astro';
 import { decodeHtmlEntities, fetchAllPosts, fetchPostsByCategory } from '../lib/wordpress';
 import { getCategoryBySlug } from '../lib/categories';
+import { getArticleImage } from '../lib/articleImages';
+import { Image } from 'astro:assets';
 import PostCard from '../components/PostCard.astro';
 import { calculatorTools } from '../lib/calculators/metadata';
 
@@ -53,6 +55,8 @@ const hookText = openingParagraph
 const bodyHtml = openingParagraph
 	? post.content.replace(openingParagraph[0], '').trim()
 	: post.content;
+
+const cover = getArticleImage(post.slug);
 
 const wordCount = plainText(post.content).split(/\s+/).filter(Boolean).length;
 const readMinutes = Math.max(1, Math.round(wordCount / 220));
@@ -132,7 +136,18 @@ const breadcrumbSchema = {
 		<div class="wrap mt-[clamp(1.5rem,3vw,2.5rem)]">
 			<div class="article-frame">
 				{
-					post.featuredImage && (
+					cover ? (
+						<figure class="w-full overflow-hidden bg-paper-3" data-reveal>
+							<Image
+								src={cover.src}
+								alt={cover.alt}
+								widths={[720, 1080, 1600, 2000]}
+								sizes="(min-width: 1024px) 72rem, 100vw"
+								loading="eager"
+								class="aspect-[16/9] w-full object-cover"
+							/>
+						</figure>
+					) : post.featuredImage ? (
 						<figure class="w-full overflow-hidden bg-paper-3" data-reveal>
 							<img
 								src={post.featuredImage}
@@ -142,7 +157,7 @@ const breadcrumbSchema = {
 								decoding="async"
 							/>
 						</figure>
-					)
+					) : null
 				}
 
 				{

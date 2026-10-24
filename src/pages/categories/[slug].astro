@@ -61,13 +61,19 @@ const breadcrumbSchema = {
 	<JsonLd slot="head" data={breadcrumbSchema} />
 
 	<section class="wrap pt-[clamp(2rem,5vw,4rem)]">
-		<a href="/categories/" class="inline-flex items-center gap-2 text-[0.875rem] text-ink-2 transition-colors hover:text-ink">
-			<span aria-hidden="true">&larr;</span> All articles
-		</a>
-		<h1 class="display mt-6 max-w-[16ch] text-ink" data-reveal>{category.name}</h1>
-		<p class="lede mt-8 max-w-[46ch]" data-reveal style="--reveal-delay:80ms">
-			{category.description || 'Guides for this pillar are being written.'}
-		</p>
+		<h1 class="display max-w-[16ch] text-ink" data-reveal>{category.name}</h1>
+		<div class="mt-7 flex flex-wrap items-end justify-between gap-6">
+			<p class="lede max-w-[46ch]" data-reveal style="--reveal-delay:80ms">
+				{category.description || 'Pieces for this subject are being written.'}
+			</p>
+			<a
+				href="/categories/"
+				class="btn-ghost pb-1"
+				data-reveal
+			>
+				<span aria-hidden="true">&larr;</span> All articles
+			</a>
+		</div>
 	</section>
 
 	<section class="wrap section" aria-label={`${category.name} guides`}>
@@ -75,7 +81,7 @@ const breadcrumbSchema = {
 			posts.length ? (
 				<div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
 					{posts.map((post, index) => (
-						<div data-reveal style={`--reveal-delay:${index * 60}ms`}>
+						<div data-reveal style={`--reveal-delay:${(index % 3) * 70}ms`}>
 							<PostCard post={post} />
 						</div>
 					))}
