@@ -50,7 +50,7 @@ featured image, so §1 and §2 are the whole contract for it.
 | # | Requirement | Why |
 | --- | --- | --- |
 | 11 | **No text in the image.** No headline, kicker, subtitle, caption, label or wordmark baked into the pixels. | The page prints the headline directly above the image in Instrument Serif. Text inside the image restates it in a second face at a third size, is illegible at 340 px, and is invisible to screen readers and search. |
-| 12 | **No invented data.** No dashboards, bar charts, counters, price tags, percentages, or "saves up to" badges. | The site's promise is that every number is published and checkable. An illustration carrying a fabricated "$1,834.75" contradicts that promise more directly than any layout mistake. If a number belongs in the piece, it belongs in the text, linked to its source. |
+| 12 | **No invented data.** No counter, badge or chart carrying a figure that has no source. A data figure built from real numbers is allowed and encouraged — see §5 for where it goes and what it needs. | The site's promise is that every number is published and checkable. A generated illustration carrying a fabricated "$1,834.75" contradicts that promise more directly than any layout mistake. |
 | 13 | One physical subject, photographed. | A photograph of the mechanism in the story (a stamped envelope, a clamped meter, a flue, a battery on a wall) survives any crop and any size. A collage or a 3D render does not. |
 | 14 | No people, faces or hands. | No model releases, and faces pull attention from the subject. |
 | 15 | No logos, brands, or recognisable proprietary products. | Legal exposure and instant dating. |
@@ -119,7 +119,51 @@ Two different things, and only one of them is allowed:
 Put the image in the body only when the piece genuinely needs a second picture. The masthead already
 carries one.
 
-## 5. How a new post gets its image
+## 5. Infographics and data figures
+
+Rule 12 bans **invented** numbers, not charts. A figure built from real, sourced data is one of the
+better things this site can publish; three of the grandfathered images are banned precisely because a
+diffusion model painted plausible digits that no source supports.
+
+The dividing line is where the numbers come from:
+
+| | Allowed | Not allowed |
+| --- | --- | --- |
+| **Source of numbers** | a published dataset, the article's own computed figures, a cited report | anything a generative model produced |
+| **How the graphic is made** | generated *from* the data — an HTML table, inline SVG, or a chart rendered at build | an image model asked to "draw an infographic" |
+| **Where it lives** | the body, as a `figure` | the featured image |
+| **Text in the picture** | never baked in — labels are real text | raster with labels drawn into the pixels |
+
+**Why never the featured image.** It renders at 340 px in a card. Chart axes, legends and units are
+unreadable at that size, and the card would then be a slide from a deck rather than a photograph. Use
+the subject of the figure as the photograph instead — the meter, the panel, the bill — and put the
+figure in the body, where it has the full column and the reader's attention.
+
+**Preferred form: a table.** It is the only form that survives every reader:
+
+```
+Words, not pixels.        screen reader  reads it        search  indexes it
+                          phone          reflows         print   reflows
+                          source         sits in the caption, linkable
+```
+
+`.article-body table` is styled as a data figure — hairline rules, tabular figures, uppercase column
+heads — and `figcaption` / `table caption` carry the source line. Ship the numbers as a table and you
+get accessibility, searchability and checkability for free.
+
+**Acceptable second: inline SVG**, generated from the same dataset, inside a `figure` with a
+`figcaption` source line, `role="img"` and an `aria-label` stating the finding in one sentence. Note
+that WordPress strips `<svg>` from post content unless the editor has `unfiltered_html`; if the figure
+must come through the CMS body, a table is the reliable route.
+
+**Acceptable third: a raster infographic** (a scanned report page, a supplied graphic) — with the full
+data also present as text or a table, alt text stating the finding rather than describing the layout,
+and a caption naming the source. Never the only place a number appears.
+
+**Every data figure needs, in this order:** the figure, the finding in one sentence, the source with a
+link, and the date the data is current to. A number without those four is decoration.
+
+## 6. How a new post gets its image
 
 ```
 1. Commission the photograph against §2 (kie.ai nano-banana, FLUX, a shoot, or an archive plate).
@@ -132,7 +176,7 @@ carries one.
 Rules 11–20 cannot be automated. They are checked at approval against §2 and the image is either
 accepted or re-shot; the script prints them as a reminder for every new file.
 
-## 6. Grandfathered images
+## 7. Grandfathered images
 
 The 38 posts published before this spec carry images that break rules 2, 3, 4, 11 and 12 (nine
 aspect ratios, headline text baked in, three with invented figures). They are listed in
