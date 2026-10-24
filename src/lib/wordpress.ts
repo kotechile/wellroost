@@ -82,7 +82,7 @@ function getWordPressApiBase() {
 	return baseUrl.replace(/\/$/, '');
 }
 
-function decodeHtmlEntities(value: string) {
+export function decodeHtmlEntities(value: string) {
 	if (!value) return '';
 	return value.replace(/&[#a-zA-Z0-9]+;/g, (entity) => {
 		if (entity in HTML_ENTITY_MAP) {

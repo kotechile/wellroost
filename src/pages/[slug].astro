@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import JsonLd from '../components/JsonLd.astro';
-import { fetchAllPosts, fetchPostsByCategory } from '../lib/wordpress';
+import { decodeHtmlEntities, fetchAllPosts, fetchPostsByCategory } from '../lib/wordpress';
 import { getCategoryBySlug } from '../lib/categories';
 import PostCard from '../components/PostCard.astro';
 import { calculatorTools } from '../lib/calculators/metadata';
@@ -30,12 +30,29 @@ const related = category?.wordpressCategoryId
 	? (await fetchPostsByCategory(category.wordpressCategoryId, 4)).filter((item) => item.slug !== post.slug).slice(0, 3)
 	: [];
 
-const plainText = (value: string) => value.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-const firstParagraph = post.content.match(/^<p[^>]*>([\s\S]*?)<\/p>/);
-const bodyHtml =
-	firstParagraph && post.excerpt && plainText(firstParagraph[1]).slice(0, 110) === plainText(post.excerpt).slice(0, 110)
-		? post.content.replace(firstParagraph[0], '').trim()
-		: post.content;
+const plainText = (value: string) =>
+	decodeHtmlEntities(
+		value
+			.replace(/<[^>]+>/g, ' ')
+			.replace(/\s+/g, ' ')
+			.trim()
+	);
+
+/*
+	The opening paragraph is the piece's standfirst, not body copy.
+
+	Every post on this CMS repeats its excerpt inside the body, so the article used to open by
+	saying the same sentence twice — once cut off in the hook, once in full below it. The full
+	opening paragraph is lifted into the hook block (italic, smaller, on the pine field) and
+	removed from the body, so it is printed once and only once.
+*/
+const openingParagraph = post.content.match(/<p[^>]*>([\s\S]*?)<\/p>/);
+const hookText = openingParagraph
+	? plainText(openingParagraph[1])
+	: plainText(post.excerpt ?? '');
+const bodyHtml = openingParagraph
+	? post.content.replace(openingParagraph[0], '').trim()
+	: post.content;
 
 const siteUrl = Astro.site?.toString() || 'https://wellroost.com/';
 const postUrl = new URL(`/${post.slug}/`, siteUrl).toString();
@@ -137,10 +154,10 @@ const breadcrumbSchema = {
 				}
 
 				{
-					post.excerpt && (
+					hookText && (
 						<div class="field-dark mt-6 p-6 sm:p-8 lg:p-10" data-reveal style="--reveal-delay:80ms">
-							<p class="max-w-[34ch] font-display text-[clamp(1.4rem,2.1vw,2rem)] leading-[1.14] tracking-[-0.02em] text-paper">
-								{post.excerpt}
+							<p class="max-w-[54ch] font-display italic text-[clamp(1.1rem,1.45vw,1.35rem)] leading-[1.5] text-paper/90">
+								{hookText}
 							</p>
 						</div>
 					)
