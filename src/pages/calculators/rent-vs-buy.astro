@@ -1,0 +1,34 @@
+---
+import CalculatorPage from '../../components/calculators/CalculatorPage.astro';
+import RentVsBuyCalculator from '../../components/calculators/react/RentVsBuyCalculator';
+---
+
+<CalculatorPage
+	slug="rent-vs-buy"
+	notes={[
+		{
+			title: 'Both paths start with the same cash',
+			body: 'A buyer commits a down payment and closing costs. A renter who is comparing honestly invests an identical sum on day one, and whichever path is cheaper each month invests the difference. Comparing a mortgage payment to a rent cheque instead is how calculators end up recommending a purchase that loses money.'
+		},
+		{
+			title: 'The tax shield is modelled',
+			body: 'At the 2026 SALT cap of $40,400, a buyer at the median price with a 7.32% loan itemises and gets a real shield. Leaving it out would bias every answer against buying, so the engine runs the itemisation test each year against the interest actually paid.'
+		},
+		{
+			title: 'One break-even year is not an answer',
+			body: 'The crossing year moves by half a decade when appreciation moves by one point. The grid shows nine combinations, because a single number in a market like this one is false precision wearing a confident face.'
+		}
+	]}
+	formula={[
+		'W_own(t) = V0(1+g)^t × (1 − C_sell) − B(t) + S_owner(t)',
+		'W_rent(t) = S_rent(t)',
+		'break-even = min t where W_own(t) − W_rent(t) > 0',
+		'S_owner, S_rent = portfolios fed by the monthly outflow difference'
+	]}
+	related={['move-or-improve', 'true-cost-of-ownership', 'recast-vs-refinance']}
+	disclosure="Tax treatment is modelled, not advised. The marginal rate, the itemisation test and the SALT phase-down are computed from the figures you enter; a tax preparer is still the authority on your return."
+>
+	<div slot="calculator">
+		<RentVsBuyCalculator client:load />
+	</div>
+</CalculatorPage>

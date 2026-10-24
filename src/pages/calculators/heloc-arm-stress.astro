@@ -1,0 +1,34 @@
+---
+import CalculatorPage from '../../components/calculators/CalculatorPage.astro';
+import FloatingRateCalculator from '../../components/calculators/react/FloatingRateCalculator';
+---
+
+<CalculatorPage
+	slug="heloc-arm-stress"
+	notes={[
+		{
+			title: 'The cap is the whole story',
+			body: 'A HELOC payment is not a number, it is a schedule. What matters is the largest move the contract allows at one reset, and how many of those the household budget can absorb before the payment becomes a second problem.'
+		},
+		{
+			title: 'Draw to repayment is a second shock',
+			body: 'When the draw period ends, an interest-only line becomes a fully amortizing payment over a decade or two. The rate does not have to move at all for the payment to double, which is why the repayment phase is priced here rather than mentioned in a footnote.'
+		},
+		{
+			title: 'Why a blocked step is printed',
+			body: 'A stress test that projects a 9% line to 11% when the contract caps it at 8% produces a scarier number and a wrong one. Steps past the lifetime ceiling are reported as blocked, with the ceiling named.'
+		}
+	]}
+	formula={[
+		'draw payment = balance × rate / 12',
+		'repayment payment = PMT(balance, rate, months remaining)',
+		'cushion ceiling = smallest Δrate where payment rise ≥ monthly cushion',
+		'extra cash = Δpayment × 12 (cash, not interest)'
+	]}
+	related={['recast-vs-refinance', 'insurance-coverage-gap', 'rent-vs-buy']}
+	disclosure="Nothing here forecasts rates. The engine runs a fixed ladder of increases — 25, 50, 100 and 200 basis points — against the caps you enter, so the output is a price list rather than a prediction."
+>
+	<div slot="calculator">
+		<FloatingRateCalculator client:load />
+	</div>
+</CalculatorPage>

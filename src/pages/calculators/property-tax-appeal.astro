@@ -1,0 +1,35 @@
+---
+import CalculatorPage from '../../components/calculators/CalculatorPage.astro';
+import TaxAppealCalculator from '../../components/calculators/react/TaxAppealCalculator';
+---
+
+<CalculatorPage
+	slug="property-tax-appeal"
+	notes={[
+		{
+			title: 'The roll states a market value whether or not it says so',
+			body: 'An assessed value divided by the statutory ratio is the county’s own opinion of what the house is worth. In a state that assesses at 40%, a $100,000 assessment is a $250,000 claim. Most owners have never seen their number written that way, which is why the appeal rate is under five percent.'
+		},
+		{
+			title: 'Your comps, adjusted in dollars',
+			body: 'Three to six sales you supply are brought to your house’s features at explicit rates — per square foot, per bedroom, per bathroom, per garage stall. Every adjustment is visible and editable, because the petition is only as strong as the evidence in it and you are the one who has to defend that evidence.'
+		},
+		{
+			title: 'What it refuses to do',
+			body: 'It does not source comparables. There is no feed behind this page and inventing sales would be fabrication with a spreadsheet around it. It also declines to rule on fewer than three comps, and declines to model a jurisdiction it does not carry.'
+		}
+	]}
+	formula={[
+		'implied value = assessed value / assessment ratio',
+		'adjusted comp = sale price + size Δ + feature Δ',
+		'excess = implied value − median(adjusted comps)',
+		'annual delta = excess × effective rate',
+		'NPV = Σ delta / (1 + d)^t − filing fee − contingency'
+	]}
+	related={['true-cost-of-ownership', 'unpermitted-work', 'down-payment']}
+	disclosure="Eight jurisdictions carry a statutory ratio here: Texas, California, Cook and non-Cook Illinois, Ohio, Georgia, New York municipalities and Montgomery County, Maryland. Elsewhere the engine refuses rather than substituting a national average."
+>
+	<div slot="calculator">
+		<TaxAppealCalculator client:load />
+	</div>
+</CalculatorPage>

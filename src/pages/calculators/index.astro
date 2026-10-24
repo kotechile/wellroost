@@ -1,45 +1,31 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { calculatorTools } from '../../lib/calculators/metadata';
+import { builtEngines, enginesByFamily, plannedEngines } from '../../lib/calculators/registry';
 import { isTelemetryConfigured } from '../../lib/telemetry';
-import { vibeAssets } from '../../lib/vibeAssets';
 
 // A claim about the system, derived from the system. It used to render unconditionally while no
 // sink was configured, i.e. the page advertised instrumentation that dropped every event.
 const telemetryLive = isTelemetryConfigured();
 
-const engines = [
-	{
-		tool: calculatorTools[1],
-		asset: vibeAssets.equityArv,
-		takes: 'Project cost, resale lift, years staying, savings, enjoyment.',
-		returns: 'Value during your stay, recovery rate, payback, and a verdict.'
-	},
-	{
-		tool: calculatorTools[0],
-		asset: vibeAssets.relocationFriction,
-		takes: 'Current value, sale friction, next purchase, expansion cost.',
-		returns: 'The five-year ledger for staying against moving.'
-	},
-	{
-		tool: calculatorTools[2],
-		asset: vibeAssets.remodelytics,
-		takes: 'After-repair value, cost, rent, financing, combined loan-to-value.',
-		returns: 'Maximum allowable offer and the risk flags that cap it.'
-	}
-];
+const engines = builtEngines();
+const families = enginesByFamily();
+const planned = plannedEngines();
+
+const words = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
+	'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'];
+const countWord = words[engines.length] ?? String(engines.length);
 ---
 
 <BaseLayout
 	title="Calculators | WellRoost"
-	description="Three free calculators for expensive home decisions: move or improve, remodeling ROI, and a full remodel underwriting model."
+	description="Decision engines for expensive home choices: renovation return, relocation friction, recast arithmetic, escrow, insurance exposure, capital reserves, assessments and tariffs. Every one prints its formulas."
 >
 	<section class="wrap pt-[clamp(2rem,5vw,4rem)]">
-		<h1 class="display max-w-[13ch] text-ink" data-reveal>Three calculators.</h1>
+		<h1 class="display max-w-[15ch] text-ink" data-reveal>{countWord} calculators.</h1>
 		<div class="mt-8 flex flex-wrap items-end justify-between gap-6">
-			<p class="lede max-w-[44ch]" data-reveal style="--reveal-delay:80ms">
-				Each runs on your inputs and prints the assumptions it used. No account, no email, no sales
-				call at the end.
+			<p class="lede max-w-[46ch]" data-reveal style="--reveal-delay:80ms">
+				Each runs on your inputs and prints the assumptions it used — every rate, every ratio, every
+				table it reached for. No account, no email, no sales call at the end.
 			</p>
 			<p class="text-[0.8125rem] text-ink-2" data-reveal>
 				{telemetryLive ? 'Interaction telemetry: on, field names only' : 'Interaction telemetry: no sink configured'}
@@ -47,54 +33,81 @@ const engines = [
 		</div>
 	</section>
 
-	<section class="wrap section" aria-label="Calculators">
-		<ul class="grid">
-			{
-				engines.map((engine, index) => (
-					<li data-reveal style={`--reveal-delay:${index * 70}ms`}>
-						<a
-							href={engine.tool.href}
-							class="group grid gap-5 py-9 text-ink transition-colors duration-200 hover:text-pine md:grid-cols-[minmax(0,0.95fr)_minmax(0,1fr)] md:gap-12"
-						>
-							<span>
-								<span class="h3 block">{engine.tool.title}</span>
-								<span class="mt-2 block max-w-[38ch] text-[1rem] leading-relaxed text-ink-2">
-									{engine.tool.description}
-								</span>
-							</span>
-							<span class="grid gap-5 sm:grid-cols-2 md:gap-8">
+	{
+		families.map((family, familyIndex) => (
+			<section class="wrap section" aria-labelledby={`family-${family.id}`}>
+				<div class="grid gap-x-12 gap-y-4 border-t border-ink/20 pt-6 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1fr)]">
+					<div>
+						<p class="font-mono text-[0.66rem] uppercase tracking-[0.24em] text-ink-2">
+							{String(familyIndex + 1).padStart(2, '0')}
+						</p>
+						<h2 id={`family-${family.id}`} class="h2 mt-3 max-w-[20ch] text-ink">
+							{family.title}
+						</h2>
+					</div>
+					<p class="max-w-[46ch] text-[1rem] leading-relaxed text-ink-2 md:pt-7">{family.blurb}</p>
+				</div>
+
+				<ul class="mt-8 grid">
+					{family.engines.map((engine, index) => (
+						<li data-reveal style={`--reveal-delay:${index * 60}ms`}>
+							<a
+								href={engine.asset.href}
+								data-asset-slug={engine.asset.slug}
+								class="group grid gap-5 border-t border-ink/10 py-7 text-ink transition-colors duration-200 hover:text-pine md:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] md:gap-12"
+							>
 								<span>
-									<span class="block text-[0.8125rem] text-ink-2">Takes</span>
-									<span class="mt-1 block max-w-[26ch] text-[1rem] leading-relaxed">
-										{engine.takes}
+									<span class="h3 block">{engine.title}</span>
+									<span class="mt-2 block max-w-[42ch] text-[0.9375rem] leading-relaxed text-ink-2">
+										{engine.description}
 									</span>
 								</span>
-								<span>
-									<span class="block text-[0.8125rem] text-ink-2">Returns</span>
-									<span class="mt-1 block max-w-[26ch] text-[1rem] leading-relaxed">
-										{engine.returns}
+								<span class="grid gap-5 sm:grid-cols-2 md:gap-8">
+									<span>
+										<span class="block text-[0.75rem] uppercase tracking-[0.14em] text-ink-2">Takes</span>
+										<span class="mt-1 block max-w-[28ch] text-[0.9375rem] leading-relaxed">{engine.takes}</span>
 									</span>
-									<span class="mt-3 inline-flex items-center gap-2 text-[0.875rem]">
-										Open
-										<span
-											aria-hidden="true"
-											class="transition-transform duration-200 group-hover:translate-x-1"
-										>
-											&rarr;
+									<span>
+										<span class="block text-[0.75rem] uppercase tracking-[0.14em] text-ink-2">Returns</span>
+										<span class="mt-1 block max-w-[28ch] text-[0.9375rem] leading-relaxed">{engine.returns}</span>
+										<span class="mt-3 inline-flex items-center gap-2 text-[0.875rem]">
+											Open
+											<span aria-hidden="true" class="transition-transform duration-200 group-hover:translate-x-1">
+												&rarr;
+											</span>
 										</span>
 									</span>
 								</span>
-							</span>
-						</a>
-					</li>
-				))
-			}
-		</ul>
+							</a>
+						</li>
+					))}
+				</ul>
+			</section>
+		))
+	}
 
-		<div class="mt-14 grid gap-6 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center" data-reveal>
+	{
+		planned.length > 0 ? (
+			<section class="wrap section" aria-labelledby="in-build">
+				<div class="border-t border-ink/20 pt-6">
+					<h2 id="in-build" class="text-[0.95rem] font-medium text-ink">
+						In build
+					</h2>
+					<ul class="mt-4 grid gap-2">
+						{planned.map((engine) => (
+							<li class="text-[0.9375rem] text-ink-2">{engine.title}</li>
+						))}
+					</ul>
+				</div>
+			</section>
+		) : null
+	}
+
+	<section class="wrap section">
+		<div class="grid gap-6 border-t border-ink/20 pt-6 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
 			<p class="max-w-[52ch] text-[1rem] leading-relaxed text-ink-2">
-				The four formulas behind all three, including the weights in the decision score, are
-				published on the homepage. Read them before you trust an answer.
+				The formulas behind every engine — including the weights in the decision score — are published
+				on the homepage and beside each result. Read them before you trust an answer.
 			</p>
 			<a href="/#method" class="btn-ghost">
 				See the formulas

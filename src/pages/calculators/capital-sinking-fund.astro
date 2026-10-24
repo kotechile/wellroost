@@ -1,0 +1,34 @@
+---
+import CalculatorPage from '../../components/calculators/CalculatorPage.astro';
+import SinkingFundCalculator from '../../components/calculators/react/SinkingFundCalculator';
+---
+
+<CalculatorPage
+	slug="capital-sinking-fund"
+	notes={[
+		{
+			title: 'Systems fail on a curve, not a calendar',
+			body: 'A water heater does not fail at year nine because a table says nine. It fails on a wear-out hazard that climbs steeply once the unit is past its median. The engine models that curve, which is why an eight-year-old water heater asks for more than a new one and a two-year-old roof asks for nothing.'
+		},
+		{
+			title: 'One year and five years answer different questions',
+			body: 'A one-year window is a catch-up figure: what it costs to be ready by next winter. A five-year window is the sustainable monthly contribution. Both are printed because a household that has just bought an old house needs the first, and one that plans to stay needs the second.'
+		},
+		{
+			title: 'The alternative is a card at 24.99%',
+			body: 'The engine prices the same replacements on an 18-month card. That interest figure is the actual cost of having no fund, and it is usually larger than the inconvenience of the monthly contribution.'
+		}
+	]}
+	formula={[
+		'F(age) = 1 − exp(−(age / λ)^k)',
+		'P(window) = [F(age + T) − F(age)] / [1 − F(age)]',
+		'contribution = Σ(replacement × P(window)) / months in window',
+		'median failure = λ × (ln 2)^(1/k)'
+	]}
+	related={['true-cost-of-ownership', 'insurance-coverage-gap', 'unpermitted-work']}
+	disclosure="Service lives are InterNACHI ranges and replacement costs are 2026 ranges. The shape parameter is exposed on the page: raising it makes the timing later and sharper, lowering it spreads failures out."
+>
+	<div slot="calculator">
+		<SinkingFundCalculator client:load />
+	</div>
+</CalculatorPage>

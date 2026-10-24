@@ -1,0 +1,34 @@
+---
+import CalculatorPage from '../../components/calculators/CalculatorPage.astro';
+import PermitRiskCalculator from '../../components/calculators/react/PermitRiskCalculator';
+---
+
+<CalculatorPage
+	slug="unpermitted-work"
+	notes={[
+		{
+			title: 'The penalty is a multiple, not a fee',
+			body: 'Municipalities usually charge a multiple of the original permit fee to legalise work that started without one, and the multiplier is the smallest part of the cost. Opening finished walls so an inspector can see the framing is where the money goes.'
+		},
+		{
+			title: 'Unpermitted area is not valued lower, it is not counted',
+			body: 'Appraisal practice excludes unpermitted square footage from gross living area. A finished basement or a deck that never had a permit is not cheap space at resale. It is space the lender’s appraisal will not finance, and a buyer prices that in before making an offer.'
+		},
+		{
+			title: 'Regularising later is the only path someone else can trigger',
+			body: 'Permitting now is a choice. So is selling as-is. Being caught mid-renovation, or by a buyer’s inspector, is not — which is why the middle path carries a contingent cost rather than a fixed one.'
+		}
+	]}
+	formula={[
+		'permit now = fee + plans + PV(tax on the added assessment)',
+		'regularise = fee × penalty + engineer + exposure + P(fail) × remediation',
+		'sell as-is = area × price per sqft × appraisal haircut + concession',
+		'exposure = the largest of the three totals'
+	]}
+	related={['remodeling-roi', 'capital-sinking-fund', 'property-tax-appeal']}
+	disclosure="Fees, penalty multiples and appraisal treatment are local. Every one of them is an input on this page with a seeded default, because a national average for a municipal fee schedule would be a guess wearing a decimal point."
+>
+	<div slot="calculator">
+		<PermitRiskCalculator client:load />
+	</div>
+</CalculatorPage>

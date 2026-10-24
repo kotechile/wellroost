@@ -1,0 +1,137 @@
+---
+/**
+ * The page shell every engine shares: header, one instrument, one aside, one set of siblings.
+ *
+ * It exists because twelve pages of hand-copied Astro is twelve chances to forget the JSON-LD, the
+ * canonical title or the assumption block. The engine page supplies three things — its registry
+ * slug, the notes that explain what the number means, and the formulas it ran — and the shell does
+ * the rest.
+ *
+ * The instrument sits in an unpadded card so the dark answer band can run flush to the card's top
+ * edge; the island owns its own internal rhythm from there.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import JsonLd from '../JsonLd.astro';
+import { engineBySlug, engineRegistry } from '../../lib/calculators/registry';
+import { getCalculatorSchema } from '../../lib/calculators/metadata';
+
+interface Props {
+	slug: string;
+	/** Two or three short explainers: what the result means, what usually surprises people. */
+	notes: Array<{ title: string; body: string }>;
+	/** The arithmetic, printed as the engine ran it. */
+	formula: string[];
+	/** Slugs of sibling engines worth opening next. */
+	related?: string[];
+	/** Extra disclosure, e.g. the dataset's coverage limits. */
+	disclosure?: string;
+}
+
+const { slug, notes, formula, related = [], disclosure } = Astro.props;
+
+const entry = engineBySlug(slug);
+if (!entry) {
+	throw new Error(`CalculatorPage: no registry entry for "${slug}". Register the engine before linking it.`);
+}
+
+const tool = {
+	title: entry.title,
+	slug: entry.toolSlug,
+	href: entry.asset.href,
+	status: entry.status,
+	description: entry.description,
+	utility: entry.utility,
+	category: entry.applicationCategory,
+	keywords: entry.keywords
+};
+const schema = Astro.site ? getCalculatorSchema(tool, Astro.site) : null;
+
+const siblings = (related.length
+	? related.map((id) => engineRegistry.filter((engine) => engine.toolSlug === id)).flat()
+	: engineRegistry.filter((engine) => engine.status !== 'Planned' && engine.toolSlug !== slug)
+).slice(0, 3);
+---
+
+<BaseLayout title={`${entry.title} | WellRoost`} description={entry.description}>
+	{schema ? <JsonLd slot="head" data={schema} /> : null}
+
+	<section class="wrap pt-[clamp(2rem,4.5vw,3.5rem)]">
+		<div class="grid items-end gap-x-14 gap-y-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
+			<div>
+				<p class="text-[0.8125rem] text-ink-2" data-reveal>{entry.eyebrow}</p>
+				<h1 class="display mt-3 text-ink" data-reveal style="--reveal-delay:60ms">{entry.title}</h1>
+			</div>
+			<p class="lede max-w-[42ch] pb-2 text-ink" data-reveal style="--reveal-delay:110ms">
+				{entry.description}
+			</p>
+		</div>
+
+		<div class="mt-[clamp(2rem,4vw,3rem)] grid items-start gap-8 lg:grid-cols-[minmax(0,1.6fr)_minmax(18rem,1fr)]">
+			<div class="overflow-hidden bg-card">
+				<slot name="calculator" />
+			</div>
+
+			<div class="grid content-start gap-6 lg:sticky lg:top-28">
+				{
+					notes.map((note) => (
+						<article class="border-t border-ink/20 pt-4">
+							<h2 class="text-[0.95rem] font-medium text-ink">{note.title}</h2>
+							<p class="mt-2 text-[0.875rem] leading-relaxed text-ink-2">{note.body}</p>
+						</article>
+					))
+				}
+
+				<article class="border-t border-ink/20 pt-4">
+					<h2 class="font-mono text-[0.66rem] uppercase tracking-[0.24em] text-ink-2">What it ran</h2>
+					<div class="mt-3 grid gap-1.5">
+						{
+							formula.map((line) => (
+								<p class="mono text-[0.72rem] leading-relaxed text-ink/85">{line}</p>
+							))
+						}
+					</div>
+				</article>
+
+				{
+					disclosure ? (
+						<article class="border-t border-ink/20 pt-4">
+							<h2 class="font-mono text-[0.66rem] uppercase tracking-[0.24em] text-ink-2">Coverage</h2>
+							<p class="mt-2 text-[0.8125rem] leading-relaxed text-ink-2">{disclosure}</p>
+						</article>
+					) : null
+				}
+			</div>
+		</div>
+	</section>
+
+	<section class="wrap section" aria-labelledby="siblings">
+		<div class="flex flex-wrap items-baseline justify-between gap-x-10 gap-y-3 border-t border-ink/20 pt-6">
+			<h2 id="siblings" class="text-[0.95rem] font-medium text-ink">Keep going</h2>
+			<a href="/calculators/" class="btn-ghost text-[0.875rem]">
+				All calculators
+				<span class="arrow" aria-hidden="true">&rarr;</span>
+			</a>
+		</div>
+		<ul class="mt-6 grid gap-px bg-ink/10 sm:grid-cols-3">
+			{
+				siblings.map((sibling) => (
+					<li class="bg-paper">
+						<a href={sibling.asset.href} class="group grid h-full gap-2 p-5 transition-colors hover:bg-card">
+							<span class="font-mono text-[0.62rem] uppercase tracking-[0.2em] text-ink-2">
+								{sibling.asset.category}
+							</span>
+							<span class="h3 text-[1.15rem] text-ink">{sibling.title}</span>
+							<span class="mt-1 text-[0.8125rem] leading-relaxed text-ink-2">{sibling.returns}</span>
+							<span class="mt-2 inline-flex items-center gap-2 text-[0.8125rem] text-pine">
+								Open
+								<span aria-hidden="true" class="transition-transform duration-200 group-hover:translate-x-1">
+									&rarr;
+								</span>
+							</span>
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</section>
+</BaseLayout>

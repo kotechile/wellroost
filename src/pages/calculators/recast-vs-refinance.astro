@@ -1,0 +1,35 @@
+---
+import CalculatorPage from '../../components/calculators/CalculatorPage.astro';
+import RecastCalculator from '../../components/calculators/react/RecastCalculator';
+---
+
+<CalculatorPage
+	slug="recast-vs-refinance"
+	notes={[
+		{
+			title: 'Relief follows the lump sum, not the balance',
+			body: 'A recast re-amortizes the balance you already have over the months you already owe, at the rate you already locked. So the payment relief is set by one number — how much principal you retire — and it does not matter whether your statement is a month stale.'
+		},
+		{
+			title: 'The fee is the whole transaction cost',
+			body: 'A servicer charges a flat administrative fee, usually $150 to $500. There is no appraisal, no title work, no income verification and no credit pull, which is why the fee returns in weeks rather than years.'
+		},
+		{
+			title: 'What you give up',
+			body: 'Liquidity, and any return that cash would have earned. The engine prices that as the interest you no longer pay, which is a guaranteed return at your note rate and is not taxed. Compare it against what the same money earns elsewhere before deciding.'
+		}
+	]}
+	formula={[
+		'M_recast = P_new [ r(1+r)^n / ((1+r)^n − 1) ]',
+		'relief = (P_before − P_new) × paymentFactor(r, n)',
+		'payback (months) = servicer fee / relief',
+		'rate to match = solve  PMT(balance, r30, 360) = M_recast',
+		'interest avoided = relief × months remaining'
+	]}
+	related={['heloc-arm-stress', 'rent-vs-buy', 'down-payment']}
+	disclosure="Conforming limits are the 2026 FHFA baseline for a one-unit property. High-cost counties are not modelled here; if your loan is near the line, ask the servicer for the limit that applies to your county."
+>
+	<div slot="calculator">
+		<RecastCalculator client:load />
+	</div>
+</CalculatorPage>

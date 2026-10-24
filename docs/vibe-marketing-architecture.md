@@ -27,18 +27,17 @@ Brand and editorial consistency are maintained across automated asset generation
 
 Instead of offering a downloadable PDF or generic form on **wellroost.com**, WellRoost embeds functional decision micro-apps that capture high intent through user interaction, instant calculation, and state persistence.
 
-### Component Architecture: `VibeAssetCard.tsx`
-Located at `src/components/VibeAssetCard.tsx`:
-- White panel matching `design-language.md` and the adjacent cards (`border-gray-200`, navy text,
-  `#1d6ae5` primary action). It was `zinc-900` glassmorphism, the only dark surface on an otherwise
-  white editorial page and a style the design language does not define.
-- Category pill (`border-blue-100 bg-blue-50 text-blue-700`).
-- Version badge (`Interactive Asset v1.0`) and, on the CTA, `data-asset-slug` so the rendered page can
-  be checked against the telemetry slug by eye.
-- Direct Smart Brevity copy hook with key formula/metrics preview.
-- The CTA is an `<a href>` to the engine (navigation semantics: middle-click, open-in-new-tab, visible
-  URL), instrumented with `engage` on click.
-- Identity comes from `src/lib/vibeAssets.ts`; the card carries no slug literal of its own.
+### Component architecture: the registry, not a card
+`src/lib/calculators/registry.ts` pairs every tool with its asset identity, its family and its
+`takes`/`returns` copy; `src/pages/calculators/index.astro` renders the hub from that one array.
+There is no `VibeAssetCard.tsx` — this document described one that was never built, which is the
+same drift a second hand-written list always produces. What the rows actually do:
+
+- Category label above the title, `data-asset-slug` on the anchor so the rendered page can be checked
+  against the telemetry slug by eye.
+- Direct Smart Brevity hook: the description, then `takes` and `returns` side by side.
+- The CTA is a plain `<a href>` to the engine (middle-click, open in a new tab, visible URL).
+- Identity comes from `src/lib/vibeAssets.ts`; the row carries no slug literal of its own.
 
 ---
 

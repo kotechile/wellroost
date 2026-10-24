@@ -1,0 +1,34 @@
+---
+import CalculatorPage from '../../components/calculators/CalculatorPage.astro';
+import ConcessionCalculator from '../../components/calculators/react/ConcessionCalculator';
+---
+
+<CalculatorPage
+	slug="seller-concession"
+	notes={[
+		{
+			title: 'A price cut is permanent in two places',
+			body: 'Reducing the price lowers the loan and the assessment the county resets to your purchase price. Points lower the rate and nothing else, and a temporary buydown lowers neither after year two. The tax row is why the price cut often wins on a five-year hold even when its monthly payment looks worse.'
+		},
+		{
+			title: 'Points do not scale linearly',
+			body: 'The first two points usually buy about 25 basis points each. Deeper buydowns buy less per point, so a $20,000 credit on a $375,000 loan does not purchase the rate a straight-line calculation suggests. The engine caps the curve and lets you enter the lender’s real bid.'
+		},
+		{
+			title: 'What survives a refinance',
+			body: 'Points are spent. A 2-1 buydown parks cash in a custodial account, and Fannie Mae’s guide credits what is left against the payoff. It may instead return it to the funding party, depending on the agreement. The toggle exists because the agreement decides, and it is worth reading before you sign.'
+		}
+	]}
+	formula={[
+		'path A: loan = (price − credit) × (1 − down)',
+		'path B: points = credit / loan × 100, rate = note − reduction(points)',
+		'path C: escrow = 12 × subsidy(2%) + 12 × subsidy(1%)',
+		'payoff credit = unused subsidy at the exit month'
+	]}
+	related={['down-payment', 'rent-vs-buy', 'recast-vs-refinance']}
+	disclosure="Points-to-rate pricing is set by the lender on the day. The curve here is a shape, not a quote: enter the basis points per point you were actually offered and the comparison becomes specific to your file."
+>
+	<div slot="calculator">
+		<ConcessionCalculator client:load />
+	</div>
+</CalculatorPage>

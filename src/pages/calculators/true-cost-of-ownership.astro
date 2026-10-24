@@ -1,0 +1,34 @@
+---
+import CalculatorPage from '../../components/calculators/CalculatorPage.astro';
+import OwnershipCostCalculator from '../../components/calculators/react/OwnershipCostCalculator';
+---
+
+<CalculatorPage
+	slug="true-cost-of-ownership"
+	notes={[
+		{
+			title: 'The tax line is not the seller’s bill',
+			body: 'In an acquisition-value state the assessment resets on sale. The listing prints the seller’s tax, which may reflect a basis set decades ago; the buyer pays on the price. The engine computes the reassessed figure and shows the delta as its own row.'
+		},
+		{
+			title: 'Insurance is a quote, not a rate',
+			body: 'Carriers do not publish a national average that applies to a specific house. The seeded figure is a starting point, and the page says so. Replace it with the quote you were given, because that is the only number the escrow will use.'
+		},
+		{
+			title: 'Reserves are a hazard, not a percentage',
+			body: 'The one-percent rule assumes every system in the house is the same age. It is not. The reserve row comes from the same wear-out model the sinking-fund engine uses, so the age of the roof and the furnace change the monthly cost.'
+		}
+	]}
+	formula={[
+		'outflow = (P + I) + T_reassessed + I_indexed + HOA + M_predictive',
+		'T_reassessed = price × effective rate / 12',
+		'HOA = dues + (reserve funding < 70% ? assessment / 36 : 0)',
+		'M_predictive = Σ(replacement × hazard) / 12'
+	]}
+	related={['rent-vs-buy', 'capital-sinking-fund', 'insurance-coverage-gap']}
+	disclosure="Eight jurisdictions are modelled: Texas, California, Cook and non-Cook Illinois, Ohio, Georgia, New York municipalities and Montgomery County, Maryland. Elsewhere the engine refuses rather than substituting a national average."
+>
+	<div slot="calculator">
+		<OwnershipCostCalculator client:load />
+	</div>
+</CalculatorPage>

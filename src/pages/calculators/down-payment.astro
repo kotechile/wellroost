@@ -1,0 +1,34 @@
+---
+import CalculatorPage from '../../components/calculators/CalculatorPage.astro';
+import DownPaymentCalculator from '../../components/calculators/react/DownPaymentCalculator';
+---
+
+<CalculatorPage
+	slug="down-payment"
+	notes={[
+		{
+			title: 'The premium is temporary; the cash is not',
+			body: 'Mortgage insurance stops at 80% loan-to-value on request and at 78% automatically. So the comparison is not a bigger payment forever against a smaller one. It is a known premium for a known number of months against liquid cash that is gone at closing and hard to rebuild.'
+		},
+		{
+			title: 'Cancellation is a request, not a schedule',
+			body: 'At 80% the borrower has to ask, and the servicer may require a current valuation. At 78% termination is automatic. The engine reports both months, because the gap between them is money a household can claim back with a phone call.'
+		},
+		{
+			title: 'Assistance has a rate attached',
+			body: 'A down-payment programme usually funds a second lien alongside an agency first mortgage, and that first lien often carries a higher rate. The page prices the surcharge against the assistance, which is the number that decides whether the package is cheaper than a smaller down payment at market.'
+		}
+	]}
+	formula={[
+		'LTV = loan / price',
+		'premium = loan × MI band rate / 12',
+		'cancellation = first month the balance reaches 80% of price',
+		'net assistance = amount − (surcharge × balance × years)'
+	]}
+	related={['seller-concession', 'rent-vs-buy', 'recast-vs-refinance']}
+	disclosure="One programme is carried at launch — the Maryland Mortgage Program — with no dollar figures attached, because terms change with every funding round and a stale limit is worse than a blank field. The arithmetic works for any offer you type in."
+>
+	<div slot="calculator">
+		<DownPaymentCalculator client:load />
+	</div>
+</CalculatorPage>

@@ -1,0 +1,34 @@
+---
+import CalculatorPage from '../../components/calculators/CalculatorPage.astro';
+import TouArbitrageCalculator from '../../components/calculators/react/TouArbitrageCalculator';
+---
+
+<CalculatorPage
+	slug="tou-ev-arbitrage"
+	notes={[
+		{
+			title: 'A tariff is a shape, not a rate',
+			body: 'Time-of-use makes overnight charging cheap and the dinner hour expensive. Whether it pays depends on how much of your load sits in that window and how much of it can move — not on the headline off-peak rate in the utility’s marketing.'
+		},
+		{
+			title: 'The peak share is the variable that matters',
+			body: 'The engine solves for the ceiling: the share of household electricity that can land between four and nine in the evening before the tariff costs more. Above that ceiling, the overnight discount is subsidising load you cannot move.'
+		},
+		{
+			title: 'Two arithmetic rules, both asserted in the tests',
+			body: 'The energy shares always sum to one, so shifting load cannot invent kilowatt-hours. And the published break-even is the inverse of the same cost function the table uses, solved numerically — a closed-form ceiling that drifts from its own model is worse than no ceiling at all.'
+		}
+	]}
+	formula={[
+		'peak + off-peak + super off-peak = 1',
+		'cost = home × (peak·R_p + off·R_o + super·R_s) + EV × (γ·R_s + (1−γ)·R_o)',
+		'ceiling = solve  savings(peak share) = 0  by bisection',
+		'demand charge = peak kW × $/kW × 12'
+	]}
+	related={['true-cost-of-ownership', 'capital-sinking-fund', 'insurance-coverage-gap']}
+	disclosure="No utility tariffs are bundled. Rates come off your own bill, with a demand-charge field for the riders that add one — several 2026 schedules do, and a model that cannot see it overstates the saving."
+>
+	<div slot="calculator">
+		<TouArbitrageCalculator client:load />
+	</div>
+</CalculatorPage>

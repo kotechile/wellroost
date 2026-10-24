@@ -1,43 +1,36 @@
-export const calculatorTools = [
-	{
-		title: 'Move or Improve Calculator',
-		slug: 'move-or-improve',
-		href: '/calculators/move-or-improve/',
-		status: 'Live',
-		accent: 'emerald',
-		description:
-			'Compare the 5-year financial projection of renovating your current home versus selling and relocating.',
-		utility: 'Choose between home renovation and relocation',
-		category: 'FinanceApplication',
-		keywords: ['move or improve calculator', 'renovate vs relocate', 'remodel vs sell calculator']
-	},
-	{
-		title: 'Remodeling ROI Calculator',
-		slug: 'remodeling-roi',
-		href: '/calculators/remodeling-roi/',
-		status: 'Live',
-		accent: 'cyan',
-		description:
-			'Pressure-test a home upgrade with project cost, resale lift, stay horizon, enjoyment value, and monthly savings.',
-		utility: 'Decide if a project is worth it',
-		category: 'FinanceApplication',
-		keywords: ['remodeling ROI calculator', 'home improvement ROI', 'renovation calculator']
-	},
-	{
-		title: 'Remodelytics',
-		slug: 'remodelytics',
-		href: '/calculators/remodelytics/',
-		status: 'Live',
-		accent: 'blue',
-		description:
-			'Model remodel ROI, ARV, energy incentives, ADU income, leverage, and over-improvement risk in one platform.',
-		utility: 'Run advanced remodel math',
-		category: 'BusinessApplication',
-		keywords: ['Remodelytics', 'home upgrade ROI calculator', 'ARV calculator', 'renovation underwriting']
-	}
-] as const;
+/**
+ * The calculator list, derived. Nothing here is a second copy of anything.
+ *
+ * This module used to *be* the list, with a second pairing of indices to asset keys living inside
+ * `/calculators/index.astro`. Now `registry.ts` holds the tool-and-asset pairing and this is a view
+ * over it, kept because four pages and the JSON-LD helper already import from here. Two lists of
+ * engines is one list too many.
+ */
+import { engineBySlug, engineRegistry, type EngineRecord } from './registry';
 
-export type CalculatorTool = (typeof calculatorTools)[number];
+export interface CalculatorTool {
+	title: string;
+	slug: string;
+	href: string;
+	status: EngineRecord['status'];
+	description: string;
+	utility: string;
+	category: EngineRecord['applicationCategory'];
+	keywords: readonly string[];
+}
+
+export const calculatorTools: CalculatorTool[] = engineRegistry.map((engine) => ({
+	title: engine.title,
+	slug: engine.toolSlug,
+	href: engine.asset.href,
+	status: engine.status,
+	description: engine.description,
+	utility: engine.utility,
+	category: engine.applicationCategory,
+	keywords: engine.keywords
+}));
+
+export type CalculatorSlug = (typeof calculatorTools)[number]['slug'];
 
 export function getCalculatorSchema(tool: CalculatorTool, site: URL) {
 	const url = new URL(tool.href, site).toString();
@@ -66,6 +59,8 @@ export function getCalculatorSchema(tool: CalculatorTool, site: URL) {
 	};
 }
 
-export function getCalculatorBySlug(slug: CalculatorTool['slug']) {
+export function getCalculatorBySlug(slug: string) {
 	return calculatorTools.find((tool) => tool.slug === slug);
 }
+
+export { engineBySlug };

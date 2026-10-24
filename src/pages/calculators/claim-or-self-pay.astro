@@ -1,0 +1,34 @@
+---
+import CalculatorPage from '../../components/calculators/CalculatorPage.astro';
+import ClaimOrSelfPayCalculator from '../../components/calculators/react/ClaimOrSelfPayCalculator';
+---
+
+<CalculatorPage
+	slug="claim-or-self-pay"
+	notes={[
+		{
+			title: 'The claim does not reprice now, it reprices at renewal',
+			body: 'A single claim can raise a premium by a third and hold it there for five years. On a small loss the premium penalty usually exceeds the payout. Only the arithmetic can tell you where the line sits, and the line moves with your deductible and claims history.'
+		},
+		{
+			title: 'The ceiling is returned as a range',
+			body: 'The soft number in this model is the probability of non-renewal, not the surcharge. Rather than print an invented percentage with two significant figures, the engine returns the ceiling at ±50% on that probability. If your loss sits inside the range, the decision is genuinely close.'
+		},
+		{
+			title: 'An inquiry is not free',
+			body: 'Insurance records can capture an enquiry even when nothing is paid out. If you have decided to absorb the cost, do not open a claim to ask a question.'
+		}
+	]}
+	formula={[
+		'payout = repair quote − deductible',
+		'NPV penalty = (1 − p) × surcharge PV + p × non-renewal PV',
+		'ceiling = deductible + expected penalty',
+		'verdict = self-pay ≤ ceiling < borderline < file'
+	]}
+	related={['insurance-coverage-gap', 'capital-sinking-fund', 'true-cost-of-ownership']}
+	disclosure="Premium surcharges, non-renewal behaviour and last-resort pricing are set by insurers and states, not by this page. The probabilities are named assumptions, banded on the page, and editable in the model."
+>
+	<div slot="calculator">
+		<ClaimOrSelfPayCalculator client:load />
+	</div>
+</CalculatorPage>

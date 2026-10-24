@@ -1,0 +1,34 @@
+---
+import CalculatorPage from '../../components/calculators/CalculatorPage.astro';
+import InsuranceGapCalculator from '../../components/calculators/react/InsuranceGapCalculator';
+---
+
+<CalculatorPage
+	slug="insurance-coverage-gap"
+	notes={[
+		{
+			title: 'Percentage deductibles are charged against the limit',
+			body: 'A 5% named-storm deductible on a $500,000 dwelling limit is $25,000 before the carrier pays anything. It is charged against the coverage amount, not against the damage. On a $40,000 loss that deductible is most of the claim.'
+		},
+		{
+			title: 'Actual cash value pays for a used roof',
+			body: 'A settlement at actual cash value withholds depreciation. Fifteen years into a twenty-year shingle, the withheld share is about three quarters of replacement cost. It is recoverable only if the work is completed and invoiced inside the policy window.'
+		},
+		{
+			title: 'The number to hold against savings',
+			body: 'A deductible and a depreciation gap arrive together on the same storm. The headline here adds them, because a household needs one figure to compare against its liquid reserves, not five.'
+		}
+	]}
+	formula={[
+		'peril deductible = Coverage A × peril share',
+		'depreciation = replacement cost × min(1, age / expected life)',
+		'carrier pays = replacement cost − depreciation   (ACV only)',
+		'liquid exposure = max(peril deductible, flat) + depreciation withheld'
+	]}
+	related={['claim-or-self-pay', 'true-cost-of-ownership', 'capital-sinking-fund']}
+	disclosure="Roof lives are InterNACHI service-life figures. Insurers apply their own schedules and endorsements, so the depreciation here is an estimate of the arithmetic, not of the adjuster's decision."
+>
+	<div slot="calculator">
+		<InsuranceGapCalculator client:load />
+	</div>
+</CalculatorPage>
