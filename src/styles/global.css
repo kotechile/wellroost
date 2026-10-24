@@ -199,6 +199,14 @@ h6 {
   padding-inline: var(--edge);
 }
 
+/* The article's two columns live inside one capped frame, so the text, the rail and the title
+   share an axis instead of the body hugging the left edge of a 90rem wrap. */
+.article-frame {
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+}
+
 .section {
   padding-block: var(--section-space);
 }
@@ -360,6 +368,11 @@ input[type="range"].range:focus-visible::-webkit-slider-thumb {
 .article-body > * + * {
   margin-top: 1.35em;
 }
+
+/* The body starts flush with the hook above it: a heading's own 2.4em lead-in would open a hole. */
+.article-body > :first-child {
+  margin-top: 0;
+}
 .article-body h2 {
   font-size: clamp(1.6rem, 2.6vw, 2.2rem);
   margin-top: 2.4em;
@@ -371,7 +384,7 @@ input[type="range"].range:focus-visible::-webkit-slider-thumb {
 }
 .article-body p,
 .article-body li {
-  max-width: 36rem;
+  max-width: 40rem;
 }
 .article-body a {
   color: var(--color-pine);

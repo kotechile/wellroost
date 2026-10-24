@@ -30,6 +30,13 @@ const related = category?.wordpressCategoryId
 	? (await fetchPostsByCategory(category.wordpressCategoryId, 4)).filter((item) => item.slug !== post.slug).slice(0, 3)
 	: [];
 
+const plainText = (value: string) => value.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+const firstParagraph = post.content.match(/^<p[^>]*>([\s\S]*?)<\/p>/);
+const bodyHtml =
+	firstParagraph && post.excerpt && plainText(firstParagraph[1]).slice(0, 110) === plainText(post.excerpt).slice(0, 110)
+		? post.content.replace(firstParagraph[0], '').trim()
+		: post.content;
+
 const siteUrl = Astro.site?.toString() || 'https://wellroost.com/';
 const postUrl = new URL(`/${post.slug}/`, siteUrl).toString();
 const categoryUrl = post.categorySlug ? new URL(`/categories/${post.categorySlug}/`, siteUrl).toString() : null;
@@ -97,6 +104,7 @@ const breadcrumbSchema = {
 
 	<article>
 		<header class="wrap pt-[clamp(2rem,4.5vw,3.5rem)]">
+			<div class="article-frame">
 			<div class="flex flex-wrap items-baseline gap-x-5 gap-y-1 text-[0.8125rem] text-ink-2">
 				{
 					post.categoryLabel && (
@@ -109,15 +117,41 @@ const breadcrumbSchema = {
 			</div>
 
 			<h1 class="display-sm mt-5 max-w-[24ch] text-ink">{post.title}</h1>
-
-			{post.excerpt && (
-				<p class="lede mt-7 max-w-[46ch] text-ink-2">{post.excerpt}</p>
-			)}
+			</div>
 		</header>
 
-		<div class="wrap mt-[clamp(2.5rem,4vw,4rem)] grid gap-12 lg:grid-cols-[minmax(0,36rem)_minmax(0,1fr)] lg:gap-20">
+		<div class="wrap mt-[clamp(1.5rem,3vw,2.5rem)]">
+			<div class="article-frame">
+				{
+					post.featuredImage && (
+						<figure class="w-full overflow-hidden bg-paper-3" data-reveal>
+							<img
+								src={post.featuredImage}
+								alt={post.featuredImageAlt || post.title}
+								class="aspect-[7/4] w-full object-cover"
+								loading="eager"
+								decoding="async"
+							/>
+						</figure>
+					)
+				}
+
+				{
+					post.excerpt && (
+						<div class="field-dark mt-6 p-6 sm:p-8 lg:p-10" data-reveal style="--reveal-delay:80ms">
+							<p class="max-w-[34ch] font-display text-[clamp(1.4rem,2.1vw,2rem)] leading-[1.14] tracking-[-0.02em] text-paper">
+								{post.excerpt}
+							</p>
+						</div>
+					)
+				}
+			</div>
+		</div>
+
+		<div class="wrap mt-[clamp(2rem,3.2vw,3rem)]">
+			<div class="article-frame grid gap-12 lg:grid-cols-[minmax(0,40rem)_minmax(14rem,1fr)] lg:gap-16">
 			<div>
-				<div class="article-body" set:html={post.content} />
+				<div class="article-body" set:html={bodyHtml} />
 
 				<div class="mt-14 bg-paper-2 p-6 sm:p-8">
 					<p class="font-display text-[1.35rem] leading-tight text-ink">WellRoost Editorial</p>
@@ -129,6 +163,26 @@ const breadcrumbSchema = {
 			</div>
 
 			<aside class="lg:sticky lg:top-28 lg:self-start">
+				{
+					related.length > 0 && (
+						<div class="mb-10 hidden lg:block">
+							<p class="text-[0.8125rem] text-ink-2">More in {category?.name ?? 'this subject'}</p>
+							<ul class="mt-4 grid gap-3">
+								{related.map((item) => (
+									<li>
+										<a
+											href={`/${item.slug}/`}
+											class="block max-w-[30ch] font-display text-[1.05rem] leading-snug text-ink transition-colors duration-150 hover:text-pine"
+										>
+											{item.title}
+										</a>
+									</li>
+								))}
+							</ul>
+						</div>
+					)
+				}
+
 				<p class="text-[0.8125rem] text-ink-2">Run the math on your own numbers</p>
 				<ul class="mt-4 grid">
 					{
