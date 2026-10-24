@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="color-scheme" content="dark" />
+		<title>Flow field: a house, its chimney, a wall charger and an electric car</title>
+		<style>
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				overflow: hidden;
+				background: #122a20;
+			}
+			canvas {
+				display: block;
+			}
+		</style>
+		<script src="/vendor/p5.min.js"></script>
+	</head>
+	<body>
+		<script>
+			/**
+			 * WellRoost — generative flow field and vector harmonics.
+			 *
+			 * Everything in the frame (clouds, chimney plume, house contour, wall charger, cable, car)
+			 * is drawn by the same three primitives: Perlin noise, trigonometric curl, and vector
+			 * steering. No sprites, no images, no third-party scene graph.
+			 *
+			 * Three departures from the sketch as handed over, all of them about *this* page:
+			 *
+			 * 1. GROUND is the site's pine-deep (#122a20) rather than a navy sky, so the plate sits on
+			 *    the page's own ink instead of importing a second palette. One constant, one line to
+			 *    change back.
+			 * 2. Particle count and frame rate scale to the viewport, and pixelDensity is pinned to 1.
+			 *    2,200 hairlines at DPR 2 on a phone is a space heater; the trail effect is unchanged.
+			 * 3. prefers-reduced-motion draws ~140 frames and then stops, leaving the settled picture.
+			 *    The swirl is an enhancement, never the content.
+			 */
+
+			// HSB(360, 100, 100): the site's pine-deep, #122a20.
+			const GROUND = [155, 57, 16];
+
+			let particles = [];
+			let NUM_PARTICLES = 2200;
+			let zOffset = 0;
+			let stillFrame = -1;
+
+			// Scene anchors and mathematical force zones
+			let scene = {};
+			let clouds = [];
+
+			function setup() {
+				createCanvas(windowWidth, windowHeight);
+				colorMode(HSB, 360, 100, 100, 100);
+				background(...GROUND);
+				pixelDensity(1);
+
+				const narrow = windowWidth < 760;
+				NUM_PARTICLES = narrow ? 900 : windowWidth < 1200 ? 1500 : 2200;
+				if (narrow) frameRate(45);
+
+				calculateSceneGeometry();
+				initClouds();
+
+				for (let i = 0; i < NUM_PARTICLES; i++) {
+					let role = 'ATMOS'; // Atmospheric wind and cloud flow field
+					if (i < NUM_PARTICLES * 0.22) {
+						role = 'ENERGY'; // Conduit: roof -> exterior wall box -> wire -> EV
+					} else if (i < NUM_PARTICLES * 0.38) {
+						role = 'SMOKE'; // Turbulent curl-noise thermal plume from the chimney
+					} else if (i < NUM_PARTICLES * 0.52) {
+						role = 'CONTOUR'; // Structural boundary particles tracing house and car
+					}
+					particles.push(new FlowParticle(role));
+				}
+
+				if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) stillFrame = 150;
+			}
+
+			function calculateSceneGeometry() {
+				let u = min(width * 0.25, 310);
+				let totalW = u * 2.25;
+				let startX = width / 2 - totalW / 2;
+				let groundY = height * 0.68;
+
+				scene.u = u;
+				scene.groundY = groundY;
+
+				// 1. House geometry
+				let houseH = u * 0.72;
+				let houseY = groundY - houseH;
+
+				scene.house = {
+					x: startX,
+					y: houseY,
+					w: u,
+					h: houseH,
+					peakX: startX + u * 0.5,
+					peakY: groundY - u * 1.18,
+					chimneyX: startX + u * 0.74,
+					chimneyY: groundY - u * 1.05,
+					chimneyW: u * 0.11,
+					// Wall box mounted squarely on the exterior right wall, ~55% down
+					chargerX: startX + u,
+					chargerY: houseY + houseH * 0.55,
+					chargerW: u * 0.05,
+					chargerH: houseH * 0.16
+				};
+
+				// 2. Modern fastback EV geometry
+				let carW = u * 0.82;
+				let carH = carW * 0.35;
+				let carX = scene.house.x + scene.house.w + u * 0.42;
+				let carY = groundY - carH * 0.22;
+
+				scene.car = {
+					x: carX,
+					y: carY,
+					w: carW,
+					h: carH,
+					centerX: carX + carW * 0.5,
+					centerY: carY - carH * 0.45,
+					wheelR: carW * 0.16,
+					wheel1X: carX + carW * 0.21,
+					wheel2X: carX + carW * 0.79,
+					wheelY: groundY - carW * 0.08,
+					// Charge port on the driver-side front quarter panel
+					portX: carX + carW * 0.14,
+					portY: carY - carH * 0.48
+				};
+
+				// 3. Natural catenary wire from the exterior wall to the car port
+				let wStartX = scene.house.chargerX + scene.house.chargerW;
+				let wStartY = scene.house.chargerY + scene.house.chargerH * 0.65;
+
+				scene.wire = {
+					x1: wStartX,
+					y1: wStartY,
+					// Control points simulate a heavy cable's gravity sag near the driveway
+					cx1: wStartX + (scene.car.portX - wStartX) * 0.25,
+					cy1: groundY + u * 0.04,
+					cx2: wStartX + (scene.car.portX - wStartX) * 0.75,
+					cy2: groundY - u * 0.02,
+					x2: scene.car.portX,
+					y2: scene.car.portY
+				};
+			}
+
+			function initClouds() {
+				clouds = [];
+				for (let i = 0; i < 4; i++) {
+					clouds.push({
+						x: random(width),
+						y: random(height * 0.08, height * 0.32),
+						rx: random(140, 260),
+						ry: random(35, 65),
+						speed: random(0.25, 0.55),
+						seed: random(1000)
+					});
+				}
+			}
+
+			function draw() {
+				noStroke();
+				fill(...GROUND, 8);
+				rect(0, 0, width, height);
+
+				// Advance drifting cloud vortex cells
+				for (let c of clouds) {
+					c.x += c.speed;
+					if (c.x - c.rx > width) c.x = -c.rx;
+				}
+
+				drawEtherealUnderlay();
+
+				for (let p of particles) {
+					p.step();
+					p.render();
+				}
+
+				zOffset += 0.0025;
+
+				if (stillFrame > 0 && frameCount === stillFrame) noLoop();
+			}
+
+			function drawEtherealUnderlay() {
+				push();
+				noFill();
+				let h = scene.house;
+				let c = scene.car;
+				let w = scene.wire;
+				let pulse = (sin(frameCount * 0.05) + 1) * 0.5;
+
+				// Ground horizon
+				stroke(205, 60, 45, 12);
+				strokeWeight(1);
+				beginShape();
+				for (let x = 0; x <= width; x += 25) {
+					let yOff = sin(x * 0.01 + zOffset * 4) * 3;
+					vertex(x, scene.groundY + yOff);
+				}
+				endShape();
+
+				// House structure
+				stroke(200, 70, 80, 14);
+				strokeWeight(1.5);
+				rect(h.x, h.y, h.w, h.h, 2);
+				triangle(h.x - h.w * 0.04, h.y, h.x + h.w * 1.04, h.y, h.peakX, h.peakY);
+				rect(h.chimneyX, h.chimneyY, h.chimneyW, h.y - h.chimneyY - h.h * 0.15);
+
+				// Exterior wall smart EVSE charger unit
+				stroke(160, 85, 95, 28);
+				strokeWeight(1.5);
+				rect(h.chargerX, h.chargerY, h.chargerW, h.chargerH, 2);
+
+				// Conduit from the eaves down the wall into the charger
+				stroke(160, 75, 80, 16);
+				line(h.x + h.w, h.y, h.chargerX, h.chargerY);
+
+				// Window glow
+				fill(38, 80, 95, 6 + pulse * 4);
+				noStroke();
+				rect(h.x + h.w * 0.22, h.y + h.h * 0.25, h.w * 0.22, h.h * 0.25, 3);
+				rect(h.x + h.w * 0.56, h.y + h.h * 0.25, h.w * 0.22, h.h * 0.25, 3);
+
+				// Wire baseline glow
+				noFill();
+				stroke(160, 90, 95, 18 + pulse * 15);
+				strokeWeight(2);
+				bezier(w.x1, w.y1, w.cx1, w.cy1, w.cx2, w.cy2, w.x2, w.y2);
+
+				// EV silhouette
+				stroke(190, 80, 90, 16);
+				strokeWeight(1.5);
+				beginShape();
+				vertex(c.x + c.w * 0.04, c.y);
+				vertex(c.x, c.y - c.h * 0.32);
+				bezierVertex(
+					c.x + c.w * 0.04, c.y - c.h * 0.55,
+					c.x + c.w * 0.18, c.y - c.h * 0.58,
+					c.x + c.w * 0.26, c.y - c.h * 0.62
+				);
+				bezierVertex(
+					c.x + c.w * 0.38, c.y - c.h * 1.05,
+					c.x + c.w * 0.55, c.y - c.h * 1.08,
+					c.x + c.w * 0.72, c.y - c.h * 0.92
+				);
+				bezierVertex(
+					c.x + c.w * 0.86, c.y - c.h * 0.78,
+					c.x + c.w * 0.94, c.y - c.h * 0.60,
+					c.x + c.w, c.y - c.h * 0.30
+				);
+				vertex(c.x + c.w * 0.94, c.y);
+				endShape(CLOSE);
+
+				// Aero rims
+				drawHarmonicWheel(c.wheel1X, c.wheelY, c.wheelR);
+				drawHarmonicWheel(c.wheel2X, c.wheelY, c.wheelR);
+
+				// Wall plug and car port nodes
+				noStroke();
+				fill(155, 90, 100, 35 + pulse * 30);
+				circle(w.x1, w.y1, 6 + pulse * 3);
+				circle(w.x2, w.y2, 7 + pulse * 3);
+				pop();
+			}
+
+			function drawHarmonicWheel(wx, wy, r) {
+				stroke(185, 80, 90, 20);
+				strokeWeight(1.5);
+				circle(wx, wy, r);
+				let rot = frameCount * 0.025;
+				for (let i = 0; i < 5; i++) {
+					let a = rot + (TWO_PI / 5) * i;
+					line(wx, wy, wx + cos(a) * (r * 0.45), wy + sin(a) * (r * 0.45));
+				}
+			}
+
+			class FlowParticle {
+				constructor(role) {
+					this.role = role;
+					this.pos = createVector(0, 0);
+					this.prevPos = createVector(0, 0);
+					this.vel = createVector(0, 0);
+					this.acc = createVector(0, 0);
+					this.seed = random(10000);
+					this.initRole(true);
+				}
+
+				initRole(firstSpawn = false) {
+					let h = scene.house;
+					let c = scene.car;
+
+					if (this.role === 'SMOKE') {
+						this.pos.set(h.chimneyX + random(h.chimneyW), h.chimneyY + random(-5, 10));
+						this.vel.set(random(-0.3, 0.3), random(-1.8, -0.8));
+						this.maxSpeed = random(1.4, 2.6);
+						this.life = firstSpawn ? random(20, 240) : 0;
+						this.maxLife = random(180, 320);
+					} else if (this.role === 'ENERGY') {
+						// t: -0.35 solar roof -> -0.1 down the wall conduit -> 0.0 wall box -> 1.0 car port -> 1.4 battery aura
+						this.t = firstSpawn ? random(-0.35, 1.35) : random(-0.35, 0.0);
+						this.tSpeed = random(0.0045, 0.0095);
+						this.waveAmp = random(3, 11);
+						this.waveFreq = random(4, 9);
+						this.phase = random(TWO_PI);
+						this.updateEnergyPos();
+						this.prevPos.set(this.pos);
+					} else if (this.role === 'CONTOUR') {
+						this.spawnOnStructure();
+						this.vel.set(random(-0.5, 0.5), random(-0.5, 0.5));
+						this.maxSpeed = random(1.2, 2.2);
+						this.life = firstSpawn ? random(0, 90) : 0;
+						this.maxLife = random(55, 110);
+					} else {
+						// ATMOS
+						this.pos.set(random(width), random(height));
+						this.vel.set(random(0.5, 2), random(-0.5, 0.5));
+						this.maxSpeed = random(1.8, 3.4);
+						this.life = 0;
+						this.maxLife = random(200, 400);
+					}
+
+					this.prevPos.set(this.pos);
+				}
+
+				spawnOnStructure() {
+					let h = scene.house;
+					let c = scene.car;
+					if (random(1) < 0.52) {
+						let t = random(1);
+						if (random(1) < 0.55) {
+							let isLeft = random(1) < 0.5;
+							this.pos.x = isLeft ? lerp(h.x, h.peakX, t) : lerp(h.peakX, h.x + h.w, t);
+							this.pos.y = isLeft ? lerp(h.y, h.peakY, t) : lerp(h.peakY, h.y, t);
+						} else {
+							this.pos.x = random(1) < 0.5 ? h.x : h.x + h.w;
+							this.pos.y = random(h.y, h.y + h.h);
+						}
+					} else {
+						let t = random(1);
+						let x = lerp(c.x, c.x + c.w, t);
+						let arch = sin(t * PI) * c.h * 0.95;
+						this.pos.set(x, c.y - arch * random(0.6, 1.05));
+					}
+				}
+
+				step() {
+					this.prevPos.set(this.pos);
+
+					if (this.role === 'ENERGY') {
+						this.stepEnergy();
+						return;
+					}
+
+					this.life++;
+
+					if (this.role === 'SMOKE') {
+						this.stepSmoke();
+					} else if (this.role === 'CONTOUR') {
+						this.stepContour();
+					} else {
+						this.stepAtmos();
+					}
+
+					// Interactive mouse swirl
+					let dMouse = dist(mouseX, mouseY, this.pos.x, this.pos.y);
+					if (dMouse < 160 && dMouse > 1) {
+						let aMouse = atan2(this.pos.y - mouseY, this.pos.x - mouseX);
+						let swirlAngle = aMouse + HALF_PI * 0.7;
+						let strength = map(dMouse, 0, 160, 0.85, 0);
+						this.acc.add(p5.Vector.fromAngle(swirlAngle).mult(strength));
+					}
+
+					this.vel.add(this.acc);
+					this.vel.limit(this.maxSpeed);
+					this.pos.add(this.vel);
+					this.acc.mult(0);
+
+					if (
+						this.life > this.maxLife ||
+						this.pos.x < -20 || this.pos.x > width + 20 ||
+						this.pos.y < -20 || this.pos.y > height + 20
+					) {
+						this.initRole(false);
+					}
+				}
+
+				stepSmoke() {
+					let progress = this.life / this.maxLife;
+					let n = noise(this.pos.x * 0.006, this.pos.y * 0.006, zOffset * 1.4);
+					let windDrift = map(progress, 0, 1, -HALF_PI, -PI * 0.18);
+					let curl = (n - 0.5) * TWO_PI * 1.8;
+					let harmonicWave = sin(this.life * 0.08 + this.seed) * 0.35;
+
+					let angle = windDrift + curl * (0.35 + progress * 0.65) + harmonicWave;
+					this.acc.add(p5.Vector.fromAngle(angle).mult(0.22));
+				}
+
+				stepEnergy() {
+					this.t += this.tSpeed;
+					if (this.t > 1.42) {
+						this.initRole(false);
+						return;
+					}
+					this.updateEnergyPos();
+				}
+
+				updateEnergyPos() {
+					let h = scene.house;
+					let w = scene.wire;
+					let c = scene.car;
+
+					if (this.t < 0) {
+						// Phase A: rooftop cascade down the exterior wall into the charger
+						let u = map(this.t, -0.35, 0, 0, 1);
+						let rx, ry;
+						if (u < 0.6) {
+							let subU = map(u, 0, 0.6, 0, 1);
+							rx = lerp(h.peakX, h.x + h.w, subU);
+							ry = lerp(h.peakY, h.y, subU);
+						} else {
+							let subU = map(u, 0.6, 1, 0, 1);
+							rx = h.x + h.w;
+							ry = lerp(h.y, w.y1, subU);
+						}
+						let wave = sin(u * TWO_PI * 3 + frameCount * 0.14 + this.phase) * 3;
+						this.pos.set(rx + wave, ry);
+					} else if (this.t <= 1.0) {
+						// Phase B: draped bezier wire from wall box to car port
+						let bx = bezierPoint(w.x1, w.cx1, w.cx2, w.x2, this.t);
+						let by = bezierPoint(w.y1, w.cy1, w.cy2, w.y2, this.t);
+
+						let tx = bezierTangent(w.x1, w.cx1, w.cx2, w.x2, this.t);
+						let ty = bezierTangent(w.y1, w.cy1, w.cy2, w.y2, this.t);
+						let normAngle = atan2(ty, tx) + HALF_PI;
+
+						let envelope = sin(this.t * PI);
+						let wave =
+							sin(this.t * TWO_PI * this.waveFreq - frameCount * 0.18 + this.phase) *
+							this.waveAmp * envelope;
+
+						this.pos.set(bx + cos(normAngle) * wave, by + sin(normAngle) * wave);
+					} else {
+						// Phase C: dispersal vortex inside the car's battery and cabin
+						let u = map(this.t, 1.0, 1.42, 0, 1);
+						let spiralAngle = u * TWO_PI * 2.5 + this.phase - frameCount * 0.06;
+						let rx = lerp(4, c.w * 0.42, u);
+						let ry = lerp(4, c.h * 0.42, u);
+
+						let cx = lerp(w.x2, c.centerX, u);
+						let cy = lerp(w.y2, c.centerY, u);
+
+						this.pos.set(cx + cos(spiralAngle) * rx, cy + sin(spiralAngle) * ry);
+					}
+				}
+
+				stepContour() {
+					let n = noise(this.pos.x * 0.008, this.pos.y * 0.008, zOffset);
+					let angle = n * TWO_PI * 2;
+					this.acc.add(p5.Vector.fromAngle(angle).mult(0.18));
+				}
+
+				stepAtmos() {
+					let nx = this.pos.x * 0.003;
+					let ny = this.pos.y * 0.003;
+					let n = noise(nx, ny, zOffset);
+
+					let baseAngle = (n - 0.5) * PI * 1.4 + sin(this.pos.x * 0.004 + zOffset * 3) * 0.25;
+
+					this.inCloud = false;
+					for (let cl of clouds) {
+						let dx = (this.pos.x - cl.x) / cl.rx;
+						let dy = (this.pos.y - cl.y) / cl.ry;
+						let d2 = dx * dx + dy * dy;
+						if (d2 < 1.0) {
+							this.inCloud = true;
+							let cloudCurl =
+								noise(this.pos.x * 0.012 + cl.seed, this.pos.y * 0.012, zOffset * 2) *
+								TWO_PI * 2;
+							baseAngle = lerp(baseAngle, cloudCurl, (1 - d2) * 0.75);
+							break;
+						}
+					}
+
+					let h = scene.house;
+					let hCenter = createVector(h.x + h.w * 0.5, h.y + h.h * 0.4);
+					if (p5.Vector.dist(this.pos, hCenter) < h.w * 0.75) {
+						let deflect = atan2(this.pos.y - hCenter.y, this.pos.x - hCenter.x);
+						baseAngle = lerp(baseAngle, deflect, 0.45);
+					}
+
+					let c = scene.car;
+					let cCenter = createVector(c.centerX, c.centerY);
+					if (p5.Vector.dist(this.pos, cCenter) < c.w * 0.6) {
+						let deflect = atan2(this.pos.y - cCenter.y, this.pos.x - cCenter.x);
+						baseAngle = lerp(baseAngle, deflect, 0.5);
+					}
+
+					this.acc.add(p5.Vector.fromAngle(baseAngle).mult(0.15));
+				}
+
+				render() {
+					if (p5.Vector.dist(this.pos, this.prevPos) > 35) return;
+
+					if (this.role === 'ENERGY') {
+						let hue = map(sin(this.t * PI + frameCount * 0.05), -1, 1, 145, 195);
+						let alpha = 85;
+						if (this.t < 0) alpha = map(this.t, -0.35, 0, 0, 85);
+						if (this.t > 1.0) alpha = map(this.t, 1.0, 1.42, 90, 0);
+
+						stroke(hue, 85, 100, alpha);
+						strokeWeight(this.t >= 0 && this.t <= 1.0 ? 2.1 : 1.5);
+						line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
+					} else if (this.role === 'SMOKE') {
+						let progress = this.life / this.maxLife;
+						let hue = lerp(25, 210, constrain(progress * 1.4, 0, 1));
+						let sat = lerp(70, 20, progress);
+						let bri = lerp(95, 85, progress);
+						let alpha = sin(progress * PI) * 55;
+
+						stroke(hue, sat, bri, alpha);
+						strokeWeight(lerp(1.2, 2.8, progress));
+						line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
+					} else if (this.role === 'CONTOUR') {
+						let progress = this.life / this.maxLife;
+						let isCarSide = this.pos.x > scene.house.x + scene.house.w * 1.1;
+						let hue = isCarSide ? 185 : 205;
+						let alpha = sin(progress * PI) * 65;
+
+						stroke(hue, 75, 95, alpha);
+						strokeWeight(1.4);
+						line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
+					} else {
+						let progress = this.life / this.maxLife;
+						let fade = sin(progress * PI);
+
+						if (this.inCloud) {
+							stroke(200, 18, 98, fade * 42);
+							strokeWeight(2.2);
+						} else if (this.pos.y > scene.groundY) {
+							let hue = map(noise(this.pos.x * 0.005, zOffset), 0, 1, 165, 225);
+							stroke(hue, 70, 60, fade * 32);
+							strokeWeight(1.2);
+						} else {
+							let hue = map(sin(this.pos.x * 0.003 + zOffset * 5), -1, 1, 190, 245);
+							stroke(hue, 65, 80, fade * 28);
+							strokeWeight(1.1);
+						}
+						line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
+					}
+				}
+			}
+
+			function windowResized() {
+				resizeCanvas(windowWidth, windowHeight);
+				background(...GROUND);
+				calculateSceneGeometry();
+			}
+		</script>
+	</body>
+</html>
