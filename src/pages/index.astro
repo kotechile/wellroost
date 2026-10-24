@@ -11,11 +11,8 @@ import PillarIndex from '../components/home/PillarIndex.astro';
 import LatestArticles from '../components/home/LatestArticles.astro';
 import CloseCta from '../components/home/CloseCta.astro';
 import { getTopLevelCategories } from '../lib/categories';
-import { fetchLatestPosts } from '../lib/wordpress';
 
 const topCategories = await getTopLevelCategories();
-const posts = await fetchLatestPosts(3);
-
 
 const siteUrl = Astro.site?.toString() || 'https://wellroost.com/';
 
