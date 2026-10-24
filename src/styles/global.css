@@ -465,6 +465,18 @@ input[type="range"].range:focus-visible::-webkit-slider-thumb {
   margin: 2rem 0;
 }
 
+/*
+ * A portrait picture is legitimate in a body but not at full measure: 3:4 in a 36rem column is
+ * 768px tall. Cap the height and centre it, so a tall image reads as a plate rather than a wall.
+ * Wide images never reach this cap (36rem wide is 20rem tall), so their treatment is unchanged.
+ */
+.prose img[data-inline-image] {
+  max-height: 34rem;
+  width: auto;
+  margin-inline: auto;
+  display: block;
+}
+
 .prose img[width][height] {
   /* dimensions are emitted where the CMS knows them, so the column does not jump on load */
   aspect-ratio: attr(width) / attr(height);

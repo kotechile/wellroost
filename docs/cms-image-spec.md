@@ -89,6 +89,32 @@ measure, so the rules differ from the featured image:
 | Format / weight | JPEG sRGB, ≤ 300 KB | Same reasoning as rule 5. |
 | Markup | theme chrome is stripped for you | `src/lib/wordpress.ts` → `cleanArticleHtml()` rewrites every `<img>`: drops the theme's classes and inline `float`/`width`, adds `loading="lazy"`, `decoding="async"`, and dimensions when WordPress supplies them. `border-border` in a body otherwise resolves to currentColor and draws a near-black hairline on a paper ground. |
 | No text, no charts | same as rules 11 and 12 | A screenshot of a table is not an illustration; it is unreadable on a phone and unsearchable everywhere. |
+| Aspect | **any**, including portrait (3:4 – 4:5) | The body slot is the one place a tall picture works. It is height-capped at 34rem and centred (`max-height: 34rem; width: auto`), so a 3:4 portrait arrives at ~408 × 544 px instead of a 768 px wall. Wide images never reach the cap, so their treatment is unchanged. |
+
+### Why the featured image cannot be portrait
+
+It has two frames and both are wide: a 7:4 card and a 16:9 masthead, `object-fit: cover`. Cover on a
+3:4 master keeps **43%** of the card and **42%** of the masthead — 57–58% of the picture is cropped
+away, and the crop is horizontal-blind: it cannot know where the subject is. A portrait there is not
+merely out of spec, it is unusable, which is why rule 2 fails it rather than tolerating it.
+
+If the desk wants a tall picture, the body slot is where it goes. If a whole post genuinely needs a
+portrait *masthead* — a real editorial form, the Argument band on the homepage uses 4:5 — that needs
+a new slot in the layout, and the spec gains a rule for it at the same time. Tell me and I will build
+it; do not send portrait files to the featured image and hope.
+
+### Text beside an image
+
+Two different things, and only one of them is allowed:
+
+- **Text baked into the image, beside or over a portrait subject** — fails rule 11, always. It is the
+  exact case the rule exists for: at 340 px in a card the text is noise, and a screen reader reads
+  the headline twice.
+- **Real page text flowing beside the image** — a layout, not an asset property. The site has one
+  such layout today (the homepage's 4:5 Argument band, copy beside a portrait plate), and it is used
+  with repo assets. In a CMS body, images are block-level: they interrupt the column, they do not
+  sit beside the text, because a float would collapse the measure on a phone. If side-by-side prose
+  is wanted, that is a layout to design and build — say so and it becomes a slot with its own rules.
 
 Put the image in the body only when the piece genuinely needs a second picture. The masthead already
 carries one.
