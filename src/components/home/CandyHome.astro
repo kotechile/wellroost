@@ -1,0 +1,58 @@
+---
+/**
+ * The page's one illustration.
+ *
+ * A 3D candy house, framed as a printed plate: no chrome inside the frame beyond two small chips,
+ * transparent ground so the paper shows through, and a caption that says exactly what it is. It sits
+ * directly after the three engines because it is the same house those engines model — a door, a
+ * chimney, a driveway — and it gives the page one moment that is felt rather than read.
+ *
+ * The frame is lazy: nothing from three.js loads until a visitor reaches it.
+ */
+const interactions = [
+	{ part: 'Door', effect: 'Opens, and the interior light comes on.' },
+	{ part: 'Chimney', effect: 'Switches the smoke to floating hearts.' },
+	{ part: 'Car', effect: 'Starts the charge; the cable pulses.' }
+];
+---
+
+<section class="section wrap" aria-labelledby="model">
+	<div class="flex flex-wrap items-end justify-between gap-x-12 gap-y-6">
+		<h2 id="model" class="h2 max-w-[20ch] text-ink" data-reveal>
+			A house, with the parts labelled.
+		</h2>
+		<p class="body max-w-[34ch] pb-2" data-reveal style="--reveal-delay:80ms">
+			Three things in this toy decide most real home budgets: the envelope you heat, the car you
+			charge, and whether you stay long enough to open the place up.
+		</p>
+	</div>
+
+	<figure class="mt-[clamp(2rem,3.5vw,3rem)]">
+		<div data-reveal style="--reveal-delay:120ms">
+			<iframe
+				src="/candy-home.html"
+				class="block h-[28rem] w-full border-0 sm:h-[34rem] lg:h-[42rem]"
+				loading="lazy"
+				title="Interactive 3D model of a candy house: click the door, the chimney or the car, and drag to orbit"
+				aria-describedby="model-caption"
+			></iframe>
+		</div>
+
+		<figcaption class="mt-4 grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-baseline">
+			<p id="model-caption" class="caption">
+				Interactive illustration, built with three.js. Drag to orbit, scroll or pinch to zoom. It
+				draws nothing from your inputs.
+			</p>
+			<dl class="flex flex-wrap gap-x-6 gap-y-1 text-[0.8125rem] text-ink-2">
+				{
+					interactions.map((item) => (
+						<div class="flex gap-2">
+							<dt class="text-ink">{item.part}</dt>
+							<dd>{item.effect}</dd>
+						</div>
+					))
+				}
+			</dl>
+		</figcaption>
+	</figure>
+</section>

@@ -5,6 +5,7 @@ import Hero from '../components/home/Hero.astro';
 import PlateBand from '../components/home/PlateBand.astro';
 import Argument from '../components/home/Argument.astro';
 import EngineRows from '../components/home/EngineRows.astro';
+import CandyHome from '../components/home/CandyHome.astro';
 import MethodSpread from '../components/home/MethodSpread.astro';
 import PillarIndex from '../components/home/PillarIndex.astro';
 import LatestArticles from '../components/home/LatestArticles.astro';
@@ -43,11 +44,7 @@ const websiteSchema = {
 
 	<Argument />
 	<EngineRows />
-	<PlateBand
-		plate="porch"
-		height="h-[34vh] min-h-[16rem] sm:h-[42vh] lg:h-[46vh]"
-		note="Detail is where a quote is decided."
-	/>
+	<CandyHome />
 	<MethodSpread />
 	<PillarIndex categories={topCategories} postCount={posts.length} />
 	<LatestArticles />
