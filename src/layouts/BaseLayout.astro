@@ -120,6 +120,13 @@ const ogImageIsRaster = /\.(png|jpe?g|webp|avif|gif)$/i.test(new URL(ogImage).pa
 		{/*
 			Entrance motion. Progressive: the `js` flag is set here, so with no script every
 			revealed block is simply visible. One observer for the page, unobserved after firing.
+
+			Trigger on *any* intersection, and let the root extend 12% past the bottom edge so a
+			block starts fading in before it reaches the screen rather than after it. The previous
+			options (`threshold: 0.08`, bottom rootMargin -12%) demanded 8% of a block's own area be
+			on screen: correct for a 60px heading, impossible for a block thousands of pixels tall —
+			and on a phone, for a body wider than the viewport, the ratio could never clear 8% at
+			all, so article text never faded in.
 		*/}
 		<script is:inline>
 			(() => {
@@ -139,7 +146,7 @@ const ogImageIsRaster = /\.(png|jpe?g|webp|avif|gif)$/i.test(new URL(ogImage).pa
 							io.unobserve(entry.target);
 						}
 					},
-					{ rootMargin: '0px 0px -12% 0px', threshold: 0.08 }
+					{ rootMargin: '0px 0px 12% 0px', threshold: 0 }
 				);
 				items.forEach((el) => io.observe(el));
 			})();

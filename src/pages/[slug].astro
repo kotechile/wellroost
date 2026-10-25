@@ -196,8 +196,15 @@ const breadcrumbSchema = {
 
 		<div class="wrap mt-[clamp(2rem,3.2vw,3rem)]">
 			<div class="article-frame grid gap-12 lg:grid-cols-[minmax(0,40rem)_minmax(14rem,1fr)] lg:gap-16">
-			<div>
-				<div class="article-body" set:html={bodyHtml} data-reveal />
+			<div class="min-w-0">
+				{/*
+					No `data-reveal` on the body. Long-form reading content must paint with the page:
+					as one reveal target it was a ~5,000px-tall block, and an IntersectionObserver
+					ratio threshold on a block that large is either met a full screen late or — when
+					the body is also wider than a phone viewport — never met at all, which is how
+					article text ended up invisible on mobile while the picture above it showed.
+				*/}
+				<div class="article-body" set:html={bodyHtml} />
 
 				<div class="mt-14 bg-paper-2 p-6 sm:p-8" data-reveal>
 					<p class="font-display text-[1.35rem] leading-tight text-ink">WellRoost Editorial</p>

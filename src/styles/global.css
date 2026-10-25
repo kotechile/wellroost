@@ -364,6 +364,25 @@ input[type="range"].range:focus-visible::-webkit-slider-thumb {
   font-size: 1.125rem;
   line-height: 1.72;
   color: var(--color-ink);
+  /*
+   * A body arrives from WordPress with whatever its author typed, and a bare source URL is one
+   * unbreakable ~600px word. That made the *min-content* width of the body 603px, which on a
+   * 390px phone pushed every paragraph wider than the viewport — and `body { overflow-x: hidden }`
+   * then clipped the right third of every line out of reach. `anywhere` is the keyword that
+   * changes intrinsic sizing so a long token cannot set the column width; `break-word` does not.
+   */
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+/* Code keeps its own measure: a wrapped URL is fine, a wrapped snippet is not. */
+.article-body pre,
+.article-body code {
+  overflow-wrap: normal;
+}
+.article-body pre {
+  max-width: 100%;
+  overflow-x: auto;
 }
 .article-body > * + * {
   margin-top: 1.35em;
@@ -431,6 +450,19 @@ input[type="range"].range:focus-visible::-webkit-slider-thumb {
   font-variant-numeric: tabular-nums;
   border-top: 2px solid var(--color-ink);
   border-bottom: 1px solid var(--color-ink);
+}
+
+/*
+ * A five-column data figure cannot honour a 350px measure by squeezing — the cells would wrap to
+ * one word per line. Below the phone breakpoint the table keeps its own width and scrolls inside
+ * the column, so the page never gains a horizontal scrollbar and the numbers stay legible.
+ */
+@media (max-width: 640px) {
+  .article-body table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 .article-body thead th {
@@ -512,6 +544,8 @@ input[type="range"].range:focus-visible::-webkit-slider-thumb {
   --tw-prose-headings: var(--color-ink);
   --tw-prose-links: var(--color-pine);
   max-width: 36rem;
+  overflow-wrap: anywhere;
+  min-width: 0;
 }
 
 /*
