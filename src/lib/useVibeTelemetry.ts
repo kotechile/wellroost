@@ -19,7 +19,7 @@
  *   than adding rows and calling the threshold a conversion.
  */
 import { useEffect, useRef } from 'react';
-import { trackVibeAssetEvent } from './telemetry';
+import { trackVibeAssetEvent, trafficEntry } from './telemetry';
 
 const COMPLETE_AFTER = 4;
 const DEBOUNCE_MS = 1200;
@@ -45,7 +45,9 @@ export function useVibeTelemetry(asset: VibeAssetIdentity) {
 			assetSlug: asset.slug,
 			category: asset.category,
 			title: asset.title,
-			eventType: 'view'
+			eventType: 'view',
+			// Where the visit came from, so a cited scenario link is separable from search traffic.
+			metadata: { entry: trafficEntry() }
 		});
 		return () => {
 			if (timer.current) clearTimeout(timer.current);

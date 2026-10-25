@@ -80,7 +80,7 @@ Standard gate for every phase, plus the phase's own exit criteria:
 npm run copy:check && npm run check && npm run test && npm run build
 ```
 
-### Phase A — make measurement honest (½ day)
+### Phase A — make measurement honest (½ day) — **built**
 
 **Why first:** I could not answer "how much traffic does this site have" from the repo; I had to query
 production. That will not do when a partner asks.
@@ -101,7 +101,7 @@ production. That will not do when a partner asks.
 **Exit:** `node scripts/stats.mjs --days 30` prints the funnel; the numbers in
 `docs/audience-snapshot.md` match production; `copy:check` green.
 
-### Phase B — connect what already exists (1–2 weeks, most traffic per hour on the site)
+### Phase B — connect what already exists (1–2 weeks, most traffic per hour on the site) — **built, awaiting prose anchors**
 
 **Why:** 3 of 44 articles link to a calculator. The site is 44 dead ends pointing at nothing, and the
 calculators carry no internal link equity. This is the cheapest traffic available here and it needs no

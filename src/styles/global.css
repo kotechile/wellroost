@@ -362,8 +362,10 @@ input[type="range"].range:focus-visible::-webkit-slider-thumb {
   align-items: center;
   justify-content: center;
   flex: none;
-  width: 3rem;
-  height: 3rem;
+  /* Size comes from the context, so the hub's row mark and an article sidebar's smaller one share
+     one rule rather than two near-copies. */
+  width: var(--tile, 3rem);
+  height: var(--tile, 3rem);
   color: var(--color-paper);
   background: var(--fam, var(--color-ink-2));
   transition:

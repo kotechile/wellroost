@@ -8,6 +8,10 @@ import { cleanArticleHtml } from '../lib/wordpress';
 import { Image } from 'astro:assets';
 import PostCard from '../components/PostCard.astro';
 import { calculatorTools } from '../lib/calculators/metadata';
+import EngineGlyph from '../components/calculators/EngineGlyph.astro';
+import { FAMILIES, engineBySlug } from '../lib/calculators/registry';
+import { accentForFamily, glyphForEngine } from '../lib/calculators/glyphs';
+import { toolsForPost } from '../data/article-tools';
 
 export async function getStaticPaths() {
 	const posts = await fetchAllPosts(100);
@@ -32,6 +36,48 @@ const category = post.categorySlug ? await getCategoryBySlug(post.categorySlug) 
 const related = category?.wordpressCategoryId
 	? (await fetchPostsByCategory(category.wordpressCategoryId, 4)).filter((item) => item.slug !== post.slug).slice(0, 3)
 	: [];
+
+/*
+ * The calculator this piece is about, resolved through the registry rather than restated here.
+ *
+ * Unresolvable slugs are dropped: a pairing for an engine that has been renamed would otherwise
+ * render a link to a 404, and the article would look correct while sending readers nowhere.
+ */
+const familyOf = (category: string) =>
+	FAMILIES.find((family) => family.categories.includes(category))?.id ?? 'elsewhere';
+
+const articleToolLinks = toolsForPost(post.slug)
+	.flatMap((entry) => {
+		const engine = engineBySlug(entry.tool);
+		if (!engine) return [];
+		const family = familyOf(engine.asset.category);
+		return [{ ...entry, engine, accent: accentForFamily(family), mark: glyphForEngine(engine.toolSlug, family) }];
+	});
+
+/**
+ * Curated tools when a pairing exists; otherwise the existing menu of every engine.
+ *
+ * Both branches carry a mark and a family hue, so the sidebar reads the same way whether the post
+ * names one engine or lists all fifteen. `--tile` is smaller here than on the hub: this is a rail,
+ * not a card.
+ */
+const sidebarTools = articleToolLinks.length
+	? articleToolLinks.map((entry) => ({
+			title: entry.engine.title,
+			href: entry.engine.asset.href,
+			accent: entry.accent,
+			mark: entry.mark
+		}))
+	: calculatorTools.map((tool) => {
+			const entry = engineBySlug(tool.slug);
+			const family = familyOf(entry?.asset.category ?? '');
+			return {
+				title: tool.title,
+				href: tool.href,
+				accent: accentForFamily(family),
+				mark: glyphForEngine(tool.slug, family)
+			};
+		});
 
 const plainText = (value: string) =>
 	decodeHtmlEntities(
@@ -206,6 +252,32 @@ const breadcrumbSchema = {
 				*/}
 				<div class="article-body" set:html={bodyHtml} />
 
+				{articleToolLinks.length > 0 && (
+					<section class="mt-14 border-t-2 border-ink/20 pt-6" aria-labelledby="tool-behind">
+						<p class="mono text-[0.66rem] uppercase tracking-[0.2em] text-ink-2">The number behind this piece</p>
+						<ul class="mt-4 grid gap-3">
+							{articleToolLinks.map(({ engine, note, accent, mark }) => (
+								<li>
+									<a
+										href={engine.asset.href}
+										data-asset-slug={engine.asset.slug}
+										class="group flex items-start gap-4 bg-paper-2 p-5 transition-colors duration-200 hover:bg-paper-3"
+										style={`--fam:${accent}`}
+									>
+										<span class="glyph-tile mt-0.5">
+											<EngineGlyph name={mark} class="h-6 w-6" />
+										</span>
+										<span class="min-w-0">
+											<span class="block font-display text-[1.35rem] leading-tight text-ink">{engine.title}</span>
+											<span class="mt-1 block max-w-[52ch] text-[0.9375rem] leading-relaxed text-ink-2">{note}</span>
+										</span>
+									</a>
+								</li>
+							))}
+						</ul>
+					</section>
+				)}
+
 				<div class="mt-14 bg-paper-2 p-6 sm:p-8" data-reveal>
 					<p class="font-display text-[1.35rem] leading-tight text-ink">WellRoost Editorial</p>
 					<p class="mt-3 max-w-[42ch] text-[1rem] leading-relaxed text-ink-2">
@@ -237,17 +309,25 @@ const breadcrumbSchema = {
 				}
 
 				<p class="text-[0.8125rem] text-ink-2">Run the math on your own numbers</p>
-				<ul class="mt-4 grid">
+				<ul class="mt-3 grid gap-0.5">
 					{
-						calculatorTools.map((tool) => (
+						sidebarTools.map((tool) => (
 							<li>
 								<a
 									href={tool.href}
-									class="group flex items-baseline justify-between gap-4 py-3.5 text-ink transition-colors hover:text-pine"
+									class="group flex items-center gap-3 py-2 text-ink"
+									style={`--fam:${tool.accent}`}
 								>
-									<span class="font-display text-[1.15rem] leading-tight">{tool.title}</span>
-									<span aria-hidden="true" class="text-[0.875rem] transition-transform duration-200 group-hover:translate-x-1">
-										&rarr;
+									{/*
+										The same mark the hub uses, at rail size. Fifteen identical text links were the
+										reason this list read as boilerplate: a colour and a shape is what makes one row
+										distinguishable from the next before it is read.
+									*/}
+									<span class="glyph-tile shrink-0" style="--tile:1.75rem">
+										<EngineGlyph name={tool.mark} class="h-4 w-4" />
+									</span>
+									<span class="font-display text-[1.1rem] leading-tight transition-colors duration-200 group-hover:text-[var(--fam)]">
+										{tool.title}
 									</span>
 								</a>
 							</li>

@@ -41,6 +41,34 @@ export function isTelemetryConfigured(): boolean {
 	return Boolean((supabaseUrl && supabaseAnonKey) || telemetryWebhookUrl());
 }
 
+/**
+ * How the visitor arrived, for the `view` event.
+ *
+ * The difference that matters commercially: a *referral* is someone who found the site (search,
+ * a thread, a partner's page) and a *state* link is someone who received a computed scenario from
+ * another person or an agent. Those are two different products — audience and distribution — and a
+ * report that adds them together cannot tell which one is working.
+ *
+ * Derived from the URL and referrer, so it is a fact about the visit, not about the person.
+ */
+export function trafficEntry(
+	search: string = typeof window === 'undefined' ? '' : window.location.search,
+	referrer: string = typeof document === 'undefined' ? '' : document.referrer,
+	host: string = typeof window === 'undefined' ? '' : window.location.hostname
+): 'direct' | 'referral' | 'state' {
+	if (new URLSearchParams(search).has('state')) return 'state';
+	try {
+		if (referrer) {
+			const ref = new URL(referrer);
+			// Same-site navigation (an internal link, or the search overlay) is not a referral.
+			if (ref.hostname && ref.hostname !== host) return 'referral';
+		}
+	} catch {
+		// An unparseable referrer is not evidence of an external one.
+	}
+	return 'direct';
+}
+
 const SESSION_KEY = 'wr:sid';
 
 /**
