@@ -7,8 +7,12 @@ import FloatingRateCalculator from '../../components/calculators/react/FloatingR
 	slug="heloc-arm-stress"
 	notes={[
 		{
+			title: 'HELOC vs. ARM: Basic concepts',
+			body: 'A HELOC (Home Equity Line of Credit) is a revolving second mortgage that lets you borrow against your home equity as needed. In contrast, an ARM (Adjustable-Rate Mortgage) is a primary home loan with a fixed rate for an initial period that adjusts periodically. Sources: <a href="https://www.youtube.com/watch?v=92JJKt7avX4" target="_blank" rel="noopener noreferrer" class="text-pine underline hover:text-pine-deep">[1]</a>, <a href="https://www.freedommortgage.com/learn/home-equity/heloc-vs-mortgage" target="_blank" rel="noopener noreferrer" class="text-pine underline hover:text-pine-deep">[2]</a>, <a href="https://www.pennymac.com/blog/heloc-home-equity-line-of-credit" target="_blank" rel="noopener noreferrer" class="text-pine underline hover:text-pine-deep">[3]</a>, <a href="https://www.loandepot.com/learning-center/home-equity/heloc-vs-heloan-which-home-equity-option-is-right-for-you" target="_blank" rel="noopener noreferrer" class="text-pine underline hover:text-pine-deep">[4]</a>, <a href="https://www.lendmire.com/heloc-for-a-homeowner-with-an-arm/" target="_blank" rel="noopener noreferrer" class="text-pine underline hover:text-pine-deep">[5]</a>.'
+		},
+		{
 			title: 'The interest-rate cap is the whole story',
-			body: 'Your adjustable payment is governed by legal caps in your contract. What matters most is the largest increase allowed at one reset (the annual or periodic cap, often 2.00%) and the highest rate allowed over the entire life of the loan (the lifetime cap).'
+			body: 'Your adjustable payment is governed by legal caps in your contract. The two governing limits are the periodic cap (the max increase at one reset) and the lifetime rate ceiling.'
 		},
 		{
 			title: 'Draw-to-repayment is a second payment shock',
@@ -16,7 +20,7 @@ import FloatingRateCalculator from '../../components/calculators/react/FloatingR
 		},
 		{
 			title: 'Why a "blocked step" appears in your table',
-			body: 'If a projected rate jump exceeds your loan’s lifetime legal limit, the engine labels it as "beyond the ceiling" and caps your payment calculation there, rather than showing a misleading, illegally inflated number.'
+			body: 'When a projected rate jump exceeds your legal ceiling, the calculation caps there. This avoids displaying an inflated, illegal number.'
 		}
 	]}
 	formula={[

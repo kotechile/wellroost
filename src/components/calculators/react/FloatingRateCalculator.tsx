@@ -133,6 +133,22 @@ export default function FloatingRateCalculator() {
 					Select your loan structure to apply the correct interest-only vs. amortizing math.
 				</p>
 
+				{/* Basic Concepts Explainer */}
+				<div className="mt-3.5 rounded-lg border border-ink/10 bg-surface/70 p-3.5 text-xs leading-relaxed text-ink-2">
+					<p>
+						<strong className="font-semibold text-ink">Basic concepts:</strong> A HELOC (Home Equity Line of Credit) is a revolving second mortgage that lets you borrow against your home equity as needed. In contrast, an ARM (Adjustable-Rate Mortgage) is a primary home loan with a fixed rate for an initial period that later adjusts periodically.
+						<span className="ml-1.5 inline-flex flex-wrap gap-1 font-mono text-[0.72rem] text-pine">
+							[
+							<a href="https://www.youtube.com/watch?v=92JJKt7avX4" target="_blank" rel="noopener noreferrer" className="underline hover:text-pine-deep" title="HELOC vs ARM Overview (YouTube)">1</a>,{' '}
+							<a href="https://www.freedommortgage.com/learn/home-equity/heloc-vs-mortgage" target="_blank" rel="noopener noreferrer" className="underline hover:text-pine-deep" title="HELOC vs Mortgage (Freedom Mortgage)">2</a>,{' '}
+							<a href="https://www.pennymac.com/blog/heloc-home-equity-line-of-credit" target="_blank" rel="noopener noreferrer" className="underline hover:text-pine-deep" title="HELOC Basics (Pennymac)">3</a>,{' '}
+							<a href="https://www.loandepot.com/learning-center/home-equity/heloc-vs-heloan-which-home-equity-option-is-right-for-you" target="_blank" rel="noopener noreferrer" className="underline hover:text-pine-deep" title="Home Equity Options (loanDepot)">4</a>,{' '}
+							<a href="https://www.lendmire.com/heloc-for-a-homeowner-with-an-arm/" target="_blank" rel="noopener noreferrer" className="underline hover:text-pine-deep" title="HELOC with an ARM (Lendmire)">5</a>
+							]
+						</span>
+					</p>
+				</div>
+
 				<div className="mt-4 grid gap-3 sm:grid-cols-3">
 					{PRODUCTS.map((prod) => {
 						const active = inputs.product === prod.value;
