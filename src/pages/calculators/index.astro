@@ -1,6 +1,8 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import EngineGlyph from '../../components/calculators/EngineGlyph.astro';
 import { builtEngines, enginesByFamily, plannedEngines } from '../../lib/calculators/registry';
+import { accentForFamily, glyphForEngine, glyphForFamily, tintForFamily } from '../../lib/calculators/glyphs';
 import { isTelemetryConfigured } from '../../lib/telemetry';
 
 // A claim about the system, derived from the system. It used to render unconditionally while no
@@ -14,6 +16,20 @@ const planned = plannedEngines();
 const words = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
 	'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'];
 const countWord = words[engines.length] ?? String(engines.length);
+
+// Every engine is decorated before it renders, so a slug with no mark of its own falls back to its
+// family's mark instead of leaving an empty tile.
+const decorated = families.map((family) => ({
+	...family,
+	accent: accentForFamily(family.id),
+	tint: tintForFamily(family.id),
+	mark: glyphForFamily(family.id),
+	rowCount: String(family.engines.length).padStart(2, '0'),
+	engines: family.engines.map((engine) => ({
+		...engine,
+		mark: glyphForEngine(engine.toolSlug, family.id)
+	}))
+}));
 ---
 
 <BaseLayout
@@ -33,36 +49,83 @@ const countWord = words[engines.length] ?? String(engines.length);
 		</div>
 	</section>
 
+	{/* Four families, four marks: the fastest way into fifteen engines is to pick the family first.
+	    The nav is a direct child of <main> on purpose — sticky is bounded by its parent, so wrapping
+	    it in a one-line section would pin it for zero pixels of scroll. Anchors are offset by the
+	    header plus this bar (scroll-mt on the sections). */}
+	<nav
+		aria-label="Jump to a family"
+		class="family-bar mt-10 border-y border-ink/15 bg-paper"
+	>
+		<div class="wrap py-3">
+			<ul class="flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+				{decorated.map((family) => (
+					<li class="shrink-0">
+						<a
+							href={`#family-${family.id}`}
+							data-family-link={family.id}
+							class="family-chip inline-flex items-center gap-2.5 border border-ink/15 px-3 py-2"
+							style={`--fam:${family.accent}`}
+						>
+							<EngineGlyph name={family.mark} class="family-chip-mark h-[1.15rem] w-[1.15rem] text-[var(--fam)]" />
+							<span class="text-[0.875rem] leading-none">{family.title}</span>
+							<span class="mono text-[0.7rem] leading-none text-ink-2">{family.rowCount}</span>
+						</a>
+					</li>
+				))}
+			</ul>
+		</div>
+	</nav>
+
 	{
-		families.map((family, familyIndex) => (
-			<section class="wrap section" aria-labelledby={`family-${family.id}`}>
-				<div class="grid gap-x-12 gap-y-4 border-t border-ink/20 pt-6 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1fr)]">
+		decorated.map((family, familyIndex) => (
+			<section
+				class="family-section scroll-mt-24 md:scroll-mt-40"
+				id={`family-${family.id}`}
+				data-family-section={family.id}
+				aria-labelledby={`family-${family.id}-title`}
+				style={`--fam:${family.accent}; --fam-tint: ${family.tint}`}
+			>
+				<div class="wrap">
+				<div class="grid gap-x-12 gap-y-4 border-t-2 pt-6 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1fr)]"
+					style={`border-color: ${family.accent}`}>
 					<div>
-						<p class="font-mono text-[0.66rem] uppercase tracking-[0.24em] text-ink-2">
-							{String(familyIndex + 1).padStart(2, '0')}
-						</p>
-						<h2 id={`family-${family.id}`} class="h2 mt-3 max-w-[20ch] text-ink">
+						<div class="flex items-center gap-3">
+							<p class="mono text-[0.7rem] uppercase tracking-[0.24em]" style={`color: ${family.accent}`}>
+								{String(familyIndex + 1).padStart(2, '0')} — {family.rowCount} {family.engines.length === 1 ? 'engine' : 'engines'}
+							</p>
+							<span aria-hidden="true" class="h-px w-8" style={`background: color-mix(in oklab, ${family.accent} 45%, transparent)`} />
+						</div>
+						<h2 id={`family-${family.id}-title`} class="h2 mt-3 max-w-[20ch] text-ink">
 							{family.title}
 						</h2>
 					</div>
 					<p class="max-w-[46ch] text-[1rem] leading-relaxed text-ink-2 md:pt-7">{family.blurb}</p>
 				</div>
 
-				<ul class="mt-8 grid">
+				<ul class="mt-8">
 					{family.engines.map((engine, index) => (
 						<li data-reveal style={`--reveal-delay:${index * 60}ms`}>
 							<a
 								href={engine.asset.href}
 								data-asset-slug={engine.asset.slug}
-								class="group grid gap-5 border-t border-ink/10 py-7 text-ink transition-colors duration-200 hover:text-pine md:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] md:gap-12"
+								class="engine-row group -mx-4 grid gap-5 border-t border-ink/10 px-4 py-7 text-ink hover:bg-paper-2/80 focus-visible:bg-paper-2/80 md:-mx-5 md:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] md:gap-12 md:px-5"
 							>
-								<span>
-									<span class="h3 block">{engine.title}</span>
-									<span class="mt-2 block max-w-[42ch] text-[0.9375rem] leading-relaxed text-ink-2">
-										{engine.description}
+								<span class="flex items-start gap-4">
+									<span class="glyph-tile mt-0.5">
+										<EngineGlyph name={engine.mark} class="h-6 w-6" />
+									</span>
+									<span class="min-w-0">
+										<span class="mono block text-[0.66rem] uppercase tracking-[0.2em]" style="color: color-mix(in oklab, var(--fam) 88%, var(--color-ink))">
+											{engine.eyebrow}
+										</span>
+										<span class="engine-title h3 mt-1.5 block">{engine.title}</span>
+										<span class="mt-2 block max-w-[42ch] text-[0.9375rem] leading-relaxed text-ink-2">
+											{engine.description}
+										</span>
 									</span>
 								</span>
-								<span class="grid gap-5 sm:grid-cols-2 md:gap-8">
+								<span class="grid gap-5 sm:grid-cols-2 md:gap-8 md:pl-0">
 									<span>
 										<span class="block text-[0.75rem] uppercase tracking-[0.14em] text-ink-2">Takes</span>
 										<span class="mt-1 block max-w-[28ch] text-[0.9375rem] leading-relaxed">{engine.takes}</span>
@@ -70,7 +133,7 @@ const countWord = words[engines.length] ?? String(engines.length);
 									<span>
 										<span class="block text-[0.75rem] uppercase tracking-[0.14em] text-ink-2">Returns</span>
 										<span class="mt-1 block max-w-[28ch] text-[0.9375rem] leading-relaxed">{engine.returns}</span>
-										<span class="mt-3 inline-flex items-center gap-2 text-[0.875rem]">
+										<span class="mt-3 inline-flex items-center gap-2 text-[0.875rem] text-ink transition-colors duration-200 group-hover:text-[var(--fam)]">
 											Open
 											<span aria-hidden="true" class="transition-transform duration-200 group-hover:translate-x-1">
 												&rarr;
@@ -82,6 +145,7 @@ const countWord = words[engines.length] ?? String(engines.length);
 						</li>
 					))}
 				</ul>
+				</div>
 			</section>
 		))
 	}
@@ -116,3 +180,35 @@ const countWord = words[engines.length] ?? String(engines.length);
 		</div>
 	</section>
 </BaseLayout>
+
+<script>
+	// Scroll-spy for the family bar: mark the chip whose section is under the reading line. One
+	// observer, no scroll listener, and nothing is marked current when no section is in view.
+	const links = new Map<string, HTMLAnchorElement>();
+	for (const link of document.querySelectorAll<HTMLAnchorElement>('[data-family-link]')) {
+		links.set(link.dataset.familyLink ?? '', link);
+	}
+
+	const sections = document.querySelectorAll<HTMLElement>('[data-family-section]');
+	if (links.size && sections.length) {
+		const setActive = (id: string | undefined) => {
+			for (const [key, link] of links) {
+				if (key === id) link.setAttribute('aria-current', 'true');
+				else link.removeAttribute('aria-current');
+			}
+		};
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				for (const entry of entries) {
+					if (entry.isIntersecting) setActive((entry.target as HTMLElement).dataset.familySection);
+				}
+			},
+			// A thin band just above the middle of the viewport: tall sections cannot all claim it,
+			// so the chip changes when the next family's heading reaches the reading line.
+			{ rootMargin: '-38% 0px -58% 0px', threshold: 0 }
+		);
+
+		sections.forEach((section) => observer.observe(section));
+	}
+</script>

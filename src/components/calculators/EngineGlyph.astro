@@ -1,0 +1,29 @@
+---
+/**
+ * One engine mark, drawn on the shared 24×24 grid.
+ *
+ * `aria-hidden` is deliberate: the mark repeats the link's title, and the title is what a screen
+ * reader should hear. It is wayfinding for the eye, not information for the ear.
+ */
+import { glyphPaths, type GlyphName } from '../../lib/calculators/glyphs';
+
+interface Props {
+	name: GlyphName;
+	class?: string;
+}
+
+const { name, class: className = '' } = Astro.props;
+---
+
+<svg
+	viewBox="0 0 24 24"
+	fill="none"
+	stroke="currentColor"
+	stroke-width="1.6"
+	stroke-linecap="round"
+	stroke-linejoin="round"
+	aria-hidden="true"
+	class={className}
+>
+	<Fragment set:html={glyphPaths(name)} />
+</svg>

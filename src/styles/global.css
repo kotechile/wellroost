@@ -30,6 +30,24 @@
   --color-pine-deep: #122a20;
   --color-pine-soft: #2c5744;
 
+  /*
+    Wayfinding hues. Four mineral tones, one per engine family, used only for the hub's marks,
+    chips and section rules — never for body copy, a figure or a result. Pine stays the one colour
+    that means "this is the answer"; these exist so fifteen engines stop looking like one list.
+    All four clear 4.5:1 on paper, so a family label can use them as text.
+  */
+  --color-clay: #8f4526;
+  --color-slate: #31497f;
+  --color-ochre: #6b5f16;
+
+  /* The chapter papers. A family band is a pale wash of its own hue, mixed by hand rather than
+     derived: a 6% mix of a dark green into warm paper just reads as dirty grey, so the light end
+     of each hue is declared explicitly. Ink on any of these stays above 12:1. */
+  --color-pine-tint: #d9e2d6;
+  --color-clay-tint: #f2ded2;
+  --color-slate-tint: #dbe1f0;
+  --color-ochre-tint: #eee8d1;
+
   /* Legacy aliases: older components reference these names. They now resolve to the new palette. */
   --color-primary: #1c3b2e;
   --color-secondary: #514d3f;
@@ -330,6 +348,124 @@ input[type="range"].range::-moz-range-thumb {
 input[type="range"].range:hover::-webkit-slider-thumb,
 input[type="range"].range:focus-visible::-webkit-slider-thumb {
   transform: scale(1.15);
+}
+
+/* ------------------------------------------------- engine wayfinding */
+
+/*
+ * The hub's mark tile. It reads as a single coloured object at a glance, which is the whole point:
+ * the eye locates "loans" or "insurance" by hue and shape before it reads a word. `--fam` is set by
+ * the family section, so the tile never needs a per-engine class.
+ */
+.glyph-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 3rem;
+  height: 3rem;
+  color: var(--color-paper);
+  background: var(--fam, var(--color-ink-2));
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.group:hover .glyph-tile,
+.group:focus-visible .glyph-tile {
+  color: var(--fam, var(--color-ink-2));
+  background: color-mix(in oklab, var(--fam, var(--color-ink-2)) 14%, var(--color-paper));
+}
+
+/* The row itself: a tone step, not a shadow or a border, is how this site lifts a surface. */
+.engine-row {
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease;
+}
+
+.engine-row .engine-title {
+  transition: color 180ms ease;
+}
+
+.group:hover .engine-title,
+.group:focus-visible .engine-title {
+  color: var(--fam, var(--color-pine));
+}
+
+/*
+ * A family is a chapter, so it gets a chapter's paper: 5% of its own hue mixed into the ground.
+ * A tint this shallow cannot hurt contrast (ink sits at ~13:1 on it) but it does separate the four
+ * families into bands, which is the navigation problem fifteen identical rows had.
+ */
+.family-section {
+  background: var(--fam-tint, var(--color-paper));
+  /* The default section rhythm is a screenful of air; inside a tinted band that air reads as an
+     empty coloured block, so a family chapter keeps a tighter, flatter interval. */
+  padding-block: clamp(2.75rem, 5vw, 5rem);
+}
+
+/*
+ * The family bar rides under the site header and moves with it: the header hides on a downward
+ * scroll and returns on an upward one, so a bar pinned to a fixed offset would either float in a
+ * 72px gap or sit behind the header. `:has` lets the bar follow the header's own state without a
+ * second scroll listener. Header height is 4.5rem.
+ */
+.family-bar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  transition: top 300ms ease;
+}
+
+body:has([data-site-header]:not([data-hidden='true'])) .family-bar {
+  top: 4.5rem;
+}
+
+/* A family chip: the same mark and hue as the section it jumps to. */
+.family-chip {
+  --fam: var(--color-ink-2);
+  color: var(--color-ink);
+  background: var(--color-card);
+  transition:
+    background-color 170ms ease,
+    border-color 170ms ease,
+    color 170ms ease;
+}
+
+.family-chip:hover {
+  background: color-mix(in oklab, var(--fam) 7%, var(--color-paper));
+  border-color: color-mix(in oklab, var(--fam) 45%, transparent);
+}
+
+.family-chip:hover .family-chip-mark,
+.family-chip[aria-current='true'] .family-chip-mark {
+  color: var(--fam);
+}
+
+/*
+ * The chip for the family you are reading. Scroll-spy is the only JavaScript on the page and it
+ * costs one observer: without it the bar is a set of links that never tell you where you are.
+ */
+.family-chip[aria-current='true'] {
+  background: color-mix(in oklab, var(--fam) 9%, var(--color-paper));
+  border-color: color-mix(in oklab, var(--fam) 55%, transparent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .family-bar,
+  .glyph-tile,
+  .engine-row,
+  .engine-row .engine-title,
+  .family-chip {
+    transition: none;
+  }
 }
 
 /* ---------------------------------------------------------------- images */
