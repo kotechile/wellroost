@@ -7,26 +7,26 @@ import FloatingRateCalculator from '../../components/calculators/react/FloatingR
 	slug="heloc-arm-stress"
 	notes={[
 		{
-			title: 'The cap is the whole story',
-			body: 'A HELOC payment is not a number, it is a schedule. What matters is the largest move the contract allows at one reset, and how many of those the household budget can absorb before the payment becomes a second problem.'
+			title: 'The interest-rate cap is the whole story',
+			body: 'Your adjustable payment is governed by legal caps in your contract. What matters most is the largest increase allowed at one reset (the annual or periodic cap, often 2.00%) and the highest rate allowed over the entire life of the loan (the lifetime cap).'
 		},
 		{
-			title: 'Draw to repayment is a second shock',
-			body: 'When the draw period ends, an interest-only line becomes a fully amortizing payment over a decade or two. The rate does not have to move at all for the payment to double, which is why the repayment phase is priced here rather than mentioned in a footnote.'
+			title: 'Draw-to-repayment is a second payment shock',
+			body: 'On a HELOC, your initial 10-year period is interest-only. When repayment begins, you must start paying back principal over 10 or 20 years. Your monthly bill can jump 30% to 60% even if interest rates do not move at all.'
 		},
 		{
-			title: 'Why a blocked step is printed',
-			body: 'A stress test that projects a 9% line to 11% when the contract caps it at 8% produces a scarier number and a wrong one. Steps past the lifetime ceiling are reported as blocked, with the ceiling named.'
+			title: 'Why a "blocked step" appears in your table',
+			body: 'If a projected rate jump exceeds your loan’s lifetime legal limit, the engine labels it as "beyond the ceiling" and caps your payment calculation there, rather than showing a misleading, illegally inflated number.'
 		}
 	]}
 	formula={[
-		'draw payment = balance × rate / 12',
-		'repayment payment = PMT(balance, rate, months remaining)',
-		'cushion ceiling = smallest Δrate where payment rise ≥ monthly cushion',
-		'extra cash = Δpayment × 12 (cash, not interest)'
+		'Interest-only payment = Loan Balance × (Interest Rate ÷ 12)',
+		'Principal + Interest payment = Standard monthly amortization over repayment term',
+		'Cushion ceiling = The rate increase (+% or basis points) that fully absorbs your monthly budget buffer',
+		'Extra cash needed = Monthly payment increase × 12 months'
 	]}
 	related={['recast-vs-refinance', 'insurance-coverage-gap', 'rent-vs-buy']}
-	disclosure="Nothing here forecasts rates. The engine runs a fixed ladder of increases — 25, 50, 100 and 200 basis points — against the caps you enter, so the output is a price list rather than a prediction."
+	disclosure="Nothing here forecasts where market rates will go. The engine tests a fixed ladder of rate increases (+0.25%, +0.50%, +1.00%, and +2.00%) against your contract's exact caps, so you know your payment worst-case before your next bank statement arrives."
 >
 	<div slot="calculator">
 		<FloatingRateCalculator client:load />

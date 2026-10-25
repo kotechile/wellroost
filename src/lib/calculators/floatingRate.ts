@@ -42,6 +42,7 @@ export interface RateStep {
 	blocked: boolean;
 	payment: number;
 	deltaPayment: number;
+	repaymentPayment: number;
 	extraCash12: number;
 	extraCash36: number;
 }
@@ -73,16 +74,16 @@ export function runFloatingRate(input: FloatingRateInputs): FloatingRateResult {
 	const balance = Math.max(0, input.balance);
 	const currentPayment = paymentAt(input, input.currentRate);
 	const interestOnlyPayment = (balance * input.currentRate) / 12;
-	const amortizingPayment =
-		input.product === 'heloc-draw'
-			? (balance * input.currentRate) / 12
-			: calculateMonthlyPayment(balance, input.currentRate, Math.max(1, input.amortizeMonths));
+	const amortizingPayment = calculateMonthlyPayment(balance, input.currentRate, Math.max(1, input.amortizeMonths));
 
 	const steps: RateStep[] = STEPS.map((bps) => {
 		const rate = input.currentRate + bps / 10000;
 		const blocked = rate > input.lifetimeCapRate;
 		const payment = blocked ? currentPayment : paymentAt(input, rate);
 		const deltaPayment = blocked ? 0 : payment - currentPayment;
+		const repaymentPayment = blocked
+			? calculateMonthlyPayment(balance, input.currentRate, Math.max(1, input.amortizeMonths))
+			: calculateMonthlyPayment(balance, rate, Math.max(1, input.amortizeMonths));
 		return {
 			bps,
 			rate,
@@ -90,6 +91,7 @@ export function runFloatingRate(input: FloatingRateInputs): FloatingRateResult {
 			blocked,
 			payment,
 			deltaPayment,
+			repaymentPayment,
 			extraCash12: deltaPayment * 12,
 			extraCash36: deltaPayment * 36
 		};

@@ -24,7 +24,7 @@
     },
     {
       "parameters": {
-        "url": "https://ixfdkninqeqmwuxncpvh.supabase.co/rest/v1/vibe_lead_intents?select=*&status=eq.pending_n8n_sync&order=created_at.asc&limit=20",
+        "url": "https://ixfdkninqeqmwuxncpvh.supabase.co/rest/v1/vibe_lead_intents?select=*&status=eq.pending_n8n_sync&send_attempts=lt.5&order=created_at.asc&limit=20",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -158,7 +158,8 @@
         90
       ],
       "id": "send-report-wellroost-",
-      "notes": "Attach the SMTP credential for reports@wellroost.com. From is a literal: this branch is already domain-specific."
+      "notes": "Attach the SMTP credential for reports@wellroost.com. From is a literal: this branch is already domain-specific.",
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -176,7 +177,8 @@
         310
       ],
       "id": "send-report-giniloh-",
-      "notes": "Attach the SMTP credential for reports@giniloh.com. From is a literal: this branch is already domain-specific."
+      "notes": "Attach the SMTP credential for reports@giniloh.com. From is a literal: this branch is already domain-specific.",
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -201,7 +203,28 @@
     },
     {
       "parameters": {
-        "url": "https://ixfdkninqeqmwuxncpvh.supabase.co/rest/v1/aichieve_lead_intents?select=*&status=eq.pending_n8n_sync&order=created_at.asc&limit=20",
+        "method": "PATCH",
+        "url": "={{ \"https://ixfdkninqeqmwuxncpvh.supabase.co/rest/v1/vibe_lead_intents?id=eq.\" + $(\"Resolve Domain (giniloh + wellroost)\").item.json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ send_attempts: ($(\"Resolve Domain (giniloh + wellroost)\").item.json.send_attempts || 0) + 1, last_attempt_at: $now.toISO(), status: (($(\"Resolve Domain (giniloh + wellroost)\").item.json.send_attempts || 0) + 1) >= 5 ? \"failed\" : \"pending_n8n_sync\" }) }}",
+        "options": {}
+      },
+      "name": "Record Attempt (giniloh + wellroost)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        480
+      ],
+      "id": "record-attempt-giniloh-wellroost-",
+      "notes": "Runs only when the send fails. Five failures retires the row as `failed`; below that it stays pending for the next tick."
+    },
+    {
+      "parameters": {
+        "url": "https://ixfdkninqeqmwuxncpvh.supabase.co/rest/v1/aichieve_lead_intents?select=*&status=eq.pending_n8n_sync&send_attempts=lt.5&order=created_at.asc&limit=20",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -269,7 +292,8 @@
         200
       ],
       "id": "send-report-aichieve-",
-      "notes": "Attach the SMTP credential for reports@aichieve.net. From is a literal: this branch is already domain-specific."
+      "notes": "Attach the SMTP credential for reports@aichieve.net. From is a literal: this branch is already domain-specific.",
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -291,6 +315,27 @@
       ],
       "id": "mark-sent-aichieve-",
       "notes": "Runs only after the email succeeds — a failed send leaves the lead pending for the next tick."
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ \"https://ixfdkninqeqmwuxncpvh.supabase.co/rest/v1/aichieve_lead_intents?id=eq.\" + $(\"Resolve Domain (aichieve)\").item.json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ send_attempts: ($(\"Resolve Domain (aichieve)\").item.json.send_attempts || 0) + 1, last_attempt_at: $now.toISO(), status: (($(\"Resolve Domain (aichieve)\").item.json.send_attempts || 0) + 1) >= 5 ? \"failed\" : \"pending_n8n_sync\" }) }}",
+        "options": {}
+      },
+      "name": "Record Attempt (aichieve)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2060,
+        480
+      ],
+      "id": "record-attempt-aichieve-",
+      "notes": "Runs only when the send fails. Five failures retires the row as `failed`; below that it stays pending for the next tick."
     }
   ],
   "connections": {
@@ -361,6 +406,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Record Attempt (giniloh + wellroost)",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -372,10 +424,28 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Record Attempt (giniloh + wellroost)",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "Mark Sent (giniloh + wellroost)": {
+      "main": [
+        [
+          {
+            "node": "One at a Time (giniloh + wellroost)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record Attempt (giniloh + wellroost)": {
       "main": [
         [
           {
@@ -428,10 +498,28 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Record Attempt (aichieve)",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "Mark Sent (aichieve)": {
+      "main": [
+        [
+          {
+            "node": "One at a Time (aichieve)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record Attempt (aichieve)": {
       "main": [
         [
           {
