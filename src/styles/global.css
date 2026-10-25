@@ -470,6 +470,126 @@ body:has([data-site-header]:not([data-hidden='true'])) .family-bar {
   }
 }
 
+/* ---------------------------------------------------- calculator fields */
+
+/*
+ * A field has to read as fillable before it is read.
+ *
+ * The first version ruled each field with a 25% ink line: 1.6:1 against the card, invisible on a
+ * laptop in daylight, so the only cue that a number was editable was the label above it. The rule is
+ * now 48% ink (3.2:1, the WCAG 1.4.11 bar for a component boundary), the label is full ink instead
+ * of ink-2, and the whole row tints on hover and focus so the target is obvious before the click.
+ * Still ruled, not boxed — the line remains a ledger line, but now it is a line you can see.
+ */
+.calc-field {
+  margin-inline: -0.5rem;
+  padding-inline: 0.5rem;
+  border-radius: 2px;
+  transition: background-color 150ms ease;
+}
+.calc-field:hover {
+  background: color-mix(in oklab, var(--color-ink) 4%, transparent);
+}
+.calc-field:focus-within {
+  background: color-mix(in oklab, var(--color-pine) 7%, transparent);
+}
+
+.calc-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+}
+.calc-field:focus-within .calc-label {
+  color: var(--color-pine-deep);
+}
+
+.calc-badge {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-pine);
+}
+
+.calc-hint {
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--color-ink-2);
+}
+
+.calc-input {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid color-mix(in oklab, var(--color-ink) 48%, transparent);
+  background: transparent;
+  padding: 0.15rem 0 0.4rem;
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink);
+  caret-color: var(--color-pine);
+  outline: none;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+.calc-input:hover {
+  border-bottom-color: color-mix(in oklab, var(--color-ink) 62%, transparent);
+}
+.calc-input:focus {
+  border-bottom-color: var(--color-pine);
+  box-shadow: 0 2px 0 0 var(--color-pine);
+}
+.calc-input::placeholder {
+  color: color-mix(in oklab, var(--color-ink-2) 50%, transparent);
+}
+select.calc-input {
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+.calc-unit {
+  font-size: 0.8125rem;
+  color: var(--color-ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Segmented choices: the unselected option needs a visible edge, the selected one needs weight. */
+.calc-choice {
+  height: 2.5rem;
+  padding-inline: 1rem;
+  font-size: 0.8125rem;
+  border: 1px solid color-mix(in oklab, var(--color-ink) 32%, transparent);
+  background: transparent;
+  color: var(--color-ink-2);
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+}
+.calc-choice:hover {
+  color: var(--color-ink);
+  border-color: color-mix(in oklab, var(--color-ink) 55%, transparent);
+}
+.calc-choice[aria-pressed='true'] {
+  background: var(--color-pine);
+  border-color: var(--color-pine);
+  color: var(--color-paper);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .calc-field,
+  .calc-input,
+  .calc-choice {
+    transition: none;
+  }
+}
+
 /* ---------------------------------------------------------------- images */
 
 .plate {

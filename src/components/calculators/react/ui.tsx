@@ -89,23 +89,25 @@ export function Field({
 	children: ReactNode;
 }) {
 	return (
-		<div className="py-4">
+		<div className="calc-field py-3.5">
 			<div className="flex items-baseline justify-between gap-3">
-				<label htmlFor={id} className="block text-[0.78rem] font-medium uppercase tracking-[0.13em] text-ink-2">
+				<label htmlFor={id} className="calc-label">
 					{label}
 				</label>
-				{badge ? (
-					<span className="font-mono text-[0.62rem] uppercase tracking-[0.16em] text-ink-2/70">{badge}</span>
-				) : null}
+				{badge ? <span className="calc-badge">{badge}</span> : null}
 			</div>
 			{children}
-			{hint ? <p className="mt-2 text-[0.75rem] leading-snug text-ink-2/85">{hint}</p> : null}
+			{hint ? <p className="calc-hint mt-2">{hint}</p> : null}
 		</div>
 	);
 }
 
-const INPUT_CLASS =
-	'w-full border-0 border-b border-ink/25 bg-transparent pb-1.5 font-display text-[1.3rem] leading-none tracking-[-0.01em] tabular-nums text-ink outline-none transition-colors placeholder:text-ink-2/40 focus:border-pine focus:border-b-2';
+/**
+ * One class for every input, defined in `global.css` as `.calc-input`: a 48% ink rule (3.2:1 against
+ * the card, so the boundary is visible), a 2px pine rule on focus, and a caret in the accent. The
+ * value is set larger than before so a field reads as a value to change, not a figure already computed.
+ */
+const INPUT_CLASS = 'calc-input';
 
 export function MoneyField({
 	id,
@@ -129,7 +131,7 @@ export function MoneyField({
 	return (
 		<Field id={id} label={label} hint={hint} badge={badge}>
 			<div className="mt-2 flex items-baseline gap-1">
-				<span aria-hidden="true" className="font-display text-[1.05rem] text-ink-2">
+				<span aria-hidden="true" className="font-display text-[1.15rem] text-ink">
 					$
 				</span>
 				<input
@@ -184,7 +186,7 @@ export function NumberField({
 					onChange={(event) => onChange(Number(event.target.value))}
 					className={INPUT_CLASS}
 				/>
-				{suffix ? <span className="text-[0.8rem] text-ink-2">{suffix}</span> : null}
+				{suffix ? <span className="calc-unit">{suffix}</span> : null}
 			</div>
 		</Field>
 	);
@@ -227,7 +229,7 @@ export function RateField({
 					onChange={(event) => onChange(Number(event.target.value) / 100)}
 					className={INPUT_CLASS}
 				/>
-				<span aria-hidden="true" className="text-[0.8rem] text-ink-2">
+				<span aria-hidden="true" className="calc-unit">
 					%
 				</span>
 			</div>
@@ -258,7 +260,7 @@ export function SelectField<T extends string>({
 				id={id}
 				value={value}
 				onChange={(event) => onChange(event.target.value as T)}
-				className="mt-2 w-full cursor-pointer appearance-none border-0 border-b border-ink/25 bg-transparent pb-1.5 font-display text-[1.15rem] leading-none text-ink outline-none transition-colors focus:border-pine focus:border-b-2"
+				className="calc-input mt-1.5 appearance-none"
 			>
 				{options.map((option) => (
 					<option key={option.value} value={option.value}>
@@ -283,8 +285,8 @@ export function Choice<T extends string>({
 	onChange: (value: T) => void;
 }) {
 	return (
-		<div className="py-4" role="group" aria-label={label}>
-			<p className="text-[0.78rem] font-medium uppercase tracking-[0.13em] text-ink-2">{label}</p>
+		<div className="calc-field py-3.5" role="group" aria-label={label}>
+			<p className="calc-label">{label}</p>
 			<div className="mt-2.5 flex flex-wrap gap-1.5">
 				{options.map((option) => {
 					const active = option.value === value;
@@ -294,9 +296,7 @@ export function Choice<T extends string>({
 							type="button"
 							onClick={() => onChange(option.value)}
 							aria-pressed={active}
-							className={`h-9 px-3.5 text-[0.8125rem] transition-colors duration-150 ${
-								active ? 'bg-pine text-paper' : 'bg-paper-2 text-ink-2 hover:bg-paper-3 hover:text-ink'
-							}`}
+							className="calc-choice"
 						>
 							{option.label}
 						</button>
