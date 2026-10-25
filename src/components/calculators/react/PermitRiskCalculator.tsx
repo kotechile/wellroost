@@ -2,11 +2,12 @@ import { useMemo, useState } from 'react';
 import { copyText } from '../../../lib/clipboard';
 import { formatCurrency } from '../../../lib/calculators/format';
 import { runPermitRisk, type PermitInputs } from '../../../lib/calculators/permitRisk';
-import { formatScenarioPacket } from '../../../lib/scenarioPacket';
+import { formatScenarioPacket, type ScenarioPacket } from '../../../lib/scenarioPacket';
+import { saveScenarioPacketAsPdf } from '../../../lib/scenarioPdf';
 import { usePersistedInputs } from '../../../lib/usePersistedInputs';
 import { useVibeTelemetry } from '../../../lib/useVibeTelemetry';
 import { vibeAssets } from '../../../lib/vibeAssets';
-import { Band, MoneyField, Note, NumberField, RateField, Rows, SectionRule } from './ui';
+import { Band, MoneyField, Note, NumberField, RateField, Rows, SectionRule, SavePdfButton } from './ui';
 
 interface FormState extends PermitInputs {}
 
@@ -35,6 +36,7 @@ export default function PermitRiskCalculator() {
 	});
 	const form = persisted.value;
 	const [copyState, setCopyState] = useState<'idle' | 'copied' | 'blocked'>('idle');
+	const [pdfState, setPdfState] = useState<'idle' | 'opened' | 'blocked'>('idle');
 	const { onInputChange, onComplete } = useVibeTelemetry(vibeAssets.permitRisk);
 
 	const set = <K extends keyof FormState>(key: K, value: FormState[K]) => {
@@ -45,8 +47,8 @@ export default function PermitRiskCalculator() {
 	const result = useMemo(() => runPermitRisk(form), [form]);
 	const winner = result.paths.find((path) => path.id === result.cheapest) ?? result.paths[0];
 
-	const copyPacket = async () => {
-		const packet = formatScenarioPacket({
+	const buildPacket = (): ScenarioPacket => {
+		const packet: ScenarioPacket = {
 			title: 'Unpermitted work',
 			sourcePath: '/calculators/unpermitted-work/',
 			verdict: `Cheapest path: ${winner.label.toLowerCase()} at ${formatCurrency(winner.total)}. The largest single exposure is ${formatCurrency(result.maxExposure)}.`,
@@ -66,11 +68,24 @@ export default function PermitRiskCalculator() {
 					rows: result.paths.map((path) => [path.label, `${formatCurrency(path.total)} over ${form.stayYears} years`])
 				}
 			]
-		});
-		const copied = await copyText(packet);
+		};
+		return packet;
+	};
+
+	const copyPacket = async () => {
+		const copied = await copyText(formatScenarioPacket(buildPacket()));
 		setCopyState(copied ? 'copied' : 'blocked');
 		onComplete({ action: 'copy_permit_packet', clipboard: copied });
 		window.setTimeout(() => setCopyState('idle'), 2400);
+	};
+
+	const savePdf = () => {
+		const opened = saveScenarioPacketAsPdf(buildPacket());
+		setPdfState(opened ? 'opened' : 'blocked');
+		// The strongest export signal on the page: `printed` records that the dialog
+		// opened, never that a file was written — the visitor finishes in the dialog.
+		onComplete({ action: 'save_pdf', printed: opened });
+		window.setTimeout(() => setPdfState('idle'), 2400);
 	};
 
 	return (
@@ -185,6 +200,7 @@ export default function PermitRiskCalculator() {
 				>
 					{copyState === 'copied' ? 'Copied' : copyState === 'blocked' ? 'Copy blocked' : 'Copy the comparison'}
 				</button>
+				<SavePdfButton onClick={savePdf} state={pdfState} />
 			</div>
 		</div>
 	);

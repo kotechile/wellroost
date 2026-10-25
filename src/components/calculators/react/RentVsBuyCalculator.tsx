@@ -3,11 +3,12 @@ import { copyText } from '../../../lib/clipboard';
 import { formatCurrency } from '../../../lib/calculators/format';
 import { MACRO_2026 } from '../../../lib/calculators/data/macro2026';
 import { runRentVsBuy, type RentVsBuyInputs } from '../../../lib/calculators/rentVsBuy';
-import { formatScenarioPacket } from '../../../lib/scenarioPacket';
+import { formatScenarioPacket, type ScenarioPacket } from '../../../lib/scenarioPacket';
+import { saveScenarioPacketAsPdf } from '../../../lib/scenarioPdf';
 import { usePersistedInputs } from '../../../lib/usePersistedInputs';
 import { useVibeTelemetry } from '../../../lib/useVibeTelemetry';
 import { vibeAssets } from '../../../lib/vibeAssets';
-import { Band, Choice, Columns, MoneyField, Note, NumberField, RateField, Rows, SectionRule } from './ui';
+import { Band, Choice, Columns, MoneyField, Note, NumberField, RateField, Rows, SectionRule, SavePdfButton } from './ui';
 
 interface FormState extends RentVsBuyInputs {}
 
@@ -85,6 +86,7 @@ export default function RentVsBuyCalculator() {
 	});
 	const form = persisted.value;
 	const [copyState, setCopyState] = useState<'idle' | 'copied' | 'blocked'>('idle');
+	const [pdfState, setPdfState] = useState<'idle' | 'opened' | 'blocked'>('idle');
 	const { onInputChange, onComplete } = useVibeTelemetry(vibeAssets.outflowParity);
 
 	const set = <K extends keyof FormState>(key: K, value: FormState[K]) => {
@@ -95,8 +97,8 @@ export default function RentVsBuyCalculator() {
 	const result = useMemo(() => runRentVsBuy(form), [form]);
 	const first = result.series[0];
 
-	const copyPacket = async () => {
-		const packet = formatScenarioPacket({
+	const buildPacket = (): ScenarioPacket => {
+		const packet: ScenarioPacket = {
 			title: 'Rent vs buy, outflow parity',
 			sourcePath: '/calculators/rent-vs-buy/',
 			verdict:
@@ -124,11 +126,24 @@ export default function RentVsBuyCalculator() {
 					])
 				}
 			]
-		});
-		const copied = await copyText(packet);
+		};
+		return packet;
+	};
+
+	const copyPacket = async () => {
+		const copied = await copyText(formatScenarioPacket(buildPacket()));
 		setCopyState(copied ? 'copied' : 'blocked');
 		onComplete({ action: 'copy_parity_packet', clipboard: copied });
 		window.setTimeout(() => setCopyState('idle'), 2400);
+	};
+
+	const savePdf = () => {
+		const opened = saveScenarioPacketAsPdf(buildPacket());
+		setPdfState(opened ? 'opened' : 'blocked');
+		// The strongest export signal on the page: `printed` records that the dialog
+		// opened, never that a file was written — the visitor finishes in the dialog.
+		onComplete({ action: 'save_pdf', printed: opened });
+		window.setTimeout(() => setPdfState('idle'), 2400);
 	};
 
 	return (
@@ -289,6 +304,7 @@ export default function RentVsBuyCalculator() {
 				>
 					{copyState === 'copied' ? 'Copied' : copyState === 'blocked' ? 'Copy blocked' : 'Copy the ledger'}
 				</button>
+				<SavePdfButton onClick={savePdf} state={pdfState} />
 			</div>
 		</div>
 	);

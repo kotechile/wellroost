@@ -464,3 +464,46 @@ export function SectionRule({ children }: { children: ReactNode }) {
 		</p>
 	);
 }
+
+/* ---------------------------------------------------------------- export */
+
+/**
+ * The PDF half of the export surface, shared so all engines spell it the same way.
+ *
+ * The label is the contract: `window.print()` tells us the dialog OPENED, never that a file was
+ * written. So the confirmation state says exactly that and lets the visitor finish in the dialog's
+ * own "Save as PDF" destination. Rendering "Saved" here would be the same class of lie as a
+ * hardcoded telemetry badge.
+ */
+export function SavePdfButton({
+	onClick,
+	state = 'idle',
+	disabled = false,
+	className = 'btn-ghost text-[0.875rem] underline decoration-ink/30 underline-offset-4 hover:decoration-ink disabled:opacity-40'
+}: {
+	onClick: () => void;
+	state?: 'idle' | 'opened' | 'blocked';
+	/** Mirrors the copy button: an engine that refuses to model a state must not print one. */
+	disabled?: boolean;
+	/** Engines that predate the shared kit keep their own button treatment. */
+	className?: string;
+}) {
+	const label =
+		state === 'opened'
+			? 'Print dialog open — choose Save as PDF'
+			: state === 'blocked'
+				? 'Print dialog unavailable — copy the scenario instead'
+				: 'Save as PDF';
+
+	return (
+		<button
+			type="button"
+			onClick={onClick}
+			disabled={disabled}
+			title="Opens your browser's print dialog with this scenario as a document"
+			className={className}
+		>
+			{label}
+		</button>
+	);
+}

@@ -4,11 +4,12 @@ import { formatCurrency } from '../../../lib/calculators/format';
 import { runDownPayment, type DownPaymentInputs } from '../../../lib/calculators/downPayment';
 import { MACRO_2026 } from '../../../lib/calculators/data/macro2026';
 import { DPA_PROGRAMS, coveredStates } from '../../../lib/calculators/data/dpaPrograms';
-import { formatScenarioPacket } from '../../../lib/scenarioPacket';
+import { formatScenarioPacket, type ScenarioPacket } from '../../../lib/scenarioPacket';
+import { saveScenarioPacketAsPdf } from '../../../lib/scenarioPdf';
 import { usePersistedInputs } from '../../../lib/usePersistedInputs';
 import { useVibeTelemetry } from '../../../lib/useVibeTelemetry';
 import { vibeAssets } from '../../../lib/vibeAssets';
-import { Band, Choice, MoneyField, Note, NumberField, RateField, Rows, SectionRule } from './ui';
+import { Band, Choice, MoneyField, Note, NumberField, RateField, Rows, SectionRule, SavePdfButton } from './ui';
 
 interface FormState {
 	price: number;
@@ -49,6 +50,7 @@ export default function DownPaymentCalculator() {
 	});
 	const form = persisted.value;
 	const [copyState, setCopyState] = useState<'idle' | 'copied' | 'blocked'>('idle');
+	const [pdfState, setPdfState] = useState<'idle' | 'opened' | 'blocked'>('idle');
 	const { onInputChange, onComplete } = useVibeTelemetry(vibeAssets.downPayment);
 
 	const set = <K extends keyof FormState>(key: K, value: FormState[K]) => {
@@ -73,8 +75,8 @@ export default function DownPaymentCalculator() {
 	const result = useMemo(() => runDownPayment(inputs), [inputs]);
 	const recommended = result.tiers.find((tier) => tier.downShare === result.recommended) ?? result.tiers[0];
 
-	const copyPacket = async () => {
-		const packet = formatScenarioPacket({
+	const buildPacket = (): ScenarioPacket => {
+		const packet: ScenarioPacket = {
 			title: 'Down payment and mortgage insurance',
 			sourcePath: '/calculators/down-payment/',
 			verdict: recommended
@@ -110,11 +112,24 @@ export default function DownPaymentCalculator() {
 					]
 				}
 			]
-		});
-		const copied = await copyText(packet);
+		};
+		return packet;
+	};
+
+	const copyPacket = async () => {
+		const copied = await copyText(formatScenarioPacket(buildPacket()));
 		setCopyState(copied ? 'copied' : 'blocked');
 		onComplete({ action: 'copy_down_payment_packet', clipboard: copied });
 		window.setTimeout(() => setCopyState('idle'), 2400);
+	};
+
+	const savePdf = () => {
+		const opened = saveScenarioPacketAsPdf(buildPacket());
+		setPdfState(opened ? 'opened' : 'blocked');
+		// The strongest export signal on the page: `printed` records that the dialog
+		// opened, never that a file was written — the visitor finishes in the dialog.
+		onComplete({ action: 'save_pdf', printed: opened });
+		window.setTimeout(() => setPdfState('idle'), 2400);
 	};
 
 	return (
@@ -284,6 +299,7 @@ export default function DownPaymentCalculator() {
 				>
 					{copyState === 'copied' ? 'Copied' : copyState === 'blocked' ? 'Copy blocked' : 'Copy the comparison'}
 				</button>
+				<SavePdfButton onClick={savePdf} state={pdfState} />
 			</div>
 		</div>
 	);

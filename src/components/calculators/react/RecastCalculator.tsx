@@ -3,7 +3,8 @@ import { copyText } from '../../../lib/clipboard';
 import { formatCurrency } from '../../../lib/calculators/format';
 import { runRecast, type LoanType, type RecastInputs } from '../../../lib/calculators/recast';
 import { MACRO_2026 } from '../../../lib/calculators/data/macro2026';
-import { formatScenarioPacket } from '../../../lib/scenarioPacket';
+import { formatScenarioPacket, type ScenarioPacket } from '../../../lib/scenarioPacket';
+import { saveScenarioPacketAsPdf } from '../../../lib/scenarioPdf';
 import { usePersistedInputs } from '../../../lib/usePersistedInputs';
 import { useVibeTelemetry } from '../../../lib/useVibeTelemetry';
 import { vibeAssets } from '../../../lib/vibeAssets';
@@ -15,7 +16,8 @@ import {
 	RateField,
 	Rows,
 	SectionRule,
-	SelectField
+	SelectField,
+	SavePdfButton
 } from './ui';
 
 const INITIAL: RecastInputs = {
@@ -48,6 +50,7 @@ export default function RecastCalculator() {
 	});
 	const inputs = persisted.value;
 	const [copyState, setCopyState] = useState<'idle' | 'copied' | 'blocked'>('idle');
+	const [pdfState, setPdfState] = useState<'idle' | 'opened' | 'blocked'>('idle');
 	const { onInputChange, onComplete } = useVibeTelemetry(vibeAssets.recastLedger);
 
 	const result = useMemo(() => runRecast(inputs), [inputs]);
@@ -73,8 +76,8 @@ export default function RecastCalculator() {
 		</>
 	);
 
-	const copyPacket = async () => {
-		const packet = formatScenarioPacket({
+	const buildPacket = (): ScenarioPacket => {
+		const packet: ScenarioPacket = {
 			title: 'Recast vs refinance',
 			sourcePath: '/calculators/recast-vs-refinance/',
 			verdict:
@@ -116,12 +119,24 @@ export default function RecastCalculator() {
 					]
 				}
 			]
-		});
+		};
+		return packet;
+	};
 
-		const copied = await copyText(packet);
+	const copyPacket = async () => {
+		const copied = await copyText(formatScenarioPacket(buildPacket()));
 		setCopyState(copied ? 'copied' : 'blocked');
 		onComplete({ action: 'copy_recast_packet', clipboard: copied });
 		window.setTimeout(() => setCopyState('idle'), 2400);
+	};
+
+	const savePdf = () => {
+		const opened = saveScenarioPacketAsPdf(buildPacket());
+		setPdfState(opened ? 'opened' : 'blocked');
+		// The strongest export signal on the page: `printed` records that the dialog
+		// opened, never that a file was written — the visitor finishes in the dialog.
+		onComplete({ action: 'save_pdf', printed: opened });
+		window.setTimeout(() => setPdfState('idle'), 2400);
 	};
 
 	return (
@@ -307,6 +322,7 @@ export default function RecastCalculator() {
 							? 'Copy blocked — select the text'
 							: 'Copy the scenario'}
 				</button>
+				<SavePdfButton onClick={savePdf} state={pdfState} />
 			</div>
 		</div>
 	);

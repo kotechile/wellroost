@@ -39,6 +39,26 @@ same drift a second hand-written list always produces. What the rows actually do
 - The CTA is a plain `<a href>` to the engine (middle-click, open in a new tab, visible URL).
 - Identity comes from `src/lib/vibeAssets.ts`; the row carries no slug literal of its own.
 
+### Two exports, one packet
+
+Every live engine offers **Copy the scenario** (plain text) and **Save as PDF** (a print document).
+Both render the same `ScenarioPacket` object built once by the engine's `buildPacket()`, through
+`src/lib/scenarioPacket.ts` (text) and `src/lib/scenarioPdf.ts` (print HTML) — so a saved PDF and a
+pasted packet can never disagree about the numbers.
+
+The PDF is the browser's own print dialog, whose "Save as PDF" destination is the save. No PDF
+dependency ships. The document is injected as `#wr-packet-print` and `html.wr-printing` hides every
+other body child while printing, so the result is a letterhead, the verdict, section tables and the
+provenance footer — not the calculator chrome, inputs or navigation.
+
+The label is the contract: `window.print()` proves the dialog *opened*, never that a file was
+written, so the confirmation reads "Print dialog open — choose Save as PDF". An engine that refuses
+to model a state (an unmodeled jurisdiction) disables both buttons with `disabled`.
+
+Both exports fire the same completion event, distinguished by `action`:
+`complete{trigger:'export', action:'copy_<engine>_packet'|'save_pdf'}`, plus `printed`/`clipboard`
+booleans recording which half actually happened.
+
 ---
 
 ## Phase 3: The 95/5 Workflow Execution Checklist

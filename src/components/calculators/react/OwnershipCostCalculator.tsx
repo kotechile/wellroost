@@ -5,11 +5,12 @@ import { HOUSEHOLD_COMPONENTS, midpointCost } from '../../../lib/calculators/dat
 import { JURISDICTIONS, DEFAULT_JURISDICTION, defaultEffectiveRate, jurisdictionById } from '../../../lib/calculators/data/jurisdictions';
 import { runOwnershipCost, type OwnershipCostInputs } from '../../../lib/calculators/ownershipCost';
 import { MACRO_2026 } from '../../../lib/calculators/data/macro2026';
-import { formatScenarioPacket } from '../../../lib/scenarioPacket';
+import { formatScenarioPacket, type ScenarioPacket } from '../../../lib/scenarioPacket';
+import { saveScenarioPacketAsPdf } from '../../../lib/scenarioPdf';
 import { usePersistedInputs } from '../../../lib/usePersistedInputs';
 import { useVibeTelemetry } from '../../../lib/useVibeTelemetry';
 import { vibeAssets } from '../../../lib/vibeAssets';
-import { Band, Choice, Columns, Meter, MoneyField, Note, NumberField, RateField, Rows, SectionRule, SelectField } from './ui';
+import { Band, Choice, Columns, Meter, MoneyField, Note, NumberField, RateField, Rows, SectionRule, SelectField, SavePdfButton } from './ui';
 
 interface FormState {
 	price: number;
@@ -46,6 +47,7 @@ export default function OwnershipCostCalculator() {
 	});
 	const form = persisted.value;
 	const [copyState, setCopyState] = useState<'idle' | 'copied' | 'blocked'>('idle');
+	const [pdfState, setPdfState] = useState<'idle' | 'opened' | 'blocked'>('idle');
 	const { onInputChange, onComplete } = useVibeTelemetry(vibeAssets.escrowTrueCost);
 
 	const set = <K extends keyof FormState>(key: K, value: FormState[K]) => {
@@ -87,9 +89,8 @@ export default function OwnershipCostCalculator() {
 	const result = useMemo(() => runOwnershipCost(inputs), [inputs]);
 	const jurisdiction = result.jurisdiction;
 
-	const copyPacket = async () => {
-		if (!result.modelable) return;
-		const packet = formatScenarioPacket({
+	const buildPacket = (): ScenarioPacket => {
+		const packet: ScenarioPacket = {
 			title: 'True cost of ownership',
 			sourcePath: '/calculators/true-cost-of-ownership/',
 			verdict: `${formatCurrency(result.monthly)} a month, of which ${formatCurrency(result.monthly - result.principalInterest)} is not debt service.`,
@@ -113,11 +114,31 @@ export default function OwnershipCostCalculator() {
 					rows: result.projection.map((year) => [`Year ${year.year}`, `${formatCurrency(year.monthly)} a month`])
 				}
 			]
-		});
-		const copied = await copyText(packet);
+		};
+		return packet;
+	};
+
+	/**
+	 * The copy action. The guard stays in the handler, not in buildPacket: an unmodelable
+	 * jurisdiction has no packet to build, and both exports must refuse rather than print a total
+	 * the engine says it cannot model.
+	 */
+	const copyPacket = async () => {
+		if (!result.modelable) return;
+		const copied = await copyText(formatScenarioPacket(buildPacket()));
 		setCopyState(copied ? 'copied' : 'blocked');
 		onComplete({ action: 'copy_ownership_packet', clipboard: copied });
 		window.setTimeout(() => setCopyState('idle'), 2400);
+	};
+
+	const savePdf = () => {
+		if (!result.modelable) return;
+		const opened = saveScenarioPacketAsPdf(buildPacket());
+		setPdfState(opened ? 'opened' : 'blocked');
+		// The strongest export signal on the page. `printed` records that the dialog opened,
+		// never that a file was written — the visitor finishes in the dialog.
+		onComplete({ action: 'save_pdf', printed: opened });
+		window.setTimeout(() => setPdfState('idle'), 2400);
 	};
 
 	const meterSegments = result.rows.map((row, index) => ({
@@ -292,6 +313,7 @@ export default function OwnershipCostCalculator() {
 				>
 					{copyState === 'copied' ? 'Copied' : copyState === 'blocked' ? 'Copy blocked' : 'Copy the outflow'}
 				</button>
+				<SavePdfButton onClick={savePdf} state={pdfState} disabled={!result.modelable} />
 			</div>
 		</div>
 	);

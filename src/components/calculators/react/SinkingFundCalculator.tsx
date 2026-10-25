@@ -3,11 +3,12 @@ import { copyText } from '../../../lib/clipboard';
 import { formatCurrency } from '../../../lib/calculators/format';
 import { HOUSEHOLD_COMPONENTS, midpointCost } from '../../../lib/calculators/data/components';
 import { defaultComponents, runSinkingFund } from '../../../lib/calculators/sinkingFund';
-import { formatScenarioPacket } from '../../../lib/scenarioPacket';
+import { formatScenarioPacket, type ScenarioPacket } from '../../../lib/scenarioPacket';
+import { saveScenarioPacketAsPdf } from '../../../lib/scenarioPdf';
 import { usePersistedInputs } from '../../../lib/usePersistedInputs';
 import { useVibeTelemetry } from '../../../lib/useVibeTelemetry';
 import { vibeAssets } from '../../../lib/vibeAssets';
-import { Band, Choice, Note, NumberField, Rows, SectionRule } from './ui';
+import { Band, Choice, Note, NumberField, Rows, SectionRule, SavePdfButton } from './ui';
 
 interface FormState {
 	horizonYears: number;
@@ -30,6 +31,7 @@ export default function SinkingFundCalculator() {
 	});
 	const form = persisted.value;
 	const [copyState, setCopyState] = useState<'idle' | 'copied' | 'blocked'>('idle');
+	const [pdfState, setPdfState] = useState<'idle' | 'opened' | 'blocked'>('idle');
 	const { onInputChange, onComplete } = useVibeTelemetry(vibeAssets.sinkingFund);
 
 	const setAge = (id: string, value: number) => {
@@ -56,8 +58,8 @@ export default function SinkingFundCalculator() {
 		[form]
 	);
 
-	const copyPacket = async () => {
-		const packet = formatScenarioPacket({
+	const buildPacket = (): ScenarioPacket => {
+		const packet: ScenarioPacket = {
 			title: 'Capital sinking fund',
 			sourcePath: '/calculators/capital-sinking-fund/',
 			verdict: `${formatCurrency(result.monthly)} a month funds ${formatCurrency(result.horizonTotal)} of expected replacements over ${form.horizonYears} years.`,
@@ -79,11 +81,24 @@ export default function SinkingFundCalculator() {
 					])
 				}
 			]
-		});
-		const copied = await copyText(packet);
+		};
+		return packet;
+	};
+
+	const copyPacket = async () => {
+		const copied = await copyText(formatScenarioPacket(buildPacket()));
 		setCopyState(copied ? 'copied' : 'blocked');
 		onComplete({ action: 'copy_sinking_fund_packet', clipboard: copied });
 		window.setTimeout(() => setCopyState('idle'), 2400);
+	};
+
+	const savePdf = () => {
+		const opened = saveScenarioPacketAsPdf(buildPacket());
+		setPdfState(opened ? 'opened' : 'blocked');
+		// The strongest export signal on the page: `printed` records that the dialog
+		// opened, never that a file was written — the visitor finishes in the dialog.
+		onComplete({ action: 'save_pdf', printed: opened });
+		window.setTimeout(() => setPdfState('idle'), 2400);
 	};
 
 	return (
@@ -232,6 +247,7 @@ export default function SinkingFundCalculator() {
 				>
 					{copyState === 'copied' ? 'Copied' : copyState === 'blocked' ? 'Copy blocked' : 'Copy the schedule'}
 				</button>
+				<SavePdfButton onClick={savePdf} state={pdfState} />
 			</div>
 		</div>
 	);

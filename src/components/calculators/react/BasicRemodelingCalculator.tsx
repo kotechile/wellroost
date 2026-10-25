@@ -2,7 +2,9 @@ import { useId, useState } from 'react';
 import { useVibeTelemetry } from '../../../lib/useVibeTelemetry';
 import { vibeAssets } from '../../../lib/vibeAssets';
 import { copyText } from '../../../lib/clipboard';
-import { formatScenarioPacket } from '../../../lib/scenarioPacket';
+import { formatScenarioPacket, type ScenarioPacket } from '../../../lib/scenarioPacket';
+import { saveScenarioPacketAsPdf } from '../../../lib/scenarioPdf';
+import { SavePdfButton } from './ui';
 
 import { calculateBasicRemodeling } from '../../../lib/calculators/basicRemodeling';
 import { formatCurrency, formatPercent } from '../../../lib/calculators/format';
@@ -118,6 +120,7 @@ export default function BasicRemodelingCalculator() {
 	const fieldId = useId();
 	const { onInputChange, onComplete } = useVibeTelemetry(vibeAssets.equityArv);
 	const [copyState, setCopyState] = useState<'idle' | 'copied' | 'blocked'>('idle');
+	const [pdfState, setPdfState] = useState<'idle' | 'opened' | 'blocked'>('idle');
 	const breakdown = calculateBasicRemodeling(inputs);
 	const selectedEnjoyment =
 		ENJOYMENT_OPTIONS.find((option) => option.value === inputs.enjoymentLevel) ?? ENJOYMENT_OPTIONS[2];
@@ -140,8 +143,8 @@ export default function BasicRemodelingCalculator() {
 	 * completion whether or not the browser permits the clipboard write, so the event fires either way
 	 * and records which happened in `clipboard`.
 	 */
-	const copyScenario = async () => {
-		const packet = formatScenarioPacket({
+	const buildPacket = (): ScenarioPacket => {
+		const packet: ScenarioPacket = {
 			title: vibeAssets.equityArv.title,
 			sourcePath: '/calculators/remodeling-roi/',
 			verdict: `${getRecommendationLabel(breakdown.recommendation)} — ${formatCurrency(breakdown.netValue)} of value during a ${inputs.yearsStaying}-year stay, on a ${formatCurrency(inputs.projectCost)} project.`,
@@ -169,12 +172,24 @@ export default function BasicRemodelingCalculator() {
 					]
 				}
 			]
-		});
+		};
+		return packet;
+	};
 
-		const copied = await copyText(packet);
+	const copyScenario = async () => {
+		const copied = await copyText(formatScenarioPacket(buildPacket()));
 		setCopyState(copied ? 'copied' : 'blocked');
 		onComplete({ action: 'copy_scenario', clipboard: copied });
 		window.setTimeout(() => setCopyState('idle'), 2400);
+	};
+
+	const savePdf = () => {
+		const opened = saveScenarioPacketAsPdf(buildPacket());
+		setPdfState(opened ? 'opened' : 'blocked');
+		// The strongest export signal on the page. `printed` records that the dialog opened,
+		// never that a file was written — the visitor finishes in the dialog.
+		onComplete({ action: 'save_pdf', printed: opened });
+		window.setTimeout(() => setPdfState('idle'), 2400);
 	};
 
 	return (
@@ -398,6 +413,11 @@ export default function BasicRemodelingCalculator() {
 						>
 							{copyState === 'copied' ? 'Copied' : copyState === 'blocked' ? 'Copy blocked' : 'Copy scenario'}
 						</button>
+						<SavePdfButton
+							onClick={savePdf}
+							state={pdfState}
+							className="rounded-full border border-blue-600 bg-white px-4 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 cursor-pointer"
+						/>
 					</div>
 					{copyState === 'blocked' && (
 						<p aria-live="polite" className="mt-3 text-xs leading-5 font-medium text-amber-800">

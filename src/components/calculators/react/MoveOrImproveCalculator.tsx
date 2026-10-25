@@ -2,7 +2,9 @@ import { useId, useState, useMemo } from 'react';
 import { useVibeTelemetry } from '../../../lib/useVibeTelemetry';
 import { vibeAssets } from '../../../lib/vibeAssets';
 import { copyText } from '../../../lib/clipboard';
-import { formatScenarioPacket } from '../../../lib/scenarioPacket';
+import { formatScenarioPacket, type ScenarioPacket } from '../../../lib/scenarioPacket';
+import { saveScenarioPacketAsPdf } from '../../../lib/scenarioPdf';
+import { SavePdfButton } from './ui';
 import { usePersistedInputs } from '../../../lib/usePersistedInputs';
 import PersistenceNotice from '../../../components/PersistenceNotice';
 import { runCapExMatrixCalculator, PROJECT_ROI_DATABASE } from '../../../lib/calculators/moveOrImprove';
@@ -72,6 +74,7 @@ export default function MoveOrImproveCalculator() {
   const fieldId = useId();
   const { onInputChange, onComplete } = useVibeTelemetry(vibeAssets.relocationFriction);
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'blocked'>('idle');
+  const [pdfState, setPdfState] = useState<'idle' | 'opened' | 'blocked'>('idle');
 
   // Run calculation engine
   const result = useMemo(() => {
@@ -145,8 +148,8 @@ export default function MoveOrImproveCalculator() {
    * has the five-year answer outside the page, which is the conversion this asset exists to produce.
    * The event fires whether or not the clipboard write is permitted, and records which happened.
    */
-  const copyScenario = async () => {
-    const packet = formatScenarioPacket({
+  const buildPacket = (): ScenarioPacket => {
+    const packet: ScenarioPacket = {
       title: vibeAssets.relocationFriction.title,
       sourcePath: '/calculators/move-or-improve/',
       verdict: improveIsBetter
@@ -195,12 +198,24 @@ export default function MoveOrImproveCalculator() {
           ]
         }
       ]
-    });
+    };
+    return packet;
+  };
 
-    const copied = await copyText(packet);
+  const copyScenario = async () => {
+    const copied = await copyText(formatScenarioPacket(buildPacket()));
     setCopyState(copied ? 'copied' : 'blocked');
     onComplete({ action: 'copy_scenario', clipboard: copied });
     window.setTimeout(() => setCopyState('idle'), 2400);
+  };
+
+  const savePdf = () => {
+    const opened = saveScenarioPacketAsPdf(buildPacket());
+    setPdfState(opened ? 'opened' : 'blocked');
+    // The strongest export signal on the page. `printed` records that the dialog opened,
+    // never that a file was written — the visitor finishes in the dialog.
+    onComplete({ action: 'save_pdf', printed: opened });
+    window.setTimeout(() => setPdfState('idle'), 2400);
   };
 
   return (

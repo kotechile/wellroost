@@ -3,11 +3,12 @@ import { copyText } from '../../../lib/clipboard';
 import { formatCurrency } from '../../../lib/calculators/format';
 import { ROOF_LIVES } from '../../../lib/calculators/data/components';
 import { runInsuranceGap, type InsuranceGapInputs } from '../../../lib/calculators/insuranceGap';
-import { formatScenarioPacket } from '../../../lib/scenarioPacket';
+import { formatScenarioPacket, type ScenarioPacket } from '../../../lib/scenarioPacket';
+import { saveScenarioPacketAsPdf } from '../../../lib/scenarioPdf';
 import { usePersistedInputs } from '../../../lib/usePersistedInputs';
 import { useVibeTelemetry } from '../../../lib/useVibeTelemetry';
 import { vibeAssets } from '../../../lib/vibeAssets';
-import { Band, Choice, MoneyField, Note, NumberField, Rows, SectionRule, SelectField } from './ui';
+import { Band, Choice, MoneyField, Note, NumberField, Rows, SectionRule, SelectField, SavePdfButton } from './ui';
 
 const INITIAL: InsuranceGapInputs = {
 	coverageA: 500000,
@@ -30,6 +31,7 @@ export default function InsuranceGapCalculator() {
 	});
 	const inputs = persisted.value;
 	const [copyState, setCopyState] = useState<'idle' | 'copied' | 'blocked'>('idle');
+	const [pdfState, setPdfState] = useState<'idle' | 'opened' | 'blocked'>('idle');
 	const { onInputChange, onComplete } = useVibeTelemetry(vibeAssets.coverageGap);
 
 	const result = useMemo(() => runInsuranceGap(inputs), [inputs]);
@@ -51,8 +53,8 @@ export default function InsuranceGapCalculator() {
 				)} of a ${formatCurrency(inputs.roofReplacementCost)} roof, and the second check is the only way back.`
 			: `Percentage deductibles put ${formatCurrency(result.maxPeril.dollars)} on the table before the carrier pays anything. That cash has to exist on the morning of the storm.`;
 
-	const copyPacket = async () => {
-		const packet = formatScenarioPacket({
+	const buildPacket = (): ScenarioPacket => {
+		const packet: ScenarioPacket = {
 			title: 'Insurance coverage gap',
 			sourcePath: '/calculators/insurance-coverage-gap/',
 			verdict: `${formatCurrency(result.liquidExposure)} of cash needed on the worst day, with ${formatCurrency(
@@ -81,11 +83,24 @@ export default function InsuranceGapCalculator() {
 					]
 				}
 			]
-		});
-		const copied = await copyText(packet);
+		};
+		return packet;
+	};
+
+	const copyPacket = async () => {
+		const copied = await copyText(formatScenarioPacket(buildPacket()));
 		setCopyState(copied ? 'copied' : 'blocked');
 		onComplete({ action: 'copy_coverage_gap_packet', clipboard: copied });
 		window.setTimeout(() => setCopyState('idle'), 2400);
+	};
+
+	const savePdf = () => {
+		const opened = saveScenarioPacketAsPdf(buildPacket());
+		setPdfState(opened ? 'opened' : 'blocked');
+		// The strongest export signal on the page: `printed` records that the dialog
+		// opened, never that a file was written — the visitor finishes in the dialog.
+		onComplete({ action: 'save_pdf', printed: opened });
+		window.setTimeout(() => setPdfState('idle'), 2400);
 	};
 
 	return (
@@ -256,6 +271,7 @@ export default function InsuranceGapCalculator() {
 							? 'Copy blocked — select the text'
 							: 'Copy the exposure'}
 				</button>
+				<SavePdfButton onClick={savePdf} state={pdfState} />
 			</div>
 		</div>
 	);
